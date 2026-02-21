@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Staff;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Gate::before(function($user, $ability) {
+            if(!($user instanceof Staff)) {
+                return null; // Không can thiệp vào các model khác
+            }
+            if(!str_contains($ability, ".")) return false;
+            [$function, $action] = explode(".", $ability, 2);
+            return $user->canAction($function, $action);
+        });
     }
 }
