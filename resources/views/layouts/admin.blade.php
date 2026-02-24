@@ -15,6 +15,7 @@
     href="https://fonts.googleapis.com/css2?family=Geologica:wght,CRSV@100..900,0&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Jacquarda+Bastarda+9&family=Luxurious+Roman&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
     rel="stylesheet">
   @vite(['resources/css/app.css', 'resources/js/app.js'])
+  @livewireStyles
 </head>
 
 <body class="text-slate-900 font-sans bg-slate-50 min-h-screen flex">
@@ -24,6 +25,16 @@
     @yield("content")
   </main>
 
+
+  <!-- Axios CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script>
+
+  </script>
+
+  @yield('scripts')
+  @livewireScripts
 </body>
 
 </html>

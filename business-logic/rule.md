@@ -34,8 +34,8 @@
 // Interface
 interface IRoomRepository
 {
-    public function add(RoomData $data): Room;
-    public function update(int $id, RoomData $data): Room;
+    public function add(Room $data): Room;
+    public function update(int $id, Room $data): Room;
     public function delete(int $id): bool;
     public function getById(int $id): ?Room;
 }
@@ -43,7 +43,7 @@ interface IRoomRepository
 // Implementation
 class RoomRepository implements IRoomRepository
 {
-    public function add(RoomData $data): Room
+    public function add(Room $data): Room
     {
         return Room::create([
             'room_number' => $data->roomNumber,
@@ -53,9 +53,9 @@ class RoomRepository implements IRoomRepository
         ]);
     }
 
-    public function update(int $id, RoomData $data): Room
+    public function update(Room $data): Room
     {
-        $room = $this->getById($id);
+
         $room->update([
             'room_number' => $data->roomNumber,
             'type_id' => $data->typeId,
@@ -65,9 +65,8 @@ class RoomRepository implements IRoomRepository
         return $room->fresh();
     }
 
-    public function delete(int $id): bool
+    public function delete(Room $room): bool
     {
-        $room = $this->getById($id);
         return $room->delete();
     }
 

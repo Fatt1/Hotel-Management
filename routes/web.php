@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Admin\AuthAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
-
+use App\Http\Controllers\Admin\RoleAdminController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -15,5 +15,8 @@ Route::prefix('admin')->middleware("guest:staff")->group(function () {
 });
 Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::get("/dashboard",[DashboardAdminController::class, "index"])->name('admin.dashboard');
+    Route::get("/roles",[RoleAdminController::class, "index"])->name('admin.roles.index');
+    Route::post("/roles",[RoleAdminController::class, "store"])->name('admin.roles.store');
+    Route::put("/roles/{id}",[RoleAdminController::class, "update"])->name('admin.roles.update');
     Route::post("/logout",[AuthAdminController::class, "logout"])->name('admin.logout');
 });
