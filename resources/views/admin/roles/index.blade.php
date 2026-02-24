@@ -1,8 +1,7 @@
 @extends("layouts.admin")
 @section('content')
 
-  </div>
-
+  <x-flash-alert></x-flash-alert>
   <div class="p-8 space-y-6">
 
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -60,7 +59,8 @@
                       class="edit-role-btn action-btn text-amber-500 hover:bg-amber-50" title="Chỉnh sửa">
                       <span class="material-symbols-outlined">edit</span>
                     </button>
-                    <button data-role-id="{{ $role->id }}" class="action-btn text-rose-500 hover:bg-rose-50" title="Xóa">
+                    <button onclick="Livewire.dispatch('open-delete-modal', { id: {{ $role->id }} })"
+                      class="action-btn text-rose-500 hover:bg-rose-50" title="Xóa">
                       <span class="material-symbols-outlined">delete</span>
                     </button>
                   </div>
@@ -70,7 +70,9 @@
 
           </tbody>
         </table>
+
         <livewire:roles.edit-role />
+        <livewire:roles.delete-role />
       </div>
       <div class="p-5 border-t border-slate-100 flex items-center justify-between">
         <span class="text-xs font-medium text-slate-500">Hiển thị {{ $roles->firstItem() }} trên {{ $roles->total() }} vai
