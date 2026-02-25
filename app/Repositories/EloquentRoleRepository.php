@@ -8,14 +8,13 @@ use App\Abstractions\Repositories\RoleRepository;
 use App\Data\RoleData;
 use App\Models\Role;
 use App\Models\RoleClaim;
+use App\Data\RoleClaimData;
 
 class EloquentRoleRepository implements RoleRepository
 {
-    public function add(Role $data): Role
+    public function add(RoleData $data): Role
     {
-        $role = Role::create([
-            'name' => $data->name,
-        ]);
+        $role = Role::create($data->toArray());
         return $role;
     }
 
@@ -37,9 +36,13 @@ class EloquentRoleRepository implements RoleRepository
 
     }
 
-    public function getById(int $id): ?Role
+    public function getById(int $id, bool $withClaims = false): ?Role
     {
-        return Role::find($id);
+        $query = Role::query();
+        if ($withClaims) {
+           $query = $query->with('claims');
+        }
+        return $query->find($id);
     }
 
     public function addRoleClaims(int $roleId, RoleClaim ...$claims): void
@@ -53,16 +56,18 @@ class EloquentRoleRepository implements RoleRepository
         }, $claims));
     }
 
-    public function updateRoleClaims(RoleClaim ...$claims): void
+    public function updateRoleClaims(RoleClaimData ...$claims): void
     {
-        foreach ($claims as $claim) {
-          $claim = RoleClaim::find($claim->id);
-          if($claim) {
-              $claim->update([
-                  'claim_type' => $claim->claim_type,
-                  'claim_value' => $claim->claim_value,
-              ]);
-          }
-        }
+        foreach ($claims as $claimData){
+            RoleClaim::updateOrInsert(
+                // Điều kiện để xác định bản ghi cần cập nhật (ở đây là dựa trên id) --- IGNORE ---
+                ['id'=> $claimData->id],
+                [
+                    'role_id' => $claimData->role_id,
+                    'claim_type' => $claimData->claim_type,
+                    'claim_value' => $claimData->claim_value,
+                ]
+            );
+        };
     }
 }

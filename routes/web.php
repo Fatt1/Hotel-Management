@@ -18,5 +18,6 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::get("/roles",[RoleAdminController::class, "index"])->name('admin.roles.index');
     Route::post("/roles",[RoleAdminController::class, "store"])->name('admin.roles.store');
     Route::put("/roles/{id}",[RoleAdminController::class, "update"])->name('admin.roles.update');
+    Route::get('/roles/{id}/permissions', [RoleAdminController::class, 'editPermission'])->name('admin.roles.edit-permission');
     Route::post("/logout",[AuthAdminController::class, "logout"])->name('admin.logout');
 });

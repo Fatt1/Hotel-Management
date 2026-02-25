@@ -1,34 +1,36 @@
 <?php
+
 namespace App\Enums;
 
 use App\Enums\ActionType;
 
-enum Module:string
-{
-  case DASHBOARD = 'dashboard';
-  case BOOKINGS= 'bookings';
-  case ROOMS = 'rooms';
-  case CUSTOMERS = 'customers';
-  case LAYOUTS = 'layouts';
-  case STAFFS = 'staffs';
-  case EQUIPMENTS = 'equipments';
-  case EQUIPMENT_CATEGORIES = 'equipment_categories';
-  case MAINTENANCE_TICKETS = 'maintenance_tickets';
-  case SERVICES = 'services';
-  case SERVICE_CATEGORIES = 'service_categories';
-  case AMENITIES = 'amenities';
-  case ROLE = "roles";
-  case SETTINGS = "settings";
-  case STATISTICS = "statistics";
-  
+use function Symfony\Component\String\s;
 
-  public function label(): string
+enum Module: string
+{
+    case DASHBOARD = 'dashboard';
+    case BOOKINGS = 'bookings';
+    case CUSTOMERS = 'customers';
+    case LAYOUTS = 'layouts';
+    case STAFFS = 'staffs';
+    case EDIT_LAYOUTS = 'edit_layouts';
+    case EQUIPMENTS = 'equipments';
+    case EQUIPMENT_CATEGORIES = 'equipment_categories';
+    case MAINTENANCE_TICKETS = 'maintenance_tickets';
+    case SERVICES = 'services';
+    case SERVICE_CATEGORIES = 'service_categories';
+    case AMENITIES = 'amenities';
+    case ROLE = "roles";
+    case SETTINGS = "settings";
+    case STATISTICS = "statistics";
+
+    public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::DASHBOARD => 'Tổng quan',
             self::LAYOUTS    => 'Sơ đồ phòng',
+            self::EDIT_LAYOUTS => 'Chỉnh sửa sơ đồ phòng',
             self::BOOKINGS  => 'Quản lý đặt lịch',
-            self::ROOMS => 'Quản lý phòng',
             self::SETTINGS  => 'Cấu hình chung',
             self::CUSTOMERS => "Quản lý khách hàng",
             self::STAFFS => "Quản lý nhân viên",
@@ -42,14 +44,15 @@ enum Module:string
             self::STATISTICS => "Thống kê",
         };
     }
-  
-  public function getAllowActions(): array
+
+
+    public function getAllowActions(): array
     {
-        return match($this) {
+        return match ($this) {
             self::DASHBOARD => [ActionType::VIEW],
             self::LAYOUTS    => [ActionType::VIEW, ActionType::EDIT],
             self::BOOKINGS  => [ActionType::VIEW, ActionType::CREATE, ActionType::EDIT, ActionType::DELETE],
-            self::ROOMS => [ActionType::VIEW, ActionType::CREATE, ActionType::EDIT, ActionType::DELETE],
+            self::EDIT_LAYOUTS => [ActionType::VIEW, ActionType::EDIT, ActionType::CREATE, ActionType::DELETE],
             self::SETTINGS  => [ActionType::VIEW, ActionType::EDIT],
             self::CUSTOMERS => [ActionType::VIEW, ActionType::CREATE, ActionType::EDIT, ActionType::DELETE],
             self::STAFFS => [ActionType::VIEW, ActionType::CREATE, ActionType::EDIT, ActionType::DELETE],
@@ -62,5 +65,52 @@ enum Module:string
             self::AMENITIES => [ActionType::VIEW, ActionType::CREATE, ActionType::EDIT, ActionType::DELETE],
             self::STATISTICS => [ActionType::VIEW],
         };
+    }
+
+    // 1. Mảng nhóm Vận hành
+    public static function groupOperate(): array
+    {
+        return [
+            self::LAYOUTS,
+            self::EDIT_LAYOUTS,
+            self::BOOKINGS,
+        ];
+    }
+
+    // 2. Mảng nhóm Dịch vụ & Thiết bị
+    public static function groupService(): array
+    {
+        return [
+            self::SERVICES,
+            self::SERVICE_CATEGORIES,
+            self::AMENITIES,
+
+        ];
+    }
+
+    public static function groupAsset(): array
+    {
+        return [
+            self::EQUIPMENTS,
+            self::EQUIPMENT_CATEGORIES,
+            self::MAINTENANCE_TICKETS,
+        ];
+    }
+    public static function groupCustomer()
+    {
+        return [
+            self::CUSTOMERS,
+        ];
+    }
+
+    // 3. Mảng nhóm Quản trị Hệ thống
+    public static function groupSystem(): array
+    {
+        return [
+            self::ROLE,
+            self::STAFFS,
+            self::SETTINGS,
+            self::STATISTICS,
+        ];
     }
 }

@@ -4,8 +4,7 @@ use Livewire\Component;
 use App\Actions\AddRoleAction;
 use App\Data\RoleData;
 new class extends Component {
-    // Các biến (props) nhận từ bên ngoài
-
+    // Các biến (props) nhận từ bên ngoài hoặc dùng để biding với form
     public $isOpen = false;
     public $name = '';
 
@@ -15,28 +14,25 @@ new class extends Component {
         $this->reset('name');         // Xóa chữ đang gõ dở
         $this->resetValidation();     // Quét sạch các lỗi Validation đỏ
     }
-    // 3. TẠO HÀM SAVE() ĐỂ CHẠY KHI BẤM SUBMIT
-    // Tiêm (Inject) AddRoleAction thẳng vào đây
+    protected $rules = [
+        'name' => 'required|string|max:255|unique:roles,name',
+    ];
+
+    protected $messages = [
+        'name.required' => 'Vui lòng nhập tên vai trò.',
+        'name.string' => 'Tên vai trò phải là chuỗi ký tự.',
+        'name.unique' => 'Tên vai trò đã tồn tại. Vui lòng chọn tên khác.'
+    ];
+
     public function save(AddRoleAction $createRoleAction)
     {
         // Bước 1: Validate
-        $this->validate([
-            'name' => 'required|string|max:255|unique:roles,name',
-        ], [
-            'name.required' => 'Vui lòng nhập tên vai trò.',
-            'name.string' => 'Tên vai trò phải là chuỗi ký tự.',
-            'name.unique' => 'Tên vai trò đã tồn tại. Vui lòng chọn tên khác.'
-        ]);
-
+        $this->validate();
 
         // Bước 2: Gọi Action để xử lý (Dùng biến $this->name đã được biding)
         $createRoleAction->handle(RoleData::from([
             'name' => $this->name,
         ]));
-
-        // Bước 3: Đóng Modal và xóa trắng input
-        $this->isOpen = false;
-        $this->reset('name');
 
         return redirect()->route('admin.roles.index')->with('success', 'Thêm vai trò thành công');
     }
@@ -60,7 +56,7 @@ new class extends Component {
                     <p class="text-sm text-slate-500 uppercase">Role</p>
                 </div>
 
-                <button @click="isOpen = false"
+                <button @click="isOpen = false; $wire.resetForm()"
                     class="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400 cursor-pointer">
                     <span class="material-symbols-outlined">close</span>
                 </button>

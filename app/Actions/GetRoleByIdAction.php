@@ -13,7 +13,7 @@ class GetRoleByIdAction
         private RoleRepository $roleRepository
     ) {
     }
-    public function handle(int $id)
+    public function handle(int $id, bool $withClaims = false): Role
     {
         $role = $this->roleRepository->getById($id);
         if (!$role) {

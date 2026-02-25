@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Actions\AddRoleAction;
 use App\Actions\GetAllRoleAction;
-use App\Actions\UpdateRoleAction;
+use App\Actions\GetRoleByIdAction;
 use App\Http\Controllers\Controller;
-use App\Data\RoleData;
+use App\ViewModels\RoleModelView;
 use Illuminate\Http\Request;
 
 class RoleAdminController extends Controller
@@ -22,5 +21,14 @@ class RoleAdminController extends Controller
             'roles' => $roles,
         ]);
     }
+
+    public function editPermission(int $id, GetRoleByIdAction $getRoleByIdAction)
+     {
+         $role = $getRoleByIdAction->handle($id);
+         $roleViewModel = new RoleModelView($role);
+         return view('admin.roles.edit-permission', [
+             'role' => $roleViewModel,
+         ]);
+     }
 
 }

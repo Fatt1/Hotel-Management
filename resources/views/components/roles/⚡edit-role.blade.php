@@ -11,6 +11,19 @@ new class extends Component {
     public $name = '';
     public $roleId = null;
 
+    protected function rules()
+    {
+        return [
+            // Bây giờ $this->roleId hoạt động hoàn hảo
+            'name' => 'required|string|max:255|unique:roles,name,' . $this->roleId,
+        ];
+    }
+
+    protected $messages = [
+        'name.required' => 'Vui lòng nhập tên vai trò.',
+        'name.string' => 'Tên vai trò phải là chuỗi ký tự.',
+        'name.unique' => 'Tên vai trò đã tồn tại. Vui lòng chọn tên khác.'
+    ];
 
     // THÊM HÀM DỌN DẸP
     public function resetForm()
@@ -18,6 +31,7 @@ new class extends Component {
         $this->reset(['name', 'roleId']);
         $this->resetValidation();
     }
+
     #[On('open-edit-modal')]
     public function loadRoleData($id, GetRoleByIdAction $getRoleByIdAction)
     {
@@ -30,19 +44,13 @@ new class extends Component {
 
     public function update(UpdateRoleAction $updateRoleAction)
     {
-        $this->validate([
-            'name' => 'required|string|max:255|unique:roles,name,' . $this->roleId,
-        ], [
-            'name.required' => 'Vui lòng nhập tên vai trò.',
-            'name.string' => 'Tên vai trò phải là chuỗi ký tự.',
-            'name.unique' => 'Tên vai trò đã tồn tại. Vui lòng chọn tên khác.'
-        ]);
-
-        $updateRoleAction->handle($this->roleId, RoleData::from([
-            'id' => $this->roleId,
-            'name' => $this->name,
-        ]));
-
+        $this->validate();
+        try {
+            $roleData = new RoleData(id: $this->roleId, name: $this->name);
+            $updateRoleAction->handle($this->roleId, $roleData);
+        } catch (\Exception $e) {
+            return session()->flash('error', $e->getMessage());
+        }
 
         return redirect()->route('admin.roles.index')->with('success', 'Cập nhật vai trò thành công');
     }
@@ -51,6 +59,7 @@ new class extends Component {
 
 <div x-data="{isOpen: @entangle('isOpen')}">
     <div x-show="isOpen" x-cloak>
+        <x-flash-alert></x-flash-alert>
         <x-modal>
             <div class="flex justify-between items-center pb-4 border-b border-slate-200">
                 <div class="flex flex-col">

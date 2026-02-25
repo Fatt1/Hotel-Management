@@ -51,10 +51,10 @@
                 </td>
                 <td class="table-cell text-right">
                   <div class="flex items-center justify-end gap-2">
-                    <button data-role-id="{{ $role->id }}" class="action-btn text-primary hover:bg-blue-50"
-                      title="Phân quyền">
+                    <a href="{{ route('admin.roles.edit-permission', ['id' => $role->id]) }}"
+                      class="action-btn text-primary hover:bg-blue-50" title="Phân quyền">
                       <span class="material-symbols-outlined">key</span>
-                    </button>
+                    </a>
                     <button onclick="Livewire.dispatch('open-edit-modal', {id: {{ $role->id }}})"
                       class="edit-role-btn action-btn text-amber-500 hover:bg-amber-50" title="Chỉnh sửa">
                       <span class="material-symbols-outlined">edit</span>

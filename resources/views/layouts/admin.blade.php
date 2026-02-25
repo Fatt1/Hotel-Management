@@ -29,8 +29,6 @@
   <!-- Axios CDN -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-  <script>
-  </script>
 
   @yield('scripts')
   @livewireScripts

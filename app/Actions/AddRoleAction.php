@@ -17,8 +17,7 @@ class AddRoleAction
 
     public function handle(RoleData $roleData) {
 
-        $newRole = new Role($roleData->toArray());
-        $role = $this->roleRepository->add($newRole);
+        $role = $this->roleRepository->add($roleData);
         return $role;
     }
 }

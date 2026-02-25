@@ -21,6 +21,9 @@ class UpdateRoleAction
         if (!$role) {
             throw new \Exception('Role not found');
         }
+        if($role->name === 'Admin') {
+            throw new \Exception('Không thể sửa vai trò Admin');
+        }
         return $this->roleRepository->update($id, $roleData);
     }
 }
