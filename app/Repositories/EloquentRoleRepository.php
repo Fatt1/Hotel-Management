@@ -33,14 +33,13 @@ class EloquentRoleRepository implements RoleRepository
             return $role->delete();
         }
         return false;
-
     }
 
     public function getById(int $id, bool $withClaims = false): ?Role
     {
         $query = Role::query();
         if ($withClaims) {
-           $query = $query->with('claims');
+            $query = $query->with('claims');
         }
         return $query->find($id);
     }
@@ -58,16 +57,21 @@ class EloquentRoleRepository implements RoleRepository
 
     public function updateRoleClaims(RoleClaimData ...$claims): void
     {
-        foreach ($claims as $claimData){
-            RoleClaim::updateOrInsert(
-                // Điều kiện để xác định bản ghi cần cập nhật (ở đây là dựa trên id) --- IGNORE ---
-                ['id'=> $claimData->id],
-                [
-                    'role_id' => $claimData->role_id,
-                    'claim_type' => $claimData->claim_type,
+        foreach ($claims as $claimData) {
+            $roleClaim = RoleClaim::where('claim_name', $claimData->claim_name)
+                ->where('role_id', $claimData->role_id)
+                ->first();
+            if ($roleClaim) {
+                $roleClaim->update([
                     'claim_value' => $claimData->claim_value,
-                ]
-            );
-        };
+                ]);
+            } else {
+                RoleClaim::create([
+                    'role_id' => $claimData->role_id,
+                    'claim_name' => $claimData->claim_name,
+                    'claim_value' => $claimData->claim_value,
+                ]);
+            };
+        }
     }
 }

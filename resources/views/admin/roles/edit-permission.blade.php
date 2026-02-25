@@ -42,7 +42,7 @@
                 @endforeach
               </tr>
             </thead>
-            <tbody class="bg-card-light divide-y divide-border-light">
+            <tbody class="bg-card-light divide-y divide-border-light" id="permission-table-body">
               @php
                 $moduleGroups = [
                     'Vận hành' => App\Enums\Module::groupOperate(),
@@ -61,7 +61,7 @@
                 </tr>
 
                 @foreach ($modules as $module)
-                  <tr>
+                  <tr id="{{ $module->value }}" class="module-row">
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">
                       {{ $module->label() }}
                     </td>
@@ -97,13 +97,15 @@
         class="px-5 py-2 rounded-lg bg-white text-text-muted-light border border-gray-300 hover:bg-gray-50 text-sm font-medium transition shadow-sm">
         Hủy
       </a>
-      <button id="saveBtn" type="button"
+      <button data-role-id="{{ $role->getRole()->id }}" id="saveBtn" type="button"
         class="px-5 py-2 rounded-lg bg-primary text-white hover:bg-blue-900 text-sm font-medium transition shadow-sm flex items-center">
         <span class="material-symbols-outlined text-sm mr-2">save</span>
         Lưu vai trò
       </button>
     </div>
   </div>
-
-  
 @endsection
+@push('scripts')
+  @vite(['resources/js/admin/role-permission.js'])
+@endpush
+

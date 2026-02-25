@@ -27,44 +27,14 @@ class RoleModelView
     return $this->role->claims;
   }
 
-  public function getOperationModules(): array
-  {
-    return Module::groupOperate();
-  }
-
-  public function getServiceModules(): array
-  {
-    return Module::groupService();
-  }
-
-  public function getSystemModules(): array
-  {
-    return Module::groupSystem();
-  }
-
-  public function getAssetModules(): array
-  {
-    return Module::groupAsset();
-  }
-
-  public function getCustomerModules(): array
-  {
-    return Module::groupCustomer();
-  }
-
-
-
   public function hasClaim(string $module, string $action): bool
   {
     $value =  ActionType::fromName($action);
-    if ($module === 'bookings') {
-    }
     $matchedClaim = $this->role->claims->where('claim_name', $module)->first();
     if (!$matchedClaim) {
       return false;
     }
     $claimValueDb = (int) $matchedClaim->claim_value;
-    logger()->info("Checking claim for module: $module, action: $action, claimValueDb: $claimValueDb, requiredValue: $value");
     $hasPermission = ($claimValueDb & $value) !== 0;
     return $hasPermission;
   }

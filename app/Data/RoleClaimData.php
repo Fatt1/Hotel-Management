@@ -9,9 +9,8 @@ use Spatie\LaravelData\Data;
 class RoleClaimData extends Data
 {
     public function __construct(
-        public ?int $id = null,
         public int $role_id,
-        public string $claim_type,
+        public string $claim_name,
         public string $claim_value,
     ) {
     }
