@@ -57,11 +57,15 @@ class RoleModelView
   public function hasClaim(string $module, string $action): bool
   {
     $value =  ActionType::fromName($action);
-
-    $claimToFind = $module;
-
-    return $this->role->claims->contains(function ($claim) use ($claimToFind, $value) {
-      return $claim->claim_type === $claimToFind && ($claim->claim_value & $value) !== 0;
-    });
+    if ($module === 'bookings') {
+    }
+    $matchedClaim = $this->role->claims->where('claim_name', $module)->first();
+    if (!$matchedClaim) {
+      return false;
+    }
+    $claimValueDb = (int) $matchedClaim->claim_value;
+    logger()->info("Checking claim for module: $module, action: $action, claimValueDb: $claimValueDb, requiredValue: $value");
+    $hasPermission = ($claimValueDb & $value) !== 0;
+    return $hasPermission;
   }
 }

@@ -21,7 +21,7 @@
         <div class="flex justify-between items-center mb-4">
           <h4 class="text-xs font-bold text-text-muted-light uppercase tracking-wider">Danh sách
             phân quyền</h4>
-          <button
+          <button id="selectAllBtn" type="button"
             class="text-xs font-medium text-primary bg-blue-50 px-3 py-1.5 rounded hover:bg-blue-100 transition">CHỌN
             TẤT CẢ</button>
         </div>
@@ -31,228 +31,79 @@
               <tr>
                 <th class="px-6 py-3 text-left text-xs font-bold text-text-muted-light uppercase tracking-wider w-1/3"
                   scope="col">Chức năng</th>
-                <th class="px-6 py-3 text-center text-xs font-bold text-text-muted-light uppercase tracking-wider"
-                  scope="col">Xem</th>
-                <th class="px-6 py-3 text-center text-xs font-bold text-text-muted-light uppercase tracking-wider"
-                  scope="col">Thêm</th>
-                <th class="px-6 py-3 text-center text-xs font-bold text-text-muted-light uppercase tracking-wider"
-                  scope="col">Sửa</th>
-                <th class="px-6 py-3 text-center text-xs font-bold text-text-muted-light uppercase tracking-wider"
-                  scope="col">Xóa</th>
+                @foreach ([
+                    App\Enums\ActionType::VIEW,
+                    App\Enums\ActionType::CREATE,
+                    App\Enums\ActionType::EDIT,
+                    App\Enums\ActionType::DELETE,
+                ] as $actionType)
+                  <th class="px-6 py-3 text-center text-xs font-bold text-text-muted-light uppercase tracking-wider"
+                    scope="col">{{ $actionType->label() }}</th>
+                @endforeach
               </tr>
             </thead>
             <tbody class="bg-card-light divide-y divide-border-light">
-              <tr class="bg-blue-50/50">
-                <td class="px-6 py-2 text-xs font-bold text-primary uppercase tracking-wide" colspan="5">
-                  Vận hành</td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">Sơ đồ
-                  phòng
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input {{ $role->hasClaim('layouts','view') ? 'checked' : '' }}
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
+              @php
+                $moduleGroups = [
+                    'Vận hành' => App\Enums\Module::groupOperate(),
+                    'Quản lý tài sản' => App\Enums\Module::groupAsset(),
+                    'Khách hàng' => App\Enums\Module::groupCustomer(),
+                    'Dịch vụ & Tiện ích' => App\Enums\Module::groupService(),
+                    'Hệ thống' => App\Enums\Module::groupSystem(),
+                ];
+              @endphp
 
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">Chỉnh sửa
-                  sơ
-                  đồ phòng</td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input {{ $role->hasClaim('edit-layouts','view') ? 'checked' : '' }}
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input {{ $role->hasClaim('edit-layouts','create') ? 'checked' : '' }}
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input {{ $role->hasClaim('edit-layouts','eidt') ? 'checked' : '' }}
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input {{ $role->hasClaim('edit-layouts','delete') ? 'checked' : '' }}
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">Quản lý
-                  đặt
-                  lịch</td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input {{ $role->hasClaim('bookings','view') ? 'checked' : '' }}
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input {{ $role->hasClaim('layouts','view') ? 'checked' : '' }}
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input {{ $role->hasClaim('layouts','view') ? 'checked' : '' }}
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-              </tr>
-              <tr class="bg-blue-50/50">
-                <td class="px-6 py-2 text-xs font-bold text-primary uppercase tracking-wide" colspan="5">
-                  Quản lý phòng</td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">Quản lý
-                  phòng</td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input {{ $role->hasClaim('layouts','view') ? 'checked' : '' }}
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">Quản lý
-                  loại
-                  phòng</td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input checked=""
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-              </tr>
-              <tr class="bg-blue-50/50">
-                <td class="px-6 py-2 text-xs font-bold text-primary uppercase tracking-wide" colspan="5">
-                  Quản lý tài sản</td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">Trang
-                  thiết
-                  bị</td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input checked=""
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">Phiếu sửa
-                  chữa</td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input checked=""
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input checked=""
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-              </tr>
-              <tr class="bg-blue-50/50">
-                <td class="px-6 py-2 text-xs font-bold text-primary uppercase tracking-wide" colspan="5">
-                  Khách hàng</td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">Quản lý
-                  khách hàng</td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input checked=""
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input checked=""
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-              </tr>
-              <tr class="bg-blue-50/50">
-                <td class="px-6 py-2 text-xs font-bold text-primary uppercase tracking-wide" colspan="5">
-                  Dịch vụ &amp; Tiện ích</td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">Quản lý
-                  dịch
-                  vụ</td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input checked=""
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">Loại dịch
-                  vụ
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input checked=""
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-              </tr>
-              <tr class="bg-blue-50/50">
-                <td class="px-6 py-2 text-xs font-bold text-primary uppercase tracking-wide" colspan="5">
-                  Hệ thống</td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">Quản lý
-                  nhân
-                  viên</td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">Quản lý
-                  vai
-                  trò</td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">Cấu hình
-                  chung</td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">Thống kê
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                <td class="px-6 py-4 whitespace-nowrap text-center"><input
-                    class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-              </tr>
+              @foreach ($moduleGroups as $groupLabel => $modules)
+                <tr class="bg-blue-50/50">
+                  <td class="px-6 py-2 text-xs font-bold text-primary uppercase tracking-wide" colspan="5">
+                    {{ $groupLabel }}
+                  </td>
+                </tr>
+
+                @foreach ($modules as $module)
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-light">
+                      {{ $module->label() }}
+                    </td>
+                    @foreach ([
+                        App\Enums\ActionType::VIEW,
+                        App\Enums\ActionType::CREATE,
+                        App\Enums\ActionType::EDIT,
+                        App\Enums\ActionType::DELETE,
+                    ] as $actionType)
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        @if (in_array($actionType, $module->getAllowActions()))
+                          @php
+                            $isChecked = $role->hasClaim($module->value, strtolower($actionType->name));
+                          @endphp
+                          <input type="checkbox" name="permissions[{{ $module->value }}][]"
+                            value="{{ $actionType->value }}" {{ $isChecked ? 'checked' : '' }}
+                            class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" />
+                        @else
+                          <span class="text-gray-300">—</span>
+                        @endif
+                      </td>
+                    @endforeach
+                  </tr>
+                @endforeach
+              @endforeach
             </tbody>
           </table>
         </div>
       </div>
     </div>
     <div class="px-6 py-4 bg-gray-50 rounded-b-xl border-t border-border-light flex justify-end space-x-3">
-      <button
+      <a href="{{ route('admin.roles.index') }}"
         class="px-5 py-2 rounded-lg bg-white text-text-muted-light border border-gray-300 hover:bg-gray-50 text-sm font-medium transition shadow-sm">
         Hủy
-      </button>
-      <button
+      </a>
+      <button id="saveBtn" type="button"
         class="px-5 py-2 rounded-lg bg-primary text-white hover:bg-blue-900 text-sm font-medium transition shadow-sm flex items-center">
         <span class="material-symbols-outlined text-sm mr-2">save</span>
         Lưu vai trò
       </button>
     </div>
   </div>
+
+  
 @endsection
