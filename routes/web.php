@@ -16,8 +16,10 @@ Route::prefix('admin')->middleware("guest:staff")->group(function () {
 Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::get("/dashboard", [DashboardAdminController::class, "index"])->name('admin.dashboard');
     Route::get("/roles", [RoleAdminController::class, "index"])->name('admin.roles.index');
+    Route::get("/roles/{id}", [RoleAdminController::class, "show"])->name('admin.roles.show');
     Route::post("/roles", [RoleAdminController::class, "store"])->name('admin.roles.store');
     Route::put("/roles/{id}", [RoleAdminController::class, "update"])->name('admin.roles.update');
+    Route::delete("/roles/{id}", [RoleAdminController::class, "destroy"])->name('admin.roles.destroy');
     Route::get('/roles/{id}/permissions', [RoleAdminController::class, 'editPermission'])->name('admin.roles.edit-permission');
     Route::post('/roles/{id}/permissions', [RoleAdminController::class, 'updatePermission'])->name('admin.roles.update-permissions');
     Route::post("/logout", [AuthAdminController::class, "logout"])->name('admin.logout');

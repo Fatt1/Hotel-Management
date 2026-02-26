@@ -1,4 +1,5 @@
 import axios from "axios";
+import Swal from "sweetalert2";
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('selectAllBtn').addEventListener('click', handleClickSelectAll);
     document.getElementById('saveBtn').addEventListener('click', function(event) {
@@ -40,11 +41,22 @@ function handleClickSave(event, roleId) {
         claims: claims
     })
     .then(response => {
-        alert("Cập nhật quyền thành công!");
-        window.location.href = `/admin/roles/`;
+        Swal.fire({
+            icon: "success",
+            title: "Thành công",
+            text: "Cập nhật quyền cho vai trò thành công!",
+        })
+        .then(result => {
+            window.location.href = `/admin/roles/`;
+        })
+       
     })
     .catch(error => {
         console.error('Error updating permissions:', error);
-        alert(error.response.data.message);
+        Swal.fire({
+            icon: "error",
+            title: "Lỗi",
+            text: error.response.data.message,
+        });
     });
 }

@@ -15,7 +15,6 @@
     href="https://fonts.googleapis.com/css2?family=Geologica:wght,CRSV@100..900,0&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Jacquarda+Bastarda+9&family=Luxurious+Roman&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
     rel="stylesheet">
   @vite(['resources/css/app.css', 'resources/js/app.js'])
-  @livewireStyles
 </head>
 
 <body class="text-slate-900 font-sans bg-slate-50 min-h-screen flex">
@@ -24,13 +23,23 @@
     @include("layouts.admin.header")
     @yield("content")
   </main>
-
+  <div id="global-modal" wire:ignore class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog"
+  aria-modal="true">
+  <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+    <!-- Backdrop -->
+    <div class="fixed inset-0 transition-opacity bg-black opacity-60 backdrop-blur-md" aria-hidden="true">
+    </div>
+    <!-- Modal Content -->
+    <div
+      class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-2xl shadow-2xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <div id="global-modal-content" class="p-5">
+      </div>
+    </div>
+  </div>
+</div>
 
   <!-- Axios CDN -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
- 
-  @livewireScripts
   @stack('scripts')
 </body>
 

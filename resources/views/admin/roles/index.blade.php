@@ -1,7 +1,6 @@
 @extends("layouts.admin")
 @section('content')
 
-  <x-flash-alert></x-flash-alert>
   <div class="p-8 space-y-6">
 
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -10,9 +9,11 @@
         <p class="text-slate-500 font-medium">Hệ thống quản trị khách sạn Urban Luxe - Quản lý phân
           quyền và vai trò người dùng (Roles).</p>
       </div>
-
-      <livewire:roles.create-role />
-
+      <button id="addRoleBtn"
+        class="cursor-pointer flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl text-sm font-bold shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all hover:-translate-y-0.5">
+        <span class="material-symbols-outlined">add_circle</span>
+        Thêm vai trò mới
+    </button>
     </div>
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
       <div class="p-5 border-b border-slate-100 flex flex-col xl:flex-row gap-4 justify-between items-center">
@@ -55,12 +56,12 @@
                       class="action-btn text-primary hover:bg-blue-50" title="Phân quyền">
                       <span class="material-symbols-outlined">key</span>
                     </a>
-                    <button onclick="Livewire.dispatch('open-edit-modal', {id: {{ $role->id }}})"
+                    <button data-role-id="{{ $role->id }}"
                       class="edit-role-btn action-btn text-amber-500 hover:bg-amber-50" title="Chỉnh sửa">
                       <span class="material-symbols-outlined">edit</span>
                     </button>
-                    <button onclick="Livewire.dispatch('open-delete-modal', { id: {{ $role->id }} })"
-                      class="action-btn text-rose-500 hover:bg-rose-50" title="Xóa">
+                    <button data-role-id="{{ $role->id }}" 
+                      class="action-btn text-rose-500 hover:bg-rose-50 btn-delete" title="Xóa">
                       <span class="material-symbols-outlined">delete</span>
                     </button>
                   </div>
@@ -71,8 +72,6 @@
           </tbody>
         </table>
 
-        <livewire:roles.edit-role />
-        <livewire:roles.delete-role />
       </div>
       <div class="p-5 border-t border-slate-100 flex items-center justify-between">
         <span class="text-xs font-medium text-slate-500">Hiển thị {{ $roles->firstItem() }} trên {{ $roles->total() }} vai
@@ -114,5 +113,8 @@
         </div>
       </div>
     </div>
-  </div>
+  </div>  
 @endsection
+@push('scripts')
+  @vite(['resources/js/admin/roles/index.js'])
+@endpush

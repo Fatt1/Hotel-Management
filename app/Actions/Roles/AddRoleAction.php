@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Actions;
+namespace App\Actions\Roles;
 
-use App\Models\Role;
 use App\Abstractions\Repositories\RoleRepository;
 use App\Data\RoleData;
 
