@@ -55,6 +55,15 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                         @foreach ($bookings as $booking)
+                            @php
+                                $status_classes = [
+                                    'Chờ xác nhận' => 'badge-pending-booking',
+                                    'Đang ở' => 'badge-confirmed-booking',
+                                    'Hoàn tất' => 'badge-completed-booking',
+                                    'Hủy' => 'badge-cancelled-booking',
+                                    'Không đến' => 'badge-no-show-booking',
+                                ];
+                            @endphp
                              <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group">
                             <td class="table-cell">
                                 <span class="font-mono font-bold text-primary tracking-wider">#UL-{{ $booking->id }}</span>
@@ -72,7 +81,7 @@
                            
                             <td class="table-cell text-right font-black text-slate-800 dark:text-slate-200">{{ number_format($booking->final_amount, 0, ',', '.') }} đ</td>
                             <td class="table-cell text-center">
-                                <span class="badge-cancelled">{{ $booking->status }}</span>
+                                <span class="{{ $status_classes[$booking->status] ?? 'badge-default' }}">{{ $booking->status }}</span>
                             </td>
                             <td class="table-cell text-right">
                                 <div
@@ -98,7 +107,7 @@
                 <div class="flex items-center gap-1">
                     @if($bookings->currentPage() > 1) 
                     <a href="{{ route('admin.bookings.index', ['page_number' => $bookings->currentPage() - 1]) }}"
-                        class="p-2 rounded-lgborder border-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
                         disabled="">
                         <span class="material-symbols-outlined !text-lg">chevron_left</span>
                     </a>
