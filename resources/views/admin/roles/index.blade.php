@@ -9,11 +9,14 @@
         <p class="text-slate-500 font-medium">Hệ thống quản trị khách sạn Urban Luxe - Quản lý phân
           quyền và vai trò người dùng (Roles).</p>
       </div>
-      <button id="addRoleBtn"
+      @can('roles.create')
+        <button id="addRoleBtn"
         class="cursor-pointer flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl text-sm font-bold shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all hover:-translate-y-0.5">
         <span class="material-symbols-outlined">add_circle</span>
         Thêm vai trò mới
     </button>
+      @endcan
+      
     </div>
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
       <div class="p-5 border-b border-slate-100 flex flex-col xl:flex-row gap-4 justify-between items-center">
@@ -52,18 +55,26 @@
                 </td>
                 <td class="table-cell text-right">
                   <div class="flex items-center justify-end gap-2">
-                    <a href="{{ route('admin.roles.edit-permission', ['id' => $role->id]) }}"
+                    @can('roles.edit')
+                     <a href="{{ route('admin.roles.edit-permission', ['id' => $role->id]) }}"
                       class="action-btn text-primary hover:bg-blue-50" title="Phân quyền">
                       <span class="material-symbols-outlined">key</span>
                     </a>
-                    <button data-role-id="{{ $role->id }}"
+                    @endcan
+                   
+                    @can('roles.edit')
+                     <button data-role-id="{{ $role->id }}"
                       class="edit-role-btn action-btn text-amber-500 hover:bg-amber-50" title="Chỉnh sửa">
                       <span class="material-symbols-outlined">edit</span>
                     </button>
-                    <button data-role-id="{{ $role->id }}" 
+                    @endcan
+                    @can('roles.delete')
+                     <button data-role-id="{{ $role->id }}" 
                       class="action-btn text-rose-500 hover:bg-rose-50 btn-delete" title="Xóa">
                       <span class="material-symbols-outlined">delete</span>
                     </button>
+                    @endcan
+                   
                   </div>
                 </td>
               </tr>
@@ -87,7 +98,7 @@
               <span class="material-symbols-outlined !text-lg">chevron_left</span>
             </span>
           @endif
-
+         {{-- Tạo phân trang --}}
           @for ($i = 1; $i <= $roles->lastPage(); $i++)
             @if ($i == $roles->currentPage())
               <a href="{{ route('admin.roles.index', ['page_number' => $i]) }}" class="pagination-link text-white bg-primary">

@@ -48,6 +48,7 @@ function getFormModalHtml(role = null) {
 document.addEventListener("DOMContentLoaded", function () {
     // add btn
     const addRoleBtn = document.getElementById("addRoleBtn");
+    if(addRoleBtn)
     addRoleBtn.addEventListener("click", (e) => {
         openRoleModal();
     });

@@ -3,7 +3,7 @@
   <div class="flex items-center gap-6">
     <div class="hidden xl:flex flex-col items-end">
       <span class="text-xs font-bold text-slate-400 uppercase tracking-tighter">Ngày làm việc</span>
-      <span class="text-sm font-bold">24 Tháng 05, 2024</span>
+      <span class="text-sm font-bold">{{ now()->isoFormat('DD [Tháng] MM, YYYY') }}</span>
     </div>
     <div class="flex gap-2">
       <button class="p-2.5 text-slate-500 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors relative">
@@ -13,8 +13,11 @@
       <div class="flex items-center gap-3 ml-2 border-l border-slate-200 dark:border-slate-800 pl-4">
         <div class="flex gap-4">
           <div class="flex flex-col">
-            <span class="text-md font-bold uppercase ">Hà Tấn Phát</span>
-            <span class="text-sm text-slate-500">Admin</span>
+            @auth
+            <span class="text-md font-bold uppercase ">{{ auth('staff')->user()->getFullNameAttribute() }}</span>
+            <span class="text-sm text-slate-500">{{ auth('staff')->user()->role->name }}</span>
+            @endauth
+            
           </div>
           <div class="relative group">
             <div

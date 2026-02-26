@@ -13,7 +13,8 @@ class GetAllRoleAction
       if($search)
          {
         $query->where('name', 'like','%'. $search. '%'); 
-      }  
+      }
+      $query = $query->orderBy('name', 'asc');  
     return $query->paginate($page_size, ['*'], 'page', $page_number);
     }
 }
