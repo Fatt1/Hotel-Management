@@ -85,7 +85,7 @@
 
       </div>
       <div class="p-5 border-t border-slate-100 flex items-center justify-between">
-        <span class="text-xs font-medium text-slate-500">Hiển thị {{ $roles->firstItem() }} trên {{ $roles->total() }} vai
+        <span class="text-xs font-medium text-slate-500">Hiển thị {{ $roles->lastItem() }} trên {{ $roles->total() }} vai
           trò hệ thống</span>
         <div class="flex items-center gap-1">
           @if ($roles->currentPage() > 1)

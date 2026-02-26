@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
             $table->dateTime('checkin_date');
             $table->dateTime('checkout_date');
-            $table->enum('status', ['pending', 'checked_in', 'checked_out', 'cancelled', 'no_show'])->default('pending');
+            $table->boolean('checkout_status')->default(false);
             $table->decimal('hourly_price', 10, 2);
             $table->decimal('daily_price', 10, 2);
             $table->decimal('service_amount', 12, 2)->default(0);

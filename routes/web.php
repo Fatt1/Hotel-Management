@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuthAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\RoleAdminController;
+use App\Http\Controllers\BookingAdminController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -22,5 +23,8 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::delete("/roles/{id}", [RoleAdminController::class, "destroy"])->name('admin.roles.destroy');
     Route::get('/roles/{id}/permissions', [RoleAdminController::class, 'editPermission'])->name('admin.roles.edit-permission');
     Route::post('/roles/{id}/permissions', [RoleAdminController::class, 'updatePermission'])->name('admin.roles.update-permissions');
+
+    // Booking routes
+    Route::get("/bookings", [BookingAdminController::class, "index"])->name("admin.bookings.index");
     Route::post("/logout", [AuthAdminController::class, "logout"])->name('admin.logout');
 });

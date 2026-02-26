@@ -14,6 +14,7 @@ class Booking extends Model
         'customer_id',
         'booking_date',
         'staff_id',
+        'status',
         'total_service_amount',
         'total_room_amount',
         'surcharge_amount',

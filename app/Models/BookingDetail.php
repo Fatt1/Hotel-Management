@@ -15,7 +15,7 @@ class BookingDetail extends Model
         'booking_id',
         'checkin_date',
         'checkout_date',
-        'status',
+        'checkout_status',
         'hourly_price',
         'daily_price',
         'service_amount',

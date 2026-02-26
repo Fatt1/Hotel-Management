@@ -26,7 +26,7 @@
       <span class="material-symbols-outlined">grid_view</span>
       <span>Chỉnh sửa sơ đồ phòng</span>
     </a>
-    <a class="sidebar-item" href="#">
+    <a class="{{ request()->routeIs("admin.bookings.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route("admin.bookings.index") }}">
       <span class="material-symbols-outlined">calendar_month</span>
       <span>Quản lý đặt lịch</span>
     </a>
