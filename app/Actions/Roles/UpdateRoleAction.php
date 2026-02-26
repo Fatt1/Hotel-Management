@@ -17,13 +17,17 @@ class UpdateRoleAction
 
     public function handle(int $id, RoleData $roleData): Role
     {
-        $role = $this->roleRepository->getById($id);
+        $role = $this->roleRepository->findById($id);
         if (!$role) {
             throw new \Exception('Role not found');
         }
-        if($role->name === 'Admin') {
+        if ($role->name === 'Admin') {
             throw new \Exception('Không thể sửa vai trò Admin');
         }
-        return $this->roleRepository->update($id, $roleData);
+
+        $role->name = $roleData->name;
+        $this->roleRepository->save($role);
+
+        return $role;
     }
 }

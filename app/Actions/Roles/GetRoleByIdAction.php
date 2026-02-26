@@ -15,7 +15,7 @@ class GetRoleByIdAction
     }
     public function handle(int $id, bool $withClaims = false): Role
     {
-        $role = $this->roleRepository->getById($id);
+        $role = $this->roleRepository->findById($id, $withClaims);
         if (!$role) {
             throw new \Exception('Role not found');
         }
