@@ -104,39 +104,9 @@
             </div>
             <div class="p-5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <span class="text-xs font-medium text-slate-500">Hiển thị {{ $bookings->lastItem() }} trên {{ $bookings->total() }} đặt lịch</span>
-                <div class="flex items-center gap-1">
-                    @if($bookings->currentPage() > 1) 
-                    <a href="{{ route('admin.bookings.index', ['page_number' => $bookings->currentPage() - 1]) }}"
-                        class="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled="">
-                        <span class="material-symbols-outlined !text-lg">chevron_left</span>
-                    </a>
-                    @else
-                    <a href="#"
-                        class="p-2 rounded-lg border border-slate-200  disabled:opacity-50 disabled:cursor-not-allowed cursor-not-allowed bg-gray-200"
-                        disabled>
-                        <span class="material-symbols-outlined !text-lg">chevron_left</span>
-                    </a>
-                    @endif
-                    @for($i = 1; $i <= $bookings->lastPage(); $i++)
-                        <a href="{{ route('admin.bookings.index', ['page_number' => $i]) }}"
-                            class="w-8 flex items-center justify-center h-8 rounded-lg text-xs font-bold {{ $bookings->currentPage() == $i ? 'bg-primary text-white' : 'hover:bg-slate-100' }}">
-                            {{ $i }}
-                        </a>
-                    @endfor
-                    @if($bookings->currentPage() < $bookings->lastPage())
-                    <a href="{{ route('admin.bookings.index', ['page_number' => $bookings->currentPage() + 1]) }}"
-                        class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
-                        <span class="material-symbols-outlined !text-lg">chevron_right</span>
-                    </a>
-                    @else
-                    <a href="#"
-                        class="p-2 rounded-lg border border-slate-200  disabled:opacity-50 disabled:cursor-not-allowed cursor-not-allowed bg-gray-200"
-                        disabled>
-                        <span class="material-symbols-outlined !text-lg">chevron_right</span>
-                    </a>
-                    @endif
-
+                <div class="mt-4 md:mt-0">
+                    {{ $bookings->withQueryString()->links('vendor.pagination.custom') }}
+                 
                 </div>
             </div>
         </div>

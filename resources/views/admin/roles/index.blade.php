@@ -20,21 +20,19 @@
     </div>
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
       <div class="p-5 border-b border-slate-100 flex flex-col xl:flex-row gap-4 justify-between items-center">
-        <div class="relative w-full xl:w-96">
-          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-            <span class="material-symbols-outlined !text-lg">search</span>
-          </span>
-          <input
-            class="block w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none"
-            placeholder="Tìm tên vai trò..." type="text" />
-        </div>
-        <div class="flex flex-wrap items-center gap-3 w-full xl:w-auto">
-          <button
-            class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-600 bg-slate-50 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
-            <span class="material-symbols-outlined !text-lg">filter_list</span>
-            <span>Lọc dữ liệu</span>
-          </button>
-        </div>
+        <form action="{{ route('admin.roles.index') }}" method="GET" class="relative w-full xl:w-96">
+          <div class="relative w-full xl:w-96">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+              <span class="material-symbols-outlined !text-lg">search</span>
+            </span>
+            <input
+              name="search"
+              value="{{ request('search') }}"
+              class="block w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+              placeholder="Tìm tên vai trò..." type="text" />
+          </div>
+        </form>
+      
       </div>
       <div class="overflow-x-auto">
         <table class="w-full">
@@ -87,40 +85,8 @@
       <div class="p-5 border-t border-slate-100 flex items-center justify-between">
         <span class="text-xs font-medium text-slate-500">Hiển thị {{ $roles->lastItem() }} trên {{ $roles->total() }} vai
           trò hệ thống</span>
-        <div class="flex items-center gap-1">
-          @if ($roles->currentPage() > 1)
-            <a href="{{ route('admin.roles.index', ['page_number' => $roles->currentPage() - 1]) }}"
-              class="p-2 rounded-lg border border-slate-200 hover:bg-slate-50">
-              <span class="material-symbols-outlined !text-lg">chevron_left</span>
-            </a>
-          @else
-            <span class="p-2 rounded-lg border border-slate-200 opacity-50 cursor-not-allowed">
-              <span class="material-symbols-outlined !text-lg">chevron_left</span>
-            </span>
-          @endif
-         {{-- Tạo phân trang --}}
-          @for ($i = 1; $i <= $roles->lastPage(); $i++)
-            @if ($i == $roles->currentPage())
-              <a href="{{ route('admin.roles.index', ['page_number' => $i]) }}" class="pagination-link text-white bg-primary">
-                {{ $i }}
-              </a>
-            @else
-              <a href="{{ route('admin.roles.index', ['page_number' => $i]) }}" class="pagination-link">
-                {{ $i }}
-              </a>
-            @endif
-          @endfor
-
-          @if ($roles->currentPage() < $roles->lastPage())
-            <a href="{{ route('admin.roles.index', ['page_number' => $roles->currentPage() + 1]) }}"
-              class="p-2 rounded-lg border border-slate-200 hover:bg-slate-50">
-              <span class="material-symbols-outlined !text-lg">chevron_right</span>
-            </a>
-          @else
-            <span class="p-2 rounded-lg border border-slate-200 opacity-50 cursor-not-allowed">
-              <span class="material-symbols-outlined !text-lg">chevron_right</span>
-            </span>
-          @endif
+        <div class="mt-5">
+          {{ $roles->withQueryString()->links('vendor.pagination.custom')}}
         </div>
       </div>
     </div>
