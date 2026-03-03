@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\AuthAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\RoleAdminController;
+use App\Http\Controllers\Admin\RoomTypeAdminController;
+use App\Http\Controllers\Admin\RoomDiagramAdminController;
 use App\Http\Controllers\BookingAdminController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,5 +28,22 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
 
     // Booking routes
     Route::get("/bookings", [BookingAdminController::class, "index"])->name("admin.bookings.index");
+    
+    // Room Type routes
+    Route::resource('room-types', RoomTypeAdminController::class)->names([
+        'index' => 'admin.room-types.index',
+        'create' => 'admin.room-types.create',
+        'store' => 'admin.room-types.store',
+        'show' => 'admin.room-types.show',
+        'edit' => 'admin.room-types.edit',
+        'update' => 'admin.room-types.update',
+        'destroy' => 'admin.room-types.destroy',
+    ]);
+    
+    // Room Diagram routes
+    Route::get('room-diagrams', [RoomDiagramAdminController::class, 'index'])->name('admin.room-diagrams.index');
+    Route::get('room-diagrams/edit', [RoomDiagramAdminController::class, 'edit'])->name('admin.room-diagrams.edit');
+    Route::post('room-diagrams/update', [RoomDiagramAdminController::class, 'update'])->name('admin.room-diagrams.update');
+    
     Route::post("/logout", [AuthAdminController::class, "logout"])->name('admin.logout');
 });
