@@ -14,7 +14,7 @@ class DeleteRoleAction
     }
     public function handle(int $id): void
     {
-        $role = $this->roleRepository->getById($id);
+        $role = $this->roleRepository->findById($id);
         if (!$role) {
             throw new \Exception('Role not found');
         }

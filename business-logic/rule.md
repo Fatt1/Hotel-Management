@@ -11,68 +11,102 @@
 
 Đối với các chức năng CRUD cơ bản, sử dụng các tên method sau:
 
-- **Thêm mới**: `add()`
-- **Cập nhật**: `update()`
-- **Xóa**: `delete()`
-- **Lấy theo ID**: `getById()`
+- **Lưu (tạo mới + cập nhật)**: `save(Model $model): bool`
+- **Xóa**: `delete(Model $model): bool`
+- **Lấy theo ID**: `findById(int $id): ?Model`
+- **Lấy theo điều kiện khác**: `findBy{Field}(...): ?Model` hoặc `get{Scope}(...)` tùy ngữ cảnh
+
+> **Lý do dùng `save()` thay cho cả `add()` lẫn `update()`:**
+> Eloquent Active Record đã tự phân biệt insert / update dựa vào việc model có `id` hay chưa.
+> Repository không cần biết bạn đang tạo mới hay cập nhật — nó chỉ làm một việc:
+> **"Lưu trạng thái hiện tại của object này vào Database"**.
 
 ### 1.3. Kiểu dữ liệu truyền vào
 
-**Quyết định: Sử dụng Data Objects (DTO) thay vì Model**
+**Quyết định: Repository nhận vào Model Object (Active Record), không nhận DTO**
 
 **Lý do:**
 
-- ✅ **Tách biệt concerns**: Data Objects chỉ chứa dữ liệu thuần túy, không có logic
-- ✅ **Validation tốt hơn**: Có thể validate dữ liệu trước khi tạo DTO
-- ✅ **Type safety**: Đảm bảo kiểu dữ liệu chính xác
-- ✅ **Dễ test**: Không phụ thuộc vào Eloquent Model
-- ✅ **Immutable**: Data Objects có thể là read-only, tránh thay đổi không mong muốn
+- ✅ **Hướng đối tượng**: Action thao tác trực tiếp trên object, Repository chỉ lưu
+- ✅ **Tái sử dụng cao**: `save()` dùng được cho cả Create lẫn Update
+- ✅ **Repository gọn nhẹ**: Không biết field nào đang thay đổi — chỉ lưu trạng thái
+- ✅ **Action kiểm soát business logic**: Mọi quyết định về dữ liệu nằm trong Action
+- ✅ **Nhất quán với Eloquent**: Tận dụng tối đa Active Record của Laravel
+
+**Data Objects (DTO) vẫn được dùng** nhưng chỉ để vận chuyển dữ liệu từ Request vào Action (validation layer) — **không truyền xuống Repository**.
 
 **Ví dụ:**
 
 ```php
 // Interface
-interface IRoomRepository
+interface RoomRepositoryInterface
 {
-    public function add(Room $data): Room;
-    public function update(int $id, Room $data): Room;
-    public function delete(int $id): bool;
-    public function getById(int $id): ?Room;
+    public function findById(int $id): ?Room;
+
+    public function save(Room $room): bool;
+
+    public function delete(Room $room): bool;
 }
 
 // Implementation
-class RoomRepository implements IRoomRepository
+class EloquentRoomRepository implements RoomRepositoryInterface
 {
-    public function add(Room $data): Room
+    public function findById(int $id): ?Room
     {
-        return Room::create([
-            'room_number' => $data->roomNumber,
-            'type_id' => $data->typeId,
-            'status' => $data->status,
-            // ...
-        ]);
+        return Room::find($id);
     }
 
-    public function update(Room $data): Room
+    public function save(Room $room): bool
     {
-
-        $room->update([
-            'room_number' => $data->roomNumber,
-            'type_id' => $data->typeId,
-            'status' => $data->status,
-            // ...
-        ]);
-        return $room->fresh();
+        // Eloquent tự phân biệt INSERT / UPDATE dựa vào $room->exists
+        return $room->save();
     }
 
     public function delete(Room $room): bool
     {
         return $room->delete();
     }
+}
+```
 
-    public function getById(int $id): ?Room
+**Action sử dụng Repository:**
+
+```php
+// Tạo mới
+class CreateRoomAction
+{
+    public function __construct(private RoomRepositoryInterface $roomRepository) {}
+
+    public function handle(RoomData $data): Room
     {
-        return Room::find($id);
+        $room = new Room();
+        $room->room_number = $data->roomNumber;
+        $room->type_id     = $data->typeId;
+        $room->status      = $data->status;
+
+        $this->roomRepository->save($room);
+        return $room;
+    }
+}
+
+// Cập nhật
+class UpdateRoomAction
+{
+    public function __construct(private RoomRepositoryInterface $roomRepository) {}
+
+    public function handle(int $id, RoomData $data): Room
+    {
+        $room = $this->roomRepository->findById($id);
+        if (!$room) {
+            throw new \Exception('Room not found');
+        }
+
+        $room->room_number = $data->roomNumber;
+        $room->type_id     = $data->typeId;
+        $room->status      = $data->status;
+
+        $this->roomRepository->save($room); // cùng method, Eloquent tự UPDATE
+        return $room;
     }
 }
 ```
@@ -110,7 +144,9 @@ public function register(): void
 Dùng cho: **Thêm, Sửa, Xóa**
 
 - ✅ **SỬ DỤNG Repository**
+- ✅ **Action chịu trách nhiệm set fields lên Model trước khi gọi `save()`**
 - ❌ **KHÔNG truy vấn trực tiếp Model**
+- ❌ **KHÔNG truyền DTO xuống Repository**
 
 **Ví dụ:**
 
@@ -119,13 +155,18 @@ Dùng cho: **Thêm, Sửa, Xóa**
 class CreateRoomAction
 {
     public function __construct(
-        private IRoomRepository $roomRepository
+        private RoomRepositoryInterface $roomRepository
     ) {}
 
-    public function execute(RoomData $data): Room
+    public function handle(RoomData $data): Room
     {
-        // Có thể thêm business logic ở đây
-        return $this->roomRepository->add($data);
+        $room = new Room();
+        $room->room_number = $data->roomNumber;
+        $room->type_id     = $data->typeId;
+        $room->status      = $data->status;
+
+        $this->roomRepository->save($room);
+        return $room;
     }
 }
 
@@ -133,13 +174,22 @@ class CreateRoomAction
 class UpdateRoomAction
 {
     public function __construct(
-        private IRoomRepository $roomRepository
+        private RoomRepositoryInterface $roomRepository
     ) {}
 
-    public function execute(int $id, RoomData $data): Room
+    public function handle(int $id, RoomData $data): Room
     {
-        // Có thể thêm business logic ở đây
-        return $this->roomRepository->update($id, $data);
+        $room = $this->roomRepository->findById($id);
+        if (!$room) {
+            throw new \Exception('Room not found');
+        }
+
+        $room->room_number = $data->roomNumber;
+        $room->type_id     = $data->typeId;
+        $room->status      = $data->status;
+
+        $this->roomRepository->save($room);
+        return $room;
     }
 }
 
@@ -147,13 +197,17 @@ class UpdateRoomAction
 class DeleteRoomAction
 {
     public function __construct(
-        private IRoomRepository $roomRepository
+        private RoomRepositoryInterface $roomRepository
     ) {}
 
-    public function execute(int $id): bool
+    public function handle(int $id): void
     {
-        // Có thể thêm business logic ở đây
-        return $this->roomRepository->delete($id);
+        $room = $this->roomRepository->findById($id);
+        if (!$room) {
+            throw new \Exception('Room not found');
+        }
+
+        $this->roomRepository->delete($room);
     }
 }
 ```
@@ -258,22 +312,23 @@ class RoomController extends Controller
 
 ### 3.1. Tạo chức năng mới (CRUD)
 
-1. **Tạo Data Object** (nếu chưa có) - `app/Data/`
-2. **Tạo IRepository Interface** - `app/Abstractions/Repositories/`
-3. **Tạo Repository Implementation** - `app/Repositories/`
+1. **Tạo Data Object** (nếu chưa có) - `app/Data/` — dùng để vận chuyển dữ liệu từ Request vào Action
+2. **Tạo Repository Interface** - `app/Abstractions/Repositories/` — chỉ expose `findById`, `save`, `delete` và các finder cần thiết
+3. **Tạo Repository Implementation** - `app/Repositories/` — mỗi method gọn nhẹ, chỉ delegate xuống Eloquent
 4. **Đăng ký DI Container** - `app/Providers/AppServiceProvider.php`
-5. **Tạo Action cho Command** - `app/Actions/{Module}/`
-6. **Tạo Action cho Query** - `app/Actions/{Module}/`
+5. **Tạo Action cho Command** - `app/Actions/{Module}/` — Action tự set fields lên Model rồi gọi `repository->save($model)`
+6. **Tạo Action cho Query** - `app/Actions/{Module}/` — dùng Eloquent trực tiếp
 7. **Tạo ViewModel** (nếu View/API cần chuẩn bị dữ liệu phức tạp) - `app/ViewModels/`
 8. **Tạo Controller** - chỉ inject Action/ViewModel và trả về response
 
 ### 3.2. Checklist
 
-- [ ] Data Object đã được tạo?
-- [ ] Interface Repository đã được tạo tại `Abstractions/Repositories`?
-- [ ] Implementation Repository đã được tạo tại `Repositories`?
+- [ ] Data Object đã được tạo (nếu cần validation từ Request)?
+- [ ] Repository Interface chỉ có `findById`, `save`, `delete` và các finder cần thiết?
+- [ ] Repository Implementation **không** chứa logic set field — chỉ gọi `$model->save()`?
 - [ ] Repository đã được đăng ký trong DI Container?
-- [ ] Command Actions đã sử dụng Repository?
+- [ ] Command Action tự `new Model()` / `findById()` → set fields → `repository->save($model)`?
+- [ ] **KHÔNG** truyền DTO xuống Repository?
 - [ ] Query Actions đã sử dụng Eloquent trực tiếp?
 - [ ] ViewModel đã được tạo cho View/API cần chuẩn bị dữ liệu phức tạp?
 - [ ] Controller KHÔNG chứa business logic và logic chuẩn bị dữ liệu?

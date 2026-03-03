@@ -24,6 +24,7 @@ return new class extends Migration
             $table->decimal('height', 8, 2);
             $table->decimal('hourly_price', 10, 2);
             $table->decimal('daily_price', 10, 2);
+            $table->boolean('is_active')->default(true);
         });
     }
 

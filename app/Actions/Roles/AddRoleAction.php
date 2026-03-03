@@ -6,6 +6,7 @@ namespace App\Actions\Roles;
 
 use App\Abstractions\Repositories\RoleRepository;
 use App\Data\RoleData;
+use App\Models\Role;
 
 class AddRoleAction
 {
@@ -14,9 +15,13 @@ class AddRoleAction
     ) {
     }
 
-    public function handle(RoleData $roleData) {
+    public function handle(RoleData $roleData): Role
+    {
+        $role = new Role();
+        $role->name = $roleData->name;
 
-        $role = $this->roleRepository->add($roleData);
+        $this->roleRepository->save($role);
+
         return $role;
     }
 }
