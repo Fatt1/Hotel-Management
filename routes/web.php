@@ -6,6 +6,10 @@ use App\Http\Controllers\Admin\RoleAdminController;
 use App\Http\Controllers\Admin\RoomTypeAdminController;
 use App\Http\Controllers\Admin\RoomDiagramAdminController;
 use App\Http\Controllers\BookingAdminController;
+use App\Http\Controllers\Client\RoomController;
+use App\Http\Controllers\Client\AmenityController;
+use App\Http\Controllers\Client\DiningController;
+use App\Http\Controllers\Client\GalleryController;
 use App\Http\Controllers\RoomAdminController;
 use Illuminate\Support\Facades\Route;
 
@@ -49,4 +53,24 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::post('room-diagrams/update', [RoomDiagramAdminController::class, 'update'])->name('admin.room-diagrams.update');
     
     Route::post("/logout", [AuthAdminController::class, "logout"])->name('admin.logout');
+});
+
+// =========================================================
+// Client Routes
+// =========================================================
+Route::name('client.')->group(function () {
+    // Danh sách loại phòng
+    Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
+
+    // Chi tiết một loại phòng
+    Route::get('/rooms/{id}', [RoomController::class, 'show'])->name('rooms.show');
+
+    // Tiện ích khách sạn
+    Route::get('/amenities', [AmenityController::class, 'index'])->name('amenities.index');
+
+    // Nhà hàng & dịch vụ ăn uống
+    Route::get('/dinings', [DiningController::class, 'index'])->name('dinings.index');
+
+    // Thư viện ảnh khách sạn
+    Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
 });

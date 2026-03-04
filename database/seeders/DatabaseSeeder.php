@@ -57,9 +57,12 @@ class DatabaseSeeder extends Seeder
         // Seed dữ liệu phòng và đặt phòng
         $this->call([
             FloorSeeder::class,
+            AmenitySeeder::class,
             RoomTypeSeeder::class,
             RoomSeeder::class,
             CustomerSeeder::class,
+            DiningSeeder::class,
+            GallerySeeder::class,
             BookingSeeder::class,
         ]);
     }
