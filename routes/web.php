@@ -55,7 +55,7 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
 // =========================================================
 // Client Routes
 // =========================================================
-Route::prefix('client')->name('client.')->group(function () {
+Route::name('client.')->group(function () {
     // Danh sách loại phòng
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
 
