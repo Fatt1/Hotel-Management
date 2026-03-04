@@ -3,6 +3,8 @@ import { openModal, closeModal } from "../../app";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import { Vietnamese } from "flatpickr/dist/l10n/vn.js";
+import { formatVND } from "../../util";
+
 
 function formatDisplay(date) {
     const d = String(date.getDate()).padStart(2, "0");
@@ -88,11 +90,21 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
 async function handleAddRoomClick() {
-    openModal(getModelHtmlRoom());
+   
+    // Lấy danh sách phòng trống từ API
+    const rooms = (await getAllRoomsApi(
+        document.getElementById("check_in").value,
+        document.getElementById("check_out").value
+    )).available_rooms;
+    let roomListContainer = '';
+    rooms.forEach((room) => {
+        const roomHtml = getRoomHtml(false, room);
+        roomListContainer += roomHtml;
+    });
+     openModal(getModelHtmlRoom(roomListContainer));
     document.querySelectorAll(".close-modal-btn").forEach((btn) => {
         btn.addEventListener("click", closeModal);
     });
-   console.log(await getAllRoomsApi("2024-06-01", "2024-06-05"));
 }
 
 function getModelHtmlRoom(content) {
@@ -172,16 +184,16 @@ function getRoomHtml(isSelected, room) {
                 type="checkbox" />
             <div class="flex-1">
                 <div class="flex items-center justify-between mb-1">
-                    <span class="text-base font-black text-slate-900 dark:text-white uppercase">P.406</span>
+                    <span class="text-base font-black text-slate-900 dark:text-white uppercase">${room.name}</span>
                     <span
                         class="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase rounded">Sẵn
                         sàng</span>
                 </div>
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Urban Deluxe Twin</div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">${room.room_type.name}</div>
                 <div class="flex items-center justify-between">
-                    <div class="text-[11px] font-bold text-slate-500 uppercase">950,000 <span
+                    <div class="text-[11px] font-bold text-slate-500 uppercase">${formatVND(room.room_type.daily_price)} <span
                             class="lowercase">đ/ngày</span></div>
-                    <div class="text-[11px] font-bold text-slate-500 uppercase">220,000 <span
+                    <div class="text-[11px] font-bold text-slate-500 uppercase">${formatVND(room.room_type.hourly_price)} <span
                             class="lowercase">đ/giờ</span></div>
                 </div>
             </div>

@@ -1,15 +1,15 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthAdminController;
+use App\Http\Controllers\Admin\BookingAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\RoleAdminController;
-use App\Http\Controllers\Admin\RoomTypeAdminController;
 use App\Http\Controllers\Admin\RoomDiagramAdminController;
-use App\Http\Controllers\BookingAdminController;
-use App\Http\Controllers\Client\RoomController;
+use App\Http\Controllers\Admin\RoomTypeAdminController;
 use App\Http\Controllers\Client\AmenityController;
 use App\Http\Controllers\Client\DiningController;
 use App\Http\Controllers\Client\GalleryController;
+use App\Http\Controllers\Client\RoomController;
 use App\Http\Controllers\RoomAdminController;
 use Illuminate\Support\Facades\Route;
 

@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+@section('title', "Tạo booking mới")
 @section('content')
 <div class="flex flex-col xl:flex-row gap-6">
         <div class="flex-1 space-y-6">

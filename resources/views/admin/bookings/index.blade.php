@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+@section('title', 'Quản lý đặt lịch')
 @section('content')
     <div class="p-8 space-y-6">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
