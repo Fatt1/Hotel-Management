@@ -12,7 +12,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between mb-8">
       <div>
-        <h2 class="text-2xl font-bold text-slate-900">Tạo loại phòng mới</h2>
+        <h2 class="text-2xl font-bold text-slate-900">Chỉnh sửa loại phòng: {{ $viewModel->roomType()->name }}</h2>
         <p class="text-slate-500 text-sm mt-1">Hệ thống quản lý khách sạn Urban Luxe</p>
       </div>
       <div class="flex gap-3">
@@ -26,8 +26,9 @@
     </div>
 
     <!-- Form -->
-    <form id="roomTypeForm" action="{{ route('admin.room-types.store') }}" method="POST" enctype="multipart/form-data" class="grid grid-cols-3 gap-6">
+    <form id="roomTypeForm" action="{{ route('admin.room-types.update', $roomType->id) }}" method="POST" enctype="multipart/form-data" class="grid grid-cols-3 gap-6">
       @csrf
+      @method('PUT')
 
       <!-- Left Column -->
       <div class="col-span-2 space-y-6">
@@ -42,7 +43,7 @@
             <!-- Tên loại phòng -->
             <div>
               <label class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2 block">Tên loại phòng <span class="text-red-500">*</span></label>
-              <input type="text" name="name" value="{{ old('name') }}" placeholder="Ví dụ: Phòng Deluxe" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('name') border-red-500 @enderror">
+              <input type="text" name="name" value="{{ old('name') ?? $viewModel->roomType()->name }}" placeholder="Ví dụ: Phòng Deluxe" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('name') border-red-500 @enderror">
               @error('name')
                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
               @enderror
@@ -51,7 +52,7 @@
             <!-- Mã loại phòng -->
             <div>
               <label class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2 block">Mã loại phòng <span class="text-red-500">*</span></label>
-              <input type="text" name="code" value="{{ old('code') }}" placeholder="Ví dụ: DLX-001" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('code') border-red-500 @enderror">
+              <input type="text" name="code" value="{{ old('code') ?? $viewModel->roomType()->code }}" placeholder="Ví dụ: DLX-001" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('code') border-red-500 @enderror">
               @error('code')
                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
               @enderror
@@ -146,7 +147,7 @@
                 <button type="button" class="w-6 h-6 rounded border border-slate-300 hover:border-blue-900 flex items-center justify-center" onclick="decrementValue(this)">
                   <span class="text-lg">−</span>
                 </button>
-                <input type="number" name="max_adults" value="{{ old('max_adults', 2) }}" min="0" class="w-12 text-center px-2 py-1 border border-slate-300 rounded focus:outline-none focus:border-blue-900" readonly>
+                <input type="number" name="adult_quantity" value="{{ old('adult_quantity') ?? $viewModel->capacity()['adult_quantity'] }}" min="1" max="10" class="w-12 text-center px-2 py-1 border border-slate-300 rounded focus:outline-none focus:border-blue-900" readonly>
                 <button type="button" class="w-6 h-6 rounded border border-slate-300 hover:border-blue-900 flex items-center justify-center" onclick="incrementValue(this)">
                   <span class="text-lg">+</span>
                 </button>
@@ -161,7 +162,7 @@
                 <button type="button" class="w-6 h-6 rounded border border-slate-300 hover:border-blue-900 flex items-center justify-center" onclick="decrementValue(this)">
                   <span class="text-lg">−</span>
                 </button>
-                <input type="number" name="max_children" value="{{ old('max_children', 1) }}" min="0" class="w-12 text-center px-2 py-1 border border-slate-300 rounded focus:outline-none focus:border-blue-900" readonly>
+                <input type="number" name="child_quantity" value="{{ old('child_quantity') ?? $viewModel->capacity()['child_quantity'] }}" min="0" max="10" class="w-12 text-center px-2 py-1 border border-slate-300 rounded focus:outline-none focus:border-blue-900" readonly>
                 <button type="button" class="w-6 h-6 rounded border border-slate-300 hover:border-blue-900 flex items-center justify-center" onclick="incrementValue(this)">
                   <span class="text-lg">+</span>
                 </button>
@@ -176,7 +177,7 @@
                 <button type="button" class="w-6 h-6 rounded border border-slate-300 hover:border-blue-900 flex items-center justify-center" onclick="decrementValue(this)">
                   <span class="text-lg">−</span>
                 </button>
-                <input type="number" name="single_beds" value="{{ old('single_beds', 1) }}" min="0" class="w-12 text-center px-2 py-1 border border-slate-300 rounded focus:outline-none focus:border-blue-900" readonly>
+                <input type="number" name="single_bed_quantity" value="{{ old('single_bed_quantity') ?? $viewModel->capacity()['single_bed_quantity'] }}" min="0" max="10" class="w-12 text-center px-2 py-1 border border-slate-300 rounded focus:outline-none focus:border-blue-900" readonly>
                 <button type="button" class="w-6 h-6 rounded border border-slate-300 hover:border-blue-900 flex items-center justify-center" onclick="incrementValue(this)">
                   <span class="text-lg">+</span>
                 </button>
@@ -191,7 +192,7 @@
                 <button type="button" class="w-6 h-6 rounded border border-slate-300 hover:border-blue-900 flex items-center justify-center" onclick="decrementValue(this)">
                   <span class="text-lg">−</span>
                 </button>
-                <input type="number" name="double_beds" value="{{ old('double_beds', 1) }}" min="0" class="w-12 text-center px-2 py-1 border border-slate-300 rounded focus:outline-none focus:border-blue-900" readonly>
+                <input type="number" name="double_bed_quantity" value="{{ old('double_bed_quantity') ?? $viewModel->capacity()['double_bed_quantity'] }}" min="0" max="10" class="w-12 text-center px-2 py-1 border border-slate-300 rounded focus:outline-none focus:border-blue-900" readonly>
                 <button type="button" class="w-6 h-6 rounded border border-slate-300 hover:border-blue-900 flex items-center justify-center" onclick="incrementValue(this)">
                   <span class="text-lg">+</span>
                 </button>

@@ -12,8 +12,8 @@
     <!-- Header -->
     <div class="flex items-center justify-between mb-8">
       <div>
-        <h2 class="text-2xl font-bold text-slate-900">Chi tiết loại phòng: Phòng Deluxe</h2>
-        <p class="text-slate-500 text-sm mt-1">Hệ thống quản lý khách sạn Urban Luxe</p>
+        <h2 class="text-2xl font-bold text-slate-900">Chi tiết loại phòng: {{ $viewModel->roomType()->name }}</h2>
+        <p class="text-slate-500 text-sm mt-1">Mã loại phòng: {{ $viewModel->roomType()->code }}</p>
       </div>
       <div class="flex gap-3">
         <span class="inline-flex items-center justify-center px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full">
@@ -22,7 +22,7 @@
         <a href="{{ route('admin.room-types.index') }}" class="bg-slate-200 hover:bg-slate-300 text-slate-900 px-4 py-2 rounded-lg font-bold text-sm transition-all">
           Quay Lại
         </a>
-        <a href="{{ route('admin.room-types.edit', 1) }}" class="bg-blue-900 hover:bg-blue-800 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all">
+        <a href="{{ route('admin.room-types.edit', $viewModel->roomType()->id) }}" class="bg-blue-900 hover:bg-blue-800 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all">
           Chỉnh sửa
         </a>
       </div>
@@ -42,19 +42,19 @@
           <div class="grid grid-cols-2 gap-6">
             <div>
               <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">Tên loại phòng</p>
-              <p class="text-base font-bold text-slate-900">Phòng Deluxe</p>
+              <p class="text-base font-bold text-slate-900">{{ $viewModel->roomType()->name }}</p>
             </div>
             <div>
               <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">Mã loại phòng</p>
-              <p class="text-base font-bold text-slate-900">DLX-001</p>
+              <p class="text-base font-bold text-slate-900">{{ $viewModel->roomType()->code }}</p>
             </div>
             <div>
-              <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">Trạng thái</p>
-              <p class="text-base font-bold text-green-600">Đang kinh doanh</p>
+              <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">Tổng phòng</p>
+              <p class="text-base font-bold text-blue-600">{{ $viewModel->totalRooms() }} phòng ({{ $viewModel->availableRooms() }} phòng trống)</p>
             </div>
             <div>
               <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">Mô tả</p>
-              <p class="text-base text-slate-600">Phòng sang trọng với đầy đủ tiện nghi hiện đại</p>
+              <p class="text-base text-slate-600">{{ $viewModel->roomType()->description ?? 'Không có mô tả' }}</p>
             </div>
           </div>
         </div>
@@ -73,11 +73,15 @@
               <div class="space-y-3">
                 <div>
                   <p class="text-xs text-slate-500 mb-1">Rộng (m)</p>
-                  <p class="text-2xl font-bold text-blue-900">5.0</p>
+                  <p class="text-2xl font-bold text-blue-900">{{ $viewModel->dimensions()['width'] }}</p>
                 </div>
                 <div>
                   <p class="text-xs text-slate-500 mb-1">Dài (m)</p>
-                  <p class="text-2xl font-bold text-blue-900">8.0</p>
+                  <p class="text-2xl font-bold text-blue-900">{{ $viewModel->dimensions()['height'] }}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-500 mb-1">Diện tích</p>
+                  <p class="text-lg font-bold text-slate-700">{{ number_format($viewModel->dimensions()['area'], 2) }} m²</p>
                 </div>
               </div>
             </div>
@@ -86,11 +90,11 @@
             <div class="space-y-4">
               <div>
                 <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">Giá giờ (VNĐ)</p>
-                <p class="text-3xl font-bold text-blue-900">200000</p>
+                <p class="text-3xl font-bold text-blue-900">{{ number_format($viewModel->pricing()['hourly_price'], 0, ',', '.') }}</p>
               </div>
               <div>
                 <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">Giá ngày (VNĐ)</p>
-                <p class="text-3xl font-bold text-blue-900">1500000</p>
+                <p class="text-3xl font-bold text-blue-900">{{ number_format($viewModel->pricing()['daily_price'], 0, ',', '.') }}</p>
               </div>
             </div>
           </div>
@@ -107,22 +111,22 @@
             <div class="bg-slate-50 rounded-lg p-4 text-center">
               <span class="material-symbols-outlined text-slate-600 text-3xl block mb-2">person</span>
               <p class="text-xs text-slate-400 uppercase font-bold mb-1">Người lớn</p>
-              <p class="text-2xl font-bold text-slate-900">2</p>
+              <p class="text-2xl font-bold text-slate-900">{{ $viewModel->capacity()['adult_quantity'] }}</p>
             </div>
             <div class="bg-slate-50 rounded-lg p-4 text-center">
               <span class="material-symbols-outlined text-slate-600 text-3xl block mb-2">child_care</span>
               <p class="text-xs text-slate-400 uppercase font-bold mb-1">Trẻ em</p>
-              <p class="text-2xl font-bold text-slate-900">1</p>
+              <p class="text-2xl font-bold text-slate-900">{{ $viewModel->capacity()['child_quantity'] }}</p>
             </div>
             <div class="bg-slate-50 rounded-lg p-4 text-center">
               <span class="material-symbols-outlined text-slate-600 text-3xl block mb-2">bed</span>
               <p class="text-xs text-slate-400 uppercase font-bold mb-1">Giường đơn</p>
-              <p class="text-2xl font-bold text-slate-900">1</p>
+              <p class="text-2xl font-bold text-slate-900">{{ $viewModel->capacity()['single_bed_quantity'] }}</p>
             </div>
             <div class="bg-slate-50 rounded-lg p-4 text-center">
               <span class="material-symbols-outlined text-slate-600 text-3xl block mb-2">bed</span>
               <p class="text-xs text-slate-400 uppercase font-bold mb-1">Giường đôi</p>
-              <p class="text-2xl font-bold text-slate-900">1</p>
+              <p class="text-2xl font-bold text-slate-900">{{ $viewModel->capacity()['double_bed_quantity'] }}</p>
             </div>
           </div>
         </div>
@@ -140,10 +144,21 @@
           </div>
           
           <div class="p-4 space-y-3">
-            <div class="w-full h-48 bg-slate-100 rounded-lg flex items-center justify-center">
-              <span class="material-symbols-outlined text-slate-400 text-4xl">image_not_supported</span>
-            </div>
-            <p class="text-xs text-slate-500 text-center">Total 1 image available</p>
+            @if($viewModel->images()->count() > 0)
+              <div class="space-y-2">
+                @foreach($viewModel->images() as $image)
+                  <div class="w-full h-48 bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="{{ $image->image_url ?? asset('images/room-default.png') }}" alt="{{ $viewModel->roomType()->name }}" class="w-full h-full object-cover">
+                  </div>
+                @endforeach
+              </div>
+              <p class="text-xs text-slate-500 text-center">Tổng {{ $viewModel->images()->count() }} hình ảnh</p>
+            @else
+              <div class="w-full h-48 bg-slate-100 rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-slate-400 text-4xl">image_not_supported</span>
+              </div>
+              <p class="text-xs text-slate-500 text-center">Chưa có hình ảnh</p>
+            @endif
           </div>
         </div>
 
@@ -155,23 +170,16 @@
           </div>
           
           <div class="flex flex-wrap gap-2">
-            @php
-              $amenities = ['Free Wifi', 'Điều hòa', 'Bãi đỗ', 'Hộp bảo'];
-            @endphp
-            @foreach($amenities as $amenity)
-              <span class="inline-flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-full text-sm text-slate-700 font-medium">
-                @if($amenity === 'Free Wifi')
-                  <span class="material-symbols-outlined text-sm">wifi</span>
-                @elseif($amenity === 'Điều hòa')
-                  <span class="material-symbols-outlined text-sm">ac_unit</span>
-                @elseif($amenity === 'Bãi đỗ')
-                  <span class="material-symbols-outlined text-sm">local_parking</span>
-                @else
-                  <span class="material-symbols-outlined text-sm">security</span>
-                @endif
-                {{ $amenity }}
-              </span>
-            @endforeach
+            @if($viewModel->amenities()->count() > 0)
+              @foreach($viewModel->amenities() as $amenity)
+                <span class="inline-flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-full text-sm text-slate-700 font-medium">
+                  <span class="material-symbols-outlined text-sm">done</span>
+                  {{ $amenity->name }}
+                </span>
+              @endforeach
+            @else
+              <p class="text-sm text-slate-500 italic">Chưa có tiện ích</p>
+            @endif
           </div>
         </div>
 
@@ -181,6 +189,7 @@
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-blue-900 text-2xl">kitchen</span>
               <h3 class="text-lg font-bold text-slate-900">Thiết bị (Room Equipment)</h3>
+              <span class="ml-auto text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">Mock Data</span>
             </div>
           </div>
           
@@ -193,18 +202,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr class="border-b border-slate-100 hover:bg-slate-50">
-                  <td class="px-6 py-3 text-sm text-slate-900">Điều hòa Daikin 1.5HP</td>
-                  <td class="px-6 py-3 text-sm text-slate-900 text-right">1</td>
-                </tr>
-                <tr class="border-b border-slate-100 hover:bg-slate-50">
-                  <td class="px-6 py-3 text-sm text-slate-900">Tủ lạnh mini Samsung</td>
-                  <td class="px-6 py-3 text-sm text-slate-900 text-right">1</td>
-                </tr>
-                <tr class="hover:bg-slate-50">
-                  <td class="px-6 py-3 text-sm text-slate-900">Smart TV 55 inch</td>
-                  <td class="px-6 py-3 text-sm text-slate-900 text-right">1</td>
-                </tr>
+                @foreach($viewModel->equipment() as $equipment)
+                  <tr class="border-b border-slate-100 hover:bg-slate-50">
+                    <td class="px-6 py-3 text-sm text-slate-900">{{ $equipment->name }}</td>
+                    <td class="px-6 py-3 text-sm text-slate-900 text-right">{{ $equipment->pivot->quantity ?? 1 }}</td>
+                  </tr>
+                @endforeach
               </tbody>
             </table>
           </div>

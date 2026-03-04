@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\RoomTypes\CreateRoomTypeAction;
+use App\Actions\RoomTypes\DeleteRoomTypeAction;
+use App\Actions\RoomTypes\GetRoomTypeListAction;
+use App\Actions\RoomTypes\UpdateRoomTypeAction;
+use App\Data\RoomTypeData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RoomTypeRequest;
 use App\Models\RoomType;
+use App\ViewModels\RoomTypeViewModel;
 use Illuminate\Http\Request;
 
 class RoomTypeAdminController extends Controller
@@ -12,9 +18,9 @@ class RoomTypeAdminController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(GetRoomTypeListAction $action)
     {
-        $roomTypes = RoomType::paginate(10);
+        $roomTypes = $action->executeWithRoomCount();
         return view('admin.room-type.index', compact('roomTypes'));
     }
 
@@ -23,21 +29,27 @@ class RoomTypeAdminController extends Controller
      */
     public function create()
     {
-        return view('admin.room-type.create');
+        $viewModel = new RoomTypeViewModel();
+        return view('admin.room-type.create', compact('viewModel'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(RoomTypeRequest $request)
+    public function store(RoomTypeRequest $request, CreateRoomTypeAction $action)
     {
-        $validated = $request->validated();
-        
-        RoomType::create($validated);
-        
-        return redirect()
-            ->route('admin.room-types.index')
-            ->with('success', 'Loại phòng đã được tạo thành công');
+        try {
+            $data = RoomTypeData::from($request->validated());
+            $action->execute($data);
+
+            return redirect()
+                ->route('admin.room-types.index')
+                ->with('success', 'Loại phòng đã được tạo thành công');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', $e->getMessage());
+        }
     }
 
     /**
@@ -45,8 +57,9 @@ class RoomTypeAdminController extends Controller
      */
     public function show(string $id)
     {
-        // $roomType = RoomType::findOrFail($id);
-        return view('admin.room-type.show'/*, compact('roomType') */);
+        $roomType = RoomType::findOrFail($id);
+        $viewModel = new RoomTypeViewModel($roomType);
+        return view('admin.room-type.show', compact('viewModel', 'roomType'));
     }
 
     /**
@@ -55,42 +68,44 @@ class RoomTypeAdminController extends Controller
     public function edit(string $id)
     {
         $roomType = RoomType::findOrFail($id);
-        return view('admin.room-type.edit', compact('roomType'));
+        $viewModel = new RoomTypeViewModel($roomType);
+        return view('admin.room-type.edit', compact('viewModel', 'roomType'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(RoomTypeRequest $request, string $id)
+    public function update(RoomTypeRequest $request, string $id, UpdateRoomTypeAction $action)
     {
-        $roomType = RoomType::findOrFail($id);
-        $validated = $request->validated();
-        
-        $roomType->update($validated);
-        
-        return redirect()
-            ->route('admin.room-types.index')
-            ->with('success', 'Loại phòng đã được cập nhật thành công');
+        try {
+            $data = RoomTypeData::from($request->validated());
+            $action->execute((int) $id, $data);
+
+            return redirect()
+                ->route('admin.room-types.index')
+                ->with('success', 'Loại phòng đã được cập nhật thành công');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', $e->getMessage());
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id, DeleteRoomTypeAction $action)
     {
-        $roomType = RoomType::findOrFail($id);
-        
-        // Kiểm tra xem loại phòng này có rooms không
-        if ($roomType->rooms()->exists()) {
+        try {
+            $action->execute((int) $id);
+
             return redirect()
                 ->route('admin.room-types.index')
-                ->with('error', 'Không thể xóa loại phòng này vì đã có phòng được tạo từ loại này');
+                ->with('success', 'Loại phòng đã được xóa thành công');
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('admin.room-types.index')
+                ->with('error', $e->getMessage());
         }
-        
-        $roomType->delete();
-        
-        return redirect()
-            ->route('admin.room-types.index')
-            ->with('success', 'Loại phòng đã được xóa thành công');
     }
 }
