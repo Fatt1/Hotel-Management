@@ -69,7 +69,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.45; cursor: p
   {{-- Search widget — floats at bottom of hero --}}
   <div class="relative z-20 max-w-6xl mx-auto px-8">
     <form method="GET" action="{{ route('client.rooms.index') }}" id="searchForm">
-      <div class="bg-white shadow-xl rounded-xl overflow-hidden grid"
+      <div class="bg-white shadow-xl rounded-xl grid"
            style="grid-template-columns: 1fr 1fr 1.8fr auto;">
 
         {{-- Check In --}}
@@ -96,7 +96,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.45; cursor: p
         </div>
 
         {{-- Guests --}}
-        <div class="px-5 py-4 border-r border-gray-100 hover:bg-gray-50 transition-colors relative select-none" id="guestField">
+        <div class="px-5 py-4 border-r border-gray-100 hover:bg-gray-50 transition-colors select-none" id="guestField">
           <label class="block text-[9px] font-bold tracking-[0.2em] uppercase text-gray-500 mb-1.5">
             <i class="far fa-user mr-1"></i>Khách
           </label>
@@ -104,54 +104,13 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.45; cursor: p
             <span class="text-gray-900 text-sm font-semibold" id="guestSummary">
               {{ $adults }} Người lớn, {{ $children }} Trẻ em, {{ $roomsCount }} phòng
             </span>
-            <i class="fas fa-chevron-down text-gray-400 text-[10px] ml-2"></i>
+            <i class="fas fa-chevron-down text-gray-400 text-[10px] ml-2" id="guestChevron"></i>
           </div>
           <input type="hidden" name="adults"      id="inp_adults"      value="{{ $adults }}">
           <input type="hidden" name="children"    id="inp_children"    value="{{ $children }}">
           <input type="hidden" name="rooms_count" id="inp_rooms_count" value="{{ $roomsCount }}">
-
-          <div id="guestDropdown" class="hidden absolute top-full left-0 mt-1 w-80 bg-white border border-gray-200 shadow-2xl z-50 p-5">
-            {{-- Adults --}}
-            <div class="flex items-center justify-between py-3 border-b border-gray-100">
-              <div>
-                <div class="text-sm font-semibold text-gray-800">Người lớn</div>
-                <div class="text-xs text-gray-400">Từ 13 tuổi trở lên</div>
-              </div>
-              <div class="flex items-center gap-3">
-                <button type="button" id="btn_adults_minus" onclick="changeGuest('adults',-1)"
-                        class="w-8 h-8 rounded-full border border-gray-300 text-gray-600 flex items-center justify-center text-lg leading-none hover:border-blue-500 hover:text-blue-500 transition-colors">−</button>
-                <span class="w-5 text-center text-sm font-bold text-gray-800" id="disp_adults">{{ $adults }}</span>
-                <button type="button" onclick="changeGuest('adults',1)"
-                        class="w-8 h-8 rounded-full border border-gray-300 text-gray-600 flex items-center justify-center text-lg leading-none hover:border-blue-500 hover:text-blue-500 transition-colors">+</button>
-              </div>
-            </div>
-            {{-- Children --}}
-            <div class="flex items-center justify-between py-3 border-b border-gray-100">
-              <div>
-                <div class="text-sm font-semibold text-gray-800">Trẻ em</div>
-                <div class="text-xs text-gray-400">Từ 0 - 12 tuổi</div>
-              </div>
-              <div class="flex items-center gap-3">
-                <button type="button" id="btn_children_minus" onclick="changeGuest('children',-1)"
-                        class="w-8 h-8 rounded-full border border-gray-300 text-gray-600 flex items-center justify-center text-lg leading-none hover:border-blue-500 hover:text-blue-500 transition-colors">−</button>
-                <span class="w-5 text-center text-sm font-bold text-gray-800" id="disp_children">{{ $children }}</span>
-                <button type="button" onclick="changeGuest('children',1)"
-                        class="w-8 h-8 rounded-full border border-gray-300 text-gray-600 flex items-center justify-center text-lg leading-none hover:border-blue-500 hover:text-blue-500 transition-colors">+</button>
-              </div>
-            </div>
-            {{-- Rooms --}}
-            <div class="flex items-center justify-between py-3">
-              <div class="text-sm font-semibold text-gray-800">Số phòng</div>
-              <div class="flex items-center gap-3">
-                <button type="button" id="btn_rooms_minus" onclick="changeGuest('rooms_count',-1)"
-                        class="w-8 h-8 rounded-full border border-gray-300 text-gray-600 flex items-center justify-center text-lg leading-none hover:border-blue-500 hover:text-blue-500 transition-colors">−</button>
-                <span class="w-5 text-center text-sm font-bold text-gray-800" id="disp_rooms_count">{{ $roomsCount }}</span>
-                <button type="button" onclick="changeGuest('rooms_count',1)"
-                        class="w-8 h-8 rounded-full border border-gray-300 text-gray-600 flex items-center justify-center text-lg leading-none hover:border-blue-500 hover:text-blue-500 transition-colors">+</button>
-              </div>
-            </div>
-          </div>
         </div>
+        {{-- Guest dropdown teleported to body in JS below --}}
 
         {{-- Submit --}}
         <button type="submit"
@@ -203,10 +162,27 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.45; cursor: p
       <div class="h-px bg-gray-100 mx-7 mb-5"></div>
 
     @if($roomTypes->isEmpty())
-      <div class="text-center py-20 mx-7 mb-7 border border-gray-100 rounded-xl">
-        <i class="fas fa-door-open text-5xl text-gray-200 mb-4 block"></i>
-        <h3 class="text-xl font-semibold text-gray-400 mb-1">Không có phòng khả dụng</h3>
-        <p class="text-sm text-gray-400">Vui lòng thử ngày khác hoặc giảm số lượng khách.</p>
+      <div class="flex flex-col items-center text-center py-16 px-6 mx-7 mb-7">
+        {{-- Red icon --}}
+        <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-5">
+          <i class="fas fa-magnifying-glass text-2xl text-red-400"></i>
+        </div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2 max-w-md">
+          Rất tiếc, không tìm thấy phòng nào phù hợp với yêu cầu của bạn
+        </h3>
+        <p class="text-sm text-gray-400 mb-7 max-w-sm">
+          Hãy thử thay đổi ngày hoặc bộ lọc để xem thêm các lựa chọn khác.
+        </p>
+        <div class="flex items-center gap-3">
+          <a href="{{ route('client.rooms.index') }}"
+             class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors">
+            Xóa bộ lọc
+          </a>
+          <a href="tel:+842812345678"
+             class="px-5 py-2.5 border border-gray-300 hover:border-gray-400 text-gray-600 text-sm font-semibold rounded-lg transition-colors">
+            Liên hệ bộ phận đặt phòng
+          </a>
+        </div>
       </div>
     @else
 
@@ -464,19 +440,80 @@ function syncMinCheckout() {
 }
 
 // ==========================================================
-// SEARCH — Guest dropdown
+// SEARCH — Guest dropdown (teleported to body to escape z-context)
 // ==========================================================
 var guestState = { adults: {{ $adults }}, children: {{ $children }}, rooms_count: {{ $roomsCount }} };
 var guestMin   = { adults: 1, children: 0, rooms_count: 1 };
 
+// Build dropdown HTML and inject into body at page load
+(function buildGuestDropdown() {
+  var dd = document.createElement('div');
+  dd.id = 'guestDropdown';
+  dd.className = 'hidden bg-white border border-gray-200 shadow-2xl p-5 w-80';
+  dd.style.cssText = 'position:fixed; z-index:9999; top:0; left:0;';
+  dd.innerHTML = `
+    <div class="flex items-center justify-between py-3 border-b border-gray-100">
+      <div><div class="text-sm font-semibold text-gray-800">Người lớn</div><div class="text-xs text-gray-400">Từ 13 tuổi trở lên</div></div>
+      <div class="flex items-center gap-3">
+        <button type="button" id="btn_adults_minus" onclick="changeGuest('adults',-1)" class="w-8 h-8 rounded-full border border-gray-300 text-gray-600 flex items-center justify-center text-lg leading-none hover:border-blue-500 hover:text-blue-500 transition-colors">−</button>
+        <span class="w-5 text-center text-sm font-bold text-gray-800" id="disp_adults">${guestState.adults}</span>
+        <button type="button" onclick="changeGuest('adults',1)" class="w-8 h-8 rounded-full border border-gray-300 text-gray-600 flex items-center justify-center text-lg leading-none hover:border-blue-500 hover:text-blue-500 transition-colors">+</button>
+      </div>
+    </div>
+    <div class="flex items-center justify-between py-3 border-b border-gray-100">
+      <div><div class="text-sm font-semibold text-gray-800">Trẻ em</div><div class="text-xs text-gray-400">Từ 0 - 12 tuổi</div></div>
+      <div class="flex items-center gap-3">
+        <button type="button" id="btn_children_minus" onclick="changeGuest('children',-1)" class="w-8 h-8 rounded-full border border-gray-300 text-gray-600 flex items-center justify-center text-lg leading-none hover:border-blue-500 hover:text-blue-500 transition-colors">−</button>
+        <span class="w-5 text-center text-sm font-bold text-gray-800" id="disp_children">${guestState.children}</span>
+        <button type="button" onclick="changeGuest('children',1)" class="w-8 h-8 rounded-full border border-gray-300 text-gray-600 flex items-center justify-center text-lg leading-none hover:border-blue-500 hover:text-blue-500 transition-colors">+</button>
+      </div>
+    </div>
+    <div class="flex items-center justify-between py-3">
+      <div class="text-sm font-semibold text-gray-800">Số phòng</div>
+      <div class="flex items-center gap-3">
+        <button type="button" id="btn_rooms_minus" onclick="changeGuest('rooms_count',-1)" class="w-8 h-8 rounded-full border border-gray-300 text-gray-600 flex items-center justify-center text-lg leading-none hover:border-blue-500 hover:text-blue-500 transition-colors">−</button>
+        <span class="w-5 text-center text-sm font-bold text-gray-800" id="disp_rooms_count">${guestState.rooms_count}</span>
+        <button type="button" onclick="changeGuest('rooms_count',1)" class="w-8 h-8 rounded-full border border-gray-300 text-gray-600 flex items-center justify-center text-lg leading-none hover:border-blue-500 hover:text-blue-500 transition-colors">+</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(dd);
+  // init minus btn states
+  ['adults','children','rooms_count'].forEach(function(k) {
+    setTimeout(function() {
+      var btn = document.getElementById('btn_' + k + '_minus');
+      if (btn) btn.disabled = (guestState[k] <= (guestMin[k] || 0));
+    }, 0);
+  });
+})();
+
 function toggleGuestDropdown(e) {
   e.stopPropagation();
-  document.getElementById('guestDropdown').classList.toggle('hidden');
+  var dd    = document.getElementById('guestDropdown');
+  var field = document.getElementById('guestField');
+  var chevron = document.getElementById('guestChevron');
+  if (!dd) return;
+  var isOpen = !dd.classList.contains('hidden');
+  if (isOpen) {
+    dd.classList.add('hidden');
+    if (chevron) chevron.style.transform = '';
+    return;
+  }
+  // Position below the guestField
+  var rect = field.getBoundingClientRect();
+  dd.style.top  = (rect.bottom + 4) + 'px';
+  dd.style.left = Math.max(0, rect.right - 320) + 'px';  // align right edge
+  dd.classList.remove('hidden');
+  if (chevron) chevron.style.transform = 'rotate(180deg)';
 }
 document.addEventListener('click', function(e) {
   var field = document.getElementById('guestField');
   var dd    = document.getElementById('guestDropdown');
-  if (dd && field && !field.contains(e.target)) dd.classList.add('hidden');
+  var chevron = document.getElementById('guestChevron');
+  if (dd && field && !field.contains(e.target) && !dd.contains(e.target)) {
+    dd.classList.add('hidden');
+    if (chevron) chevron.style.transform = '';
+  }
 });
 function changeGuest(type, delta) {
   var min = guestMin[type] !== undefined ? guestMin[type] : 0;
@@ -531,6 +568,16 @@ function updateTotalPanelState() {
   }
 }
 window.addEventListener('scroll', updateTotalPanelState, { passive: true });
+
+// Close guest dropdown on scroll (fixed-positioned dropdown would follow screen otherwise)
+window.addEventListener('scroll', function() {
+  var dd = document.getElementById('guestDropdown');
+  var chevron = document.getElementById('guestChevron');
+  if (dd && !dd.classList.contains('hidden')) {
+    dd.classList.add('hidden');
+    if (chevron) chevron.style.transform = '';
+  }
+}, { passive: true });
 document.addEventListener('DOMContentLoaded', updateTotalPanelState);
 
 // ==========================================================
