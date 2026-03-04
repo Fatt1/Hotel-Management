@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\RoleAdminController;
 use App\Http\Controllers\Admin\RoomTypeAdminController;
 use App\Http\Controllers\Admin\RoomDiagramAdminController;
 use App\Http\Controllers\BookingAdminController;
+use App\Http\Controllers\RoomAdminController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -40,6 +41,8 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
         'destroy' => 'admin.room-types.destroy',
     ]);
     
+    Route::get('/rooms/available', [RoomAdminController::class, 'getAvailableRooms'])->name('admin.rooms.available');
+
     // Room Diagram routes
     Route::get('room-diagrams', [RoomDiagramAdminController::class, 'index'])->name('admin.room-diagrams.index');
     Route::get('room-diagrams/edit', [RoomDiagramAdminController::class, 'edit'])->name('admin.room-diagrams.edit');

@@ -6,7 +6,7 @@ function getFormModalHtml(role = null) {
     const modalTitle = isEdit ? "Chỉnh sửa vai trò" : "Thêm vai trò";
     const submitButtonText = isEdit ? "Cập nhật" : "Tạo";
     return `
-                   <div id='roleFormModal'>
+                   <div id='roleFormModal' class="min-w-[412px]">
                         <div class="flex justify-between items-center pb-4 border-b border-slate-200">
                     <div class="flex flex-col">
                         <h2 class="text-xl font-bold text-slate-900">${modalTitle}</h2>

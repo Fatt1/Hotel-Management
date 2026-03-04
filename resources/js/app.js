@@ -12,3 +12,5 @@ export function closeModal() {
     modal.classList.add("hidden");
     modal.style.display = "";
 }
+window.openModal = openModal;
+window.closeModal = closeModal;
