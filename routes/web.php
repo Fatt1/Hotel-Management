@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\EquipmentAdminController;
 use App\Http\Controllers\Admin\UtilityAdminController;
 use App\Http\Controllers\Admin\RoomTypeAdminController;
 use App\Http\Controllers\Client\AmenityController;
+use App\Http\Controllers\Client\BookingCheckoutController;
 use App\Http\Controllers\Client\DiningController;
 use App\Http\Controllers\Client\GalleryController;
 use App\Http\Controllers\Client\RoomController;
@@ -109,4 +110,7 @@ Route::name('client.')->group(function () {
 
     // Thư viện ảnh khách sạn
     Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
+
+    // Checkout — nhận dữ liệu phòng từ trang rooms và hiển thị form thông tin khách
+    Route::post('/booking/checkout', [BookingCheckoutController::class, 'checkout'])->name('booking.checkout');
 });

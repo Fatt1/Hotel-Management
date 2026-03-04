@@ -550,7 +550,54 @@ function updateTotal() {
   if (priceEl) priceEl.innerHTML = new Intl.NumberFormat('vi-VN').format(total) + ' &#8363;';
   if (btnEl)   btnEl.disabled   = !hasAny;
 }
-function handleBookNow() { return false; }
+function handleBookNow() {
+  // Collect selected qty from each room type select
+  var selects = document.querySelectorAll('.qty-select');
+  var hasAny  = false;
+  selects.forEach(function(s){ if (parseInt(s.value) > 0) hasAny = true; });
+  if (!hasAny) return;
+
+  // Build a hidden form and POST to checkout
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = '{{ route("client.booking.checkout") }}';
+  form.style.display = 'none';
+
+  // CSRF token
+  var csrf = document.createElement('input');
+  csrf.type = 'hidden'; csrf.name = '_token';
+  csrf.value = '{{ csrf_token() }}';
+  form.appendChild(csrf);
+
+  // Search params
+  var params = {
+    check_in:    document.getElementById('check_in').value,
+    check_out:   document.getElementById('check_out').value,
+    adults:      document.getElementById('inp_adults').value,
+    children:    document.getElementById('inp_children').value,
+    rooms_count: document.getElementById('inp_rooms_count').value,
+  };
+  Object.keys(params).forEach(function(k) {
+    var i = document.createElement('input');
+    i.type = 'hidden'; i.name = k; i.value = params[k];
+    form.appendChild(i);
+  });
+
+  // Room quantities
+  selects.forEach(function(sel) {
+    var qty = parseInt(sel.value) || 0;
+    if (qty > 0) {
+      var i = document.createElement('input');
+      i.type = 'hidden';
+      i.name  = 'qty_' + sel.dataset.roomId;
+      i.value = qty;
+      form.appendChild(i);
+    }
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+}
 document.addEventListener('DOMContentLoaded', function() { updateTotal(); });
 
 // ==========================================================
