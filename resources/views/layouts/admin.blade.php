@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>Hotel</title>
+  <title>@yield('title', "Hotel")</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
     rel="stylesheet" />
@@ -83,11 +83,11 @@
   aria-modal="true">
   <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
     <!-- Backdrop -->
-    <div class="fixed inset-0 transition-opacity bg-black opacity-60 backdrop-blur-md" aria-hidden="true">
+    <div class="fixed inset-0 transition-opacity bg-black opacity-60 backdrop-blur-md" aria-hidden="true" onclick="closeModal()">
     </div>
     <!-- Modal Content -->
     <div
-      class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-2xl shadow-2xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-2xl shadow-2xl sm:my-8 sm:align-middle">
       <div id="global-modal-content" class="p-5">
       </div>
     </div>

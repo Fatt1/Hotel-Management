@@ -1,14 +1,23 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthAdminController;
+use App\Http\Controllers\Admin\BookingAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\RoleAdminController;
-use App\Http\Controllers\Admin\RoomTypeAdminController;
 use App\Http\Controllers\Admin\RoomDiagramAdminController;
+<<<<<<< HEAD
 use App\Http\Controllers\Admin\EquipmentCategoryAdminController;
 use App\Http\Controllers\Admin\EquipmentAdminController;
 use App\Http\Controllers\Admin\UtilityAdminController;
 use App\Http\Controllers\BookingAdminController;
+=======
+use App\Http\Controllers\Admin\RoomTypeAdminController;
+use App\Http\Controllers\Client\AmenityController;
+use App\Http\Controllers\Client\DiningController;
+use App\Http\Controllers\Client\GalleryController;
+use App\Http\Controllers\Client\RoomController;
+use App\Http\Controllers\RoomAdminController;
+>>>>>>> c45d2161fb47281a29ca4729932cf5bb02e574b6
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -31,7 +40,7 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
 
     // Booking routes
     Route::get("/bookings", [BookingAdminController::class, "index"])->name("admin.bookings.index");
-    
+    Route::get('/bookings/create', [BookingAdminController::class,'create'])->name('admin.bookings.create');
     // Room Type routes
     Route::resource('room-types', RoomTypeAdminController::class)->names([
         'index' => 'admin.room-types.index',
@@ -43,6 +52,8 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
         'destroy' => 'admin.room-types.destroy',
     ]);
     
+    Route::get('/rooms/available', [RoomAdminController::class, 'getAvailableRooms'])->name('admin.rooms.available');
+
     // Room Diagram routes
     Route::get('room-diagrams', [RoomDiagramAdminController::class, 'index'])->name('admin.room-diagrams.index');
     Route::get('room-diagrams/edit', [RoomDiagramAdminController::class, 'edit'])->name('admin.room-diagrams.edit');
@@ -82,4 +93,24 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     ]);
     
     Route::post("/logout", [AuthAdminController::class, "logout"])->name('admin.logout');
+});
+
+// =========================================================
+// Client Routes
+// =========================================================
+Route::name('client.')->group(function () {
+    // Danh sách loại phòng
+    Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
+
+    // Chi tiết một loại phòng
+    Route::get('/rooms/{id}', [RoomController::class, 'show'])->name('rooms.show');
+
+    // Tiện ích khách sạn
+    Route::get('/amenities', [AmenityController::class, 'index'])->name('amenities.index');
+
+    // Nhà hàng & dịch vụ ăn uống
+    Route::get('/dinings', [DiningController::class, 'index'])->name('dinings.index');
+
+    // Thư viện ảnh khách sạn
+    Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
 });
