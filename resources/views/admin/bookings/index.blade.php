@@ -7,11 +7,13 @@
                 <p class="text-slate-500 dark:text-slate-400 font-medium">Hệ thống quản trị khách sạn Urban Luxe - Quản lý
                     đặt lịch khách hàng.</p>
             </div>
-            <button
-                class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl text-sm font-bold shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all hover:-translate-y-0.5">
-                <span class="material-symbols-outlined">add_circle</span>
-                Tạo đặt phòng mới
-            </button>
+           <form action="{{ route('admin.bookings.create') }}">
+                <button type="submit"
+                    class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl text-sm font-bold shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all hover:-translate-y-0.5">
+                    <span class="material-symbols-outlined">add_circle</span>
+                    Tạo đặt phòng mới
+                </button>
+           </form>
         </div>
         <div
             class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">

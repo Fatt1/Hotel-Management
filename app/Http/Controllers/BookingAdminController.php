@@ -19,4 +19,8 @@ class BookingAdminController extends Controller
         
         return view("admin.bookings.index", compact('bookings'));
     }
+    public function create()
+    {
+        return view("admin.bookings.create");
+    }
 }
