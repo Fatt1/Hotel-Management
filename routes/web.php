@@ -5,19 +5,15 @@ use App\Http\Controllers\Admin\BookingAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\RoleAdminController;
 use App\Http\Controllers\Admin\RoomDiagramAdminController;
-<<<<<<< HEAD
 use App\Http\Controllers\Admin\EquipmentCategoryAdminController;
 use App\Http\Controllers\Admin\EquipmentAdminController;
 use App\Http\Controllers\Admin\UtilityAdminController;
-use App\Http\Controllers\BookingAdminController;
-=======
 use App\Http\Controllers\Admin\RoomTypeAdminController;
 use App\Http\Controllers\Client\AmenityController;
 use App\Http\Controllers\Client\DiningController;
 use App\Http\Controllers\Client\GalleryController;
 use App\Http\Controllers\Client\RoomController;
 use App\Http\Controllers\RoomAdminController;
->>>>>>> c45d2161fb47281a29ca4729932cf5bb02e574b6
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
