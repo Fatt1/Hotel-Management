@@ -58,39 +58,43 @@
                   <span class="material-symbols-outlined">hotel</span>
                 </div>
                 <div>
-                  <p class="font-bold text-slate-900">{{ $room->name }}</p>
-                  <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ $room->code ?? 'N/A' }}</p>
+                  <p class="font-bold text-slate-900">{{ $room['name'] }}</p>
+                  <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ $room['code'] ?? 'N/A' }}</p>
                 </div>
               </div>
             </td>
-            <td class="px-6 py-4 text-center font-medium text-slate-600">{{ $room->area ?? '-' }}</td>
+            <td class="px-6 py-4 text-center font-medium text-slate-600">{{ number_format($room['width'] * $room['height'], 2, ',', '.') }} m²</td>
             <td class="px-6 py-4 text-center">
               <div class="flex items-center justify-center gap-3 text-slate-600 text-sm font-medium">
                 <span class="flex items-center gap-1">
                   <span class="material-symbols-outlined text-slate-400" style="font-size: 14px;">group</span> 
-                  {{ $room->max_adults ?? 0 }}
+                  {{ $room['adult_quantity'] }}
                 </span>
                 <span class="flex items-center gap-1">
                   <span class="material-symbols-outlined text-slate-400" style="font-size: 14px;">person</span> 
-                  {{ $room->max_children ?? 0 }}
+                  {{ $room['child_quantity'] }}
                 </span>
               </div>
             </td>
-            <td class="px-6 py-4 text-right font-bold text-blue-900">{{ number_format($room->hourly_rate ?? 0, 0, ',', '.') }}đ</td>
-            <td class="px-6 py-4 text-right font-bold text-blue-900">{{ number_format($room->daily_rate ?? 0, 0, ',', '.') }}đ</td>
-            <td class="px-6 py-4 text-center font-bold text-slate-700">{{ $room->quantity ?? 0 }}</td>
+            <td class="px-6 py-4 text-right font-bold text-blue-900">{{ number_format($room['hourly_price'], 0, ',', '.') }}đ</td>
+            <td class="px-6 py-4 text-right font-bold text-blue-900">{{ number_format($room['daily_price'], 0, ',', '.') }}đ</td>
+            <td class="px-6 py-4 text-center">
+              <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-900 rounded-full text-xs font-bold">
+                {{ $room['total_rooms'] }} phòng
+              </span>
+            </td>
             <td class="px-6 py-4">
               <div class="flex items-center justify-center gap-2">
-                <a href="{{ route('admin.room-types.show', $room->id) }}" class="p-2 text-slate-400 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-all">
+                <a href="{{ route('admin.room-types.show', $room['id']) }}" class="p-2 text-slate-400 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-all" title="Xem chi tiết">
                   <span class="material-symbols-outlined">visibility</span>
                 </a>
-                <a href="{{ route('admin.room-types.edit', $room->id) }}" class="p-2 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-all">
+                <a href="{{ route('admin.room-types.edit', $room['id']) }}" class="p-2 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-all" title="Chỉnh sửa">
                   <span class="material-symbols-outlined">edit</span>
                 </a>
-                <form action="{{ route('admin.room-types.destroy', $room->id) }}" method="POST" style="display:inline;" onclick="openDeleteModal(event, '{{ route('admin.room-types.destroy', $room->id) }}', '{{ $room->name }}')">
+                <form action="{{ route('admin.room-types.destroy', $room['id']) }}" method="POST" style="display:inline;" onclick="openDeleteModal(event, '{{ route('admin.room-types.destroy', $room['id']) }}', '{{ $room['name'] }}')">
                   @csrf
                   @method('DELETE')
-                  <button type="button" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                  <button type="button" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Xóa">
                     <span class="material-symbols-outlined">delete</span>
                   </button>
                 </form>
@@ -107,44 +111,15 @@
         </tbody>
       </table>
       
-      <!-- Pagination -->
-      <div class="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+      <!-- Pagination Info -->
+      <div class="px-6 py-4 bg-slate-50/50 border-t border-slate-100">
         <p class="text-xs text-slate-500 font-medium">
-          @if($roomTypes->count() > 0)
-            Hiển thị {{ $roomTypes->firstItem() }} đến {{ $roomTypes->lastItem() }} trên {{ $roomTypes->total() }} loại phòng
+          @if(count($roomTypes) > 0)
+            Tổng cộng {{ count($roomTypes) }} loại phòng
           @else
             Không có dữ liệu
           @endif
         </p>
-        <div class="flex items-center gap-1">
-          @if($roomTypes->onFirstPage())
-            <button class="p-1.5 text-slate-400 disabled:opacity-30" disabled>
-              <span class="material-symbols-outlined" style="transform: rotate(180deg);">chevron_right</span>
-            </button>
-          @else
-            <a href="{{ $roomTypes->previousPageUrl() }}" class="p-1.5 text-slate-400 hover:text-blue-900">
-              <span class="material-symbols-outlined" style="transform: rotate(180deg);">chevron_right</span>
-            </a>
-          @endif
-          
-          @foreach($roomTypes->getUrlRange(1, $roomTypes->lastPage()) as $page => $url)
-            @if($page == $roomTypes->currentPage())
-              <button class="w-8 h-8 rounded-lg bg-blue-900 text-white text-xs font-bold flex items-center justify-center">{{ $page }}</button>
-            @else
-              <a href="{{ $url }}" class="w-8 h-8 rounded-lg hover:bg-slate-200 text-slate-600 text-xs font-bold flex items-center justify-center transition-colors">{{ $page }}</a>
-            @endif
-          @endforeach
-          
-          @if($roomTypes->hasMorePages())
-            <a href="{{ $roomTypes->nextPageUrl() }}" class="p-1.5 text-slate-400 hover:text-blue-900">
-              <span class="material-symbols-outlined">chevron_right</span>
-            </a>
-          @else
-            <button class="p-1.5 text-slate-400 disabled:opacity-30" disabled>
-              <span class="material-symbols-outlined">chevron_right</span>
-            </button>
-          @endif
-        </div>
       </div>
     </div>
   </div>
