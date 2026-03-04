@@ -36,9 +36,13 @@
       <span>Quản lý loại phòng</span>
     </a>
     <div class="sidebar-group-label">QUẢN LÝ TÀI SẢN</div>
-    <a class="sidebar-item" href="#">
+    <a class="{{ request()->routeIs("admin.equipments.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.equipments.index') }}">
       <span class="material-symbols-outlined">inventory_2</span>
       <span>Trang thiết bị</span>
+    </a>
+    <a class="{{ request()->routeIs("admin.equipment-categories.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.equipment-categories.index') }}">
+      <span class="material-symbols-outlined">category</span>
+      <span>Quản lý loại thiết bị</span>
     </a>
     <a class="sidebar-item" href="#">
       <span class="material-symbols-outlined">build</span>
@@ -58,7 +62,7 @@
       <span class="material-symbols-outlined">list_alt</span>
       <span>Loại dịch vụ</span>
     </a>
-    <a class="sidebar-item" href="#">
+    <a class="{{ request()->routeIs('admin.utilities.*') ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.utilities.index') }}">
       <span class="material-symbols-outlined">spa</span>
       <span>Quản lý tiện ích</span>
     </a>

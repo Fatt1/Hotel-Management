@@ -5,6 +5,9 @@ use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\RoleAdminController;
 use App\Http\Controllers\Admin\RoomTypeAdminController;
 use App\Http\Controllers\Admin\RoomDiagramAdminController;
+use App\Http\Controllers\Admin\EquipmentCategoryAdminController;
+use App\Http\Controllers\Admin\EquipmentAdminController;
+use App\Http\Controllers\Admin\UtilityAdminController;
 use App\Http\Controllers\BookingAdminController;
 use Illuminate\Support\Facades\Route;
 
@@ -44,6 +47,39 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::get('room-diagrams', [RoomDiagramAdminController::class, 'index'])->name('admin.room-diagrams.index');
     Route::get('room-diagrams/edit', [RoomDiagramAdminController::class, 'edit'])->name('admin.room-diagrams.edit');
     Route::post('room-diagrams/update', [RoomDiagramAdminController::class, 'update'])->name('admin.room-diagrams.update');
+
+    // Equipment Category routes
+    Route::resource('equipment-categories', EquipmentCategoryAdminController::class)->names([
+        'index' => 'admin.equipment-categories.index',
+        'create' => 'admin.equipment-categories.create',
+        'store' => 'admin.equipment-categories.store',
+        'show' => 'admin.equipment-categories.show',
+        'edit' => 'admin.equipment-categories.edit',
+        'update' => 'admin.equipment-categories.update',
+        'destroy' => 'admin.equipment-categories.destroy',
+    ]);
+
+    // Equipment routes
+    Route::resource('equipments', EquipmentAdminController::class)->names([
+        'index' => 'admin.equipments.index',
+        'create' => 'admin.equipments.create',
+        'store' => 'admin.equipments.store',
+        'show' => 'admin.equipments.show',
+        'edit' => 'admin.equipments.edit',
+        'update' => 'admin.equipments.update',
+        'destroy' => 'admin.equipments.destroy',
+    ]);
+
+    // Utility routes
+    Route::resource('utilities', UtilityAdminController::class)->names([
+        'index' => 'admin.utilities.index',
+        'create' => 'admin.utilities.create',
+        'store' => 'admin.utilities.store',
+        'show' => 'admin.utilities.show',
+        'edit' => 'admin.utilities.edit',
+        'update' => 'admin.utilities.update',
+        'destroy' => 'admin.utilities.destroy',
+    ]);
     
     Route::post("/logout", [AuthAdminController::class, "logout"])->name('admin.logout');
 });

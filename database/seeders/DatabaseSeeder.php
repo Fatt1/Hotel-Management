@@ -61,6 +61,9 @@ class DatabaseSeeder extends Seeder
             RoomSeeder::class,
             CustomerSeeder::class,
             BookingSeeder::class,
+            EquipmentCategorySeeder::class,
+            EquipmentSeeder::class,
+            AmenitySeeder::class,
         ]);
     }
 }
