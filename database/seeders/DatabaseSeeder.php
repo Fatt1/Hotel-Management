@@ -61,8 +61,6 @@ class DatabaseSeeder extends Seeder
             RoomTypeSeeder::class,
             RoomSeeder::class,
             CustomerSeeder::class,
-            DiningSeeder::class,
-            GallerySeeder::class,
             BookingSeeder::class,
         ]);
     }

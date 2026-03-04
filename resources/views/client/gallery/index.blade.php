@@ -4,149 +4,16 @@
 
 @push('styles')
 <style>
-/* =========================================
-   GALLERY PAGE — CUSTOM STYLES
-   ========================================= */
-
-/* --- Filter tabs --- */
-.gal-tab-btn {
-    display: inline-block;
-    padding: 0.45rem 1.25rem;
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    border: 1px solid rgba(212,175,55,0.25);
-    color: #9a9080;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-}
-.gal-tab-btn:hover {
-    color: #d4af37;
-    border-color: rgba(212,175,55,0.5);
-}
-.gal-tab-btn.active {
-    background-color: #d4af37;
-    border-color: #d4af37;
-    color: #0a0a0a;
-}
-
-/* --- Masonry grid --- */
-.gal-masonry {
-    columns: 3;
-    column-gap: 0.85rem;
-}
-@media (max-width: 900px) {
-    .gal-masonry { columns: 2; }
-}
-@media (max-width: 540px) {
-    .gal-masonry { columns: 1; }
-}
-
-.gal-item {
-    break-inside: avoid;
-    margin-bottom: 0.85rem;
-    overflow: hidden;
-    position: relative;
-    cursor: pointer;
-    display: block; /* shown by default */
-}
-.gal-item[hidden] {
-    display: none !important;
-}
-
-.gal-item img {
-    width: 100%;
-    height: auto;
-    display: block;
-    transition: transform 0.5s ease;
-}
-.gal-item:hover img {
-    transform: scale(1.04);
-}
-
-/* Caption overlay */
-.gal-caption {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(5,5,5,0.82) 0%, transparent 55%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    display: flex;
-    align-items: flex-end;
-    padding: 1.2rem 1rem;
-}
-.gal-item:hover .gal-caption {
-    opacity: 1;
-}
-.gal-caption-title {
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    color: #f0ead8;
-}
-.gal-caption-cat {
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: #d4af37;
-    margin-bottom: 0.3rem;
-}
-
-/* Lightbox */
-#gal-lightbox {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: rgba(5,5,5,0.95);
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-}
-#gal-lightbox.open {
-    display: flex;
-}
-#gal-lightbox img {
-    max-width: 90vw;
-    max-height: 88vh;
-    object-fit: contain;
-    box-shadow: 0 0 80px rgba(0,0,0,0.6);
-}
-#gal-lb-close {
-    position: absolute;
-    top: 1.25rem;
-    right: 1.5rem;
-    font-size: 1.8rem;
-    color: #9a9080;
-    cursor: pointer;
-    background: none;
-    border: none;
-    line-height: 1;
-    transition: color 0.2s;
-}
-#gal-lb-close:hover { color: #d4af37; }
-#gal-lb-caption {
-    position: absolute;
-    bottom: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.75rem;
-    color: #9a9080;
-    letter-spacing: 0.08em;
-    white-space: nowrap;
-}
-
-/* Fade-in on appear */
+/* Minimal custom CSS for Animation and fallback states */
 @keyframes gal-fadein {
     from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0); }
 }
-.gal-item.appeared {
+.animate-gal-fadein {
     animation: gal-fadein 0.4s ease forwards;
+}
+.gal-item[hidden] {
+    display: none !important;
 }
 </style>
 @endpush
@@ -156,39 +23,39 @@
 {{-- ============================================================
      HEADER SECTION
      ============================================================ --}}
-<section style="padding: 9rem 0 4rem; background-color: #0a0a0a;">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+<section class="pt-36 pb-16 bg-[#0a0a0a]">
+    <div class="max-w-7xl mx-auto px-8">
 
         {{-- Title row --}}
-        <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: 3.5rem;">
-            <div style="max-width: 480px;">
+        <div class="flex flex-wrap items-end justify-between gap-8 mb-14">
+            <div class="max-w-[480px]">
                 {{-- Eyebrow label --}}
-                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-                    <div style="height: 1px; width: 40px; background-color: #d4af37;"></div>
-                    <span style="font-size: 0.6rem; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: #d4af37;">Thư Viện Hình Ảnh</span>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="h-px w-10 bg-[#d4af37]"></div>
+                    <span class="text-[10px] font-bold tracking-[0.3em] uppercase text-[#d4af37]">Thư Viện Hình Ảnh</span>
                 </div>
-                <h1 style="font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 5vw, 3.75rem); font-weight: 700; color: #f0ead8; line-height: 1.1; margin-bottom: 1rem;">
+                <h1 class="font-['Playfair_Display'] text-[clamp(2.5rem,5vw,3.75rem)] font-bold text-[#f0ead8] leading-[1.1] mb-4">
                     Bộ Sưu Tập
                 </h1>
-                <p style="font-size: 0.875rem; color: #6b6050; line-height: 1.8; max-width: 380px;">
+                <p class="text-sm text-[#6b6050] leading-relaxed max-w-[380px]">
                     Đắm chìm trong trải nghiệm Urban Luxe. Hành trình thị giác qua những
                     không gian được thiết kế cho người lữ hành hiện đại.
                 </p>
             </div>
 
             {{-- Filter tabs --}}
-            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;" id="gal-tabs">
-                <button class="gal-tab-btn active" data-cat="all">Tất Cả</button>
-                <button class="gal-tab-btn" data-cat="room">Phòng</button>
-                <button class="gal-tab-btn" data-cat="dining">Ẩm Thực</button>
-                <button class="gal-tab-btn" data-cat="exterior">Ngoại Thất</button>
-                <button class="gal-tab-btn" data-cat="interior">Nội Thất</button>
-                <button class="gal-tab-btn" data-cat="event">Sự Kiện</button>
+            <div class="flex flex-wrap gap-2" id="gal-tabs">
+                <button class="gal-tab-btn inline-block py-2 px-5 text-[11px] font-bold tracking-[0.15em] uppercase border transition-all duration-200 whitespace-nowrap bg-[#d4af37] border-[#d4af37] text-[#0a0a0a]" data-cat="all">Tất Cả</button>
+                <button class="gal-tab-btn inline-block py-2 px-5 text-[11px] font-bold tracking-[0.15em] uppercase border transition-all duration-200 whitespace-nowrap border-[#d4af37]/25 text-[#9a9080] bg-transparent hover:text-[#d4af37] hover:border-[#d4af37]/50" data-cat="room">Phòng</button>
+                <button class="gal-tab-btn inline-block py-2 px-5 text-[11px] font-bold tracking-[0.15em] uppercase border transition-all duration-200 whitespace-nowrap border-[#d4af37]/25 text-[#9a9080] bg-transparent hover:text-[#d4af37] hover:border-[#d4af37]/50" data-cat="dining">Ẩm Thực</button>
+                <button class="gal-tab-btn inline-block py-2 px-5 text-[11px] font-bold tracking-[0.15em] uppercase border transition-all duration-200 whitespace-nowrap border-[#d4af37]/25 text-[#9a9080] bg-transparent hover:text-[#d4af37] hover:border-[#d4af37]/50" data-cat="exterior">Ngoại Thất</button>
+                <button class="gal-tab-btn inline-block py-2 px-5 text-[11px] font-bold tracking-[0.15em] uppercase border transition-all duration-200 whitespace-nowrap border-[#d4af37]/25 text-[#9a9080] bg-transparent hover:text-[#d4af37] hover:border-[#d4af37]/50" data-cat="interior">Nội Thất</button>
+                <button class="gal-tab-btn inline-block py-2 px-5 text-[11px] font-bold tracking-[0.15em] uppercase border transition-all duration-200 whitespace-nowrap border-[#d4af37]/25 text-[#9a9080] bg-transparent hover:text-[#d4af37] hover:border-[#d4af37]/50" data-cat="event">Sự Kiện</button>
             </div>
         </div>
 
         {{-- Decorative divider --}}
-        <div style="height: 1px; background: linear-gradient(to right, transparent, rgba(212,175,55,0.3), transparent); margin-bottom: 3rem;"></div>
+        <div class="h-px bg-gradient-to-r from-transparent via-[#d4af37]/30 to-transparent mb-12"></div>
 
         {{-- ============================================================
              MASONRY GALLERY GRID
@@ -196,34 +63,36 @@
 
         {{-- Build a flat list of all images across all categories --}}
         @php
-            $allItems = collect();
-            foreach ($galleries as $cat => $items) {
-                $allItems = $allItems->merge($items);
-            }
-
-            /* Unsplash fallbacks per category */
-            $fallbacks = [
-                'room'     => 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',
-                'dining'   => 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80',
-                'exterior' => 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80',
-                'interior' => 'https://images.unsplash.com/photo-1610641818989-c2051b5e2cfd?w=800&q=80',
-                'event'    => 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
-            ];
+            /* Static mock data for Gallery */
+            $allItems = collect([
+                (object)['category' => 'room', 'title' => 'Phòng Superior', 'image_path' => 'https://picsum.photos/seed/room-superior/800/600'],
+                (object)['category' => 'room', 'title' => 'Phòng Deluxe Hướng Biển', 'image_path' => 'https://picsum.photos/seed/room-deluxe/600/800'],
+                (object)['category' => 'room', 'title' => 'Phòng Suite Góc', 'image_path' => 'https://picsum.photos/seed/room-suite/800/500'],
+                (object)['category' => 'dining', 'title' => 'Nhà Hàng Cung Đình', 'image_path' => 'https://picsum.photos/seed/dining-cung/800/800'],
+                (object)['category' => 'dining', 'title' => 'Ocean Breeze Buffet', 'image_path' => 'https://picsum.photos/seed/dining-ocean/800/500'],
+                (object)['category' => 'dining', 'title' => 'Skyline Bar', 'image_path' => 'https://picsum.photos/seed/dining-sky/600/800'],
+                (object)['category' => 'exterior', 'title' => 'Kiến Trúc Mặt Tiền', 'image_path' => 'https://picsum.photos/seed/ext-facade/800/600'],
+                (object)['category' => 'exterior', 'title' => 'Khuôn Viên Vườn Đêm', 'image_path' => 'https://picsum.photos/seed/ext-garden/800/800'],
+                (object)['category' => 'interior', 'title' => 'Sảnh Lễ Tân Sang Trọng', 'image_path' => 'https://picsum.photos/seed/int-lobby/800/600'],
+                (object)['category' => 'interior', 'title' => 'Hành Lang Nghệ Thuật', 'image_path' => 'https://picsum.photos/seed/int-hall/600/800'],
+                (object)['category' => 'event', 'title' => 'Phòng Hội Nghị Grand', 'image_path' => 'https://picsum.photos/seed/event-grand/800/500'],
+                (object)['category' => 'event', 'title' => 'Tiệc Cưới Ngoài Trời', 'image_path' => 'https://picsum.photos/seed/event-wedding/800/800'],
+            ]);
         @endphp
 
         @if($allItems->isEmpty())
             {{-- ---- Empty state ---- --}}
-            <div style="text-align: center; padding: 6rem 0;">
-                <p style="font-size: 0.9rem; color: #4a4040; font-style: italic;">Chưa có hình ảnh nào trong thư viện.</p>
+            <div class="text-center py-24">
+                <p class="text-[14.5px] text-[#4a4040] italic">Chưa có hình ảnh nào trong thư viện.</p>
             </div>
         @else
-            <div class="gal-masonry" id="gal-grid">
+            <div class="columns-1 sm:columns-2 md:columns-3 gap-3" id="gal-grid">
                 @foreach($allItems as $item)
                     @php
                         $cat = $item->category ?? 'room';
                         $imgSrc = ($item->image_path && file_exists(public_path($item->image_path)))
                             ? asset($item->image_path)
-                            : ($fallbacks[$cat] ?? 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80');
+                            : ('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80');
 
                         $catLabels = [
                             'room'     => 'Phòng Nghỉ',
@@ -235,7 +104,7 @@
                         $catLabel = $catLabels[$cat] ?? ucfirst($cat);
                     @endphp
                     <div
-                        class="gal-item appeared"
+                        class="gal-item animate-gal-fadein break-inside-avoid mb-3 overflow-hidden relative cursor-pointer block group"
                         data-cat="{{ $cat }}"
                         onclick="openLightbox('{{ $imgSrc }}', '{{ addslashes($item->title) }}')"
                         title="{{ $item->title }}"
@@ -244,11 +113,12 @@
                             src="{{ $imgSrc }}"
                             alt="{{ $item->title }}"
                             loading="lazy"
+                            class="w-full h-auto block transition-transform duration-500 group-hover:scale-[1.04]"
                         >
-                        <div class="gal-caption">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#050505]/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 flex items-end p-5 group-hover:opacity-100">
                             <div>
-                                <p class="gal-caption-cat">{{ $catLabel }}</p>
-                                <p class="gal-caption-title">{{ $item->title }}</p>
+                                <p class="text-[9px] font-bold tracking-[0.2em] uppercase text-[#d4af37] mb-1">{{ $catLabel }}</p>
+                                <p class="text-[12.5px] font-semibold tracking-[0.06em] text-[#f0ead8]">{{ $item->title }}</p>
                             </div>
                         </div>
                     </div>
@@ -256,7 +126,7 @@
             </div>
 
             {{-- Item count --}}
-            <p id="gal-count" style="text-align: center; margin-top: 2.5rem; font-size: 0.72rem; color: #4a4040; letter-spacing: 0.1em;">
+            <p id="gal-count" class="text-center mt-10 text-[11.5px] text-[#4a4040] tracking-[0.1em]">
                 Hiển thị <span id="gal-count-num">{{ $allItems->count() }}</span> / {{ $allItems->count() }} hình ảnh
             </p>
         @endif
@@ -267,10 +137,10 @@
 {{-- ============================================================
      LIGHTBOX
      ============================================================ --}}
-<div id="gal-lightbox" onclick="closeLightbox(event)" role="dialog" aria-modal="true" aria-label="Xem ảnh lớn">
-    <button id="gal-lb-close" onclick="closeLightbox()" aria-label="Đóng">&times;</button>
-    <img id="gal-lb-img" src="" alt="">
-    <span id="gal-lb-caption"></span>
+<div id="gal-lightbox" class="hidden fixed inset-0 z-[9999] bg-[#050505]/95 items-center justify-center p-8" onclick="closeLightbox(event)" role="dialog" aria-modal="true" aria-label="Xem ảnh lớn">
+    <button id="gal-lb-close" class="absolute top-5 right-6 text-3xl text-[#9a9080] cursor-pointer bg-none border-none leading-none transition-colors duration-200 hover:text-[#d4af37]" onclick="closeLightbox()" aria-label="Đóng">&times;</button>
+    <img id="gal-lb-img" class="max-w-[90vw] max-h-[88vh] object-contain shadow-[0_0_80px_rgba(0,0,0,0.6)]" src="" alt="">
+    <span id="gal-lb-caption" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs text-[#9a9080] tracking-[0.08em] whitespace-nowrap"></span>
 </div>
 
 @push('scripts')
@@ -291,8 +161,14 @@
             const cat = btn.dataset.cat;
 
             /* Toggle active state */
-            tabs.forEach(t => t.classList.remove('active'));
-            btn.classList.add('active');
+            tabs.forEach(t => {
+                 // reset classes to inactive
+                 t.classList.remove('bg-[#d4af37]', 'border-[#d4af37]', 'text-[#0a0a0a]');
+                 t.classList.add('bg-transparent', 'border-[#d4af37]/25', 'text-[#9a9080]', 'hover:text-[#d4af37]', 'hover:border-[#d4af37]/50');
+            });
+            // set active classes
+            btn.classList.add('bg-[#d4af37]', 'border-[#d4af37]', 'text-[#0a0a0a]');
+            btn.classList.remove('bg-transparent', 'border-[#d4af37]/25', 'text-[#9a9080]', 'hover:text-[#d4af37]', 'hover:border-[#d4af37]/50');
 
             /* Show / hide items */
             let visible = 0;
@@ -301,9 +177,9 @@
                 if (match) {
                     item.removeAttribute('hidden');
                     /* Re-trigger fade animation */
-                    item.classList.remove('appeared');
+                    item.classList.remove('animate-gal-fadein');
                     void item.offsetWidth; /* reflow */
-                    item.classList.add('appeared');
+                    item.classList.add('animate-gal-fadein');
                     visible++;
                 } else {
                     item.setAttribute('hidden', '');
@@ -325,13 +201,17 @@ function openLightbox(src, title) {
     img.src    = src;
     img.alt    = title;
     cap.textContent = title;
-    lb.classList.add('open');
+    lb.classList.remove('hidden');
+    lb.classList.add('flex');
     document.body.style.overflow = 'hidden';
 }
 
 function closeLightbox(event) {
-    if (event && event.target !== document.getElementById('gal-lightbox') && event.target !== document.getElementById('gal-lb-close')) return;
-    document.getElementById('gal-lightbox').classList.remove('open');
+    const lb = document.getElementById('gal-lightbox');
+    const cls = document.getElementById('gal-lb-close');
+    if (event && event.target !== lb && event.target !== cls) return;
+    lb.classList.remove('flex');
+    lb.classList.add('hidden');
     document.getElementById('gal-lb-img').src = '';
     document.body.style.overflow = '';
 }
