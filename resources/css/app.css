@@ -76,3 +76,135 @@ body {
     box-sizing: content-box;
     font-family: "Inter", sans-serif;
 }
+
+/* ===== Flatpickr Custom Styles ===== */
+.flatpickr-calendar {
+    border-radius: 16px !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
+    border: 1px solid #e2e8f0 !important;
+    font-family: "Inter", sans-serif !important;
+    padding: 16px !important;
+}
+.flatpickr-months {
+    padding: 0 0 8px 0;
+}
+.flatpickr-month {
+    color: #1e293b !important;
+    fill: #1e293b !important;
+    height: 36px !important;
+}
+.flatpickr-current-month {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+}
+.flatpickr-current-month select {
+    font-weight: 700 !important;
+}
+.flatpickr-weekday {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #94a3b8 !important;
+    text-transform: uppercase !important;
+}
+.flatpickr-day {
+    border-radius: 10px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #334155 !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    max-width: 36px !important;
+}
+.flatpickr-day:hover {
+    background: #eff6ff !important;
+    color: #1e3a8a !important;
+    border-color: transparent !important;
+}
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+    background: #1e3a8a !important;
+    border-color: #1e3a8a !important;
+    color: white !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+}
+.flatpickr-day.inRange {
+    background: #dbeafe !important;
+    border-color: transparent !important;
+    color: #1e3a8a !important;
+    border-radius: 0 !important;
+    box-shadow: -5px 0 0 #dbeafe, 5px 0 0 #dbeafe !important;
+}
+.flatpickr-day.startRange {
+    border-radius: 10px 0 0 10px !important;
+}
+.flatpickr-day.endRange {
+    border-radius: 0 10px 10px 0 !important;
+}
+.flatpickr-day.startRange.endRange {
+    border-radius: 10px !important;
+}
+.flatpickr-day.today {
+    border-color: #1e3a8a !important;
+    color: #1e3a8a !important;
+    font-weight: 700 !important;
+}
+.flatpickr-day.today:hover {
+    background: #1e3a8a !important;
+    color: white !important;
+}
+.flatpickr-prev-month svg,
+.flatpickr-next-month svg {
+    fill: #475569 !important;
+}
+.flatpickr-prev-month:hover svg,
+.flatpickr-next-month:hover svg {
+    fill: #1e3a8a !important;
+}
+.numInputWrapper:hover {
+    background: #f1f5f9 !important;
+}
+.flatpickr-time {
+    border-top: 1px solid #e2e8f0 !important;
+    margin-top: 12px !important;
+    padding-top: 12px !important;
+    height: 40px !important;
+}
+.flatpickr-time input {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+}
+.flatpickr-time .flatpickr-time-separator {
+    color: #94a3b8 !important;
+    font-weight: 700 !important;
+}
+
+/* ===== Booking Flow Animations & Utilities ===== */
+@keyframes booking-pop-in {
+  0%   { transform: scale(.5); opacity: 0; }
+  70%  { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes booking-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.booking-anim-pop  { animation: booking-pop-in  .55s cubic-bezier(.34,1.56,.64,1) forwards; }
+.booking-anim-fadeup  { animation: booking-fade-up .5s ease .25s both; }
+.booking-anim-fadeup2 { animation: booking-fade-up .5s ease .45s both; }
+
+/* Payment method tabs */
+.method-tab { cursor:pointer; border:2px solid #e5e7eb; border-radius:12px; padding:18px 12px; text-align:center; transition:all .2s; }
+.method-tab:hover { border-color:#93c5fd; background:#f0f7ff; }
+.method-tab.active { border-color:#3b82f6; background:#eff6ff; }
+.method-tab.active .tab-label { color:#2563eb; font-weight:700; }
+.method-tab .tab-dot { display:none; }
+.method-tab.active .tab-dot { display:block; }
+
+/* Payment panels */
+.payment-panel { display:none; }
+.payment-panel.active { display:block; }
+

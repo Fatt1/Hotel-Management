@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class EquipmentCategory extends Model
 {
     public $timestamps = false;
+    
+    protected $table = 'equipment_categories';
 
     protected $fillable = [
         'name',
@@ -15,6 +17,6 @@ class EquipmentCategory extends Model
 
     public function equipments(): HasMany
     {
-        return $this->hasMany(Equipment::class);
+        return $this->hasMany(Equipment::class, 'equipment_category_id');
     }
 }

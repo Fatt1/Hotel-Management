@@ -18,12 +18,12 @@
       <span>Tổng quan</span>
     </a>
     <div class="sidebar-group-label">VẬN HÀNH</div>
-    <a class="sidebar-item" href="#">
+    <a class="{{ request()->routeIs("admin.room-diagrams.index") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.room-diagrams.index') }}">
       <span class="material-symbols-outlined">grid_view</span>
       <span>Sơ đồ phòng</span>
     </a>
-    <a class="sidebar-item" href="#">
-      <span class="material-symbols-outlined">grid_view</span>
+    <a class="{{ request()->routeIs("admin.room-diagrams.edit") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.room-diagrams.edit') }}">
+      <span class="material-symbols-outlined">edit</span>
       <span>Chỉnh sửa sơ đồ phòng</span>
     </a>
     <a class="{{ request()->routeIs("admin.bookings.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route("admin.bookings.index") }}">
@@ -31,18 +31,18 @@
       <span>Quản lý đặt lịch</span>
     </a>
     <div class="sidebar-group-label">QUẢN LÝ PHÒNG</div>
-    <a class="sidebar-item" href="#">
-      <span class="material-symbols-outlined">bed</span>
-      <span>Quản lý phòng</span>
-    </a>
-    <a class="sidebar-item" href="#">
+    <a class="{{ request()->routeIs("admin.room-types.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.room-types.index') }}">
       <span class="material-symbols-outlined">category</span>
       <span>Quản lý loại phòng</span>
     </a>
     <div class="sidebar-group-label">QUẢN LÝ TÀI SẢN</div>
-    <a class="sidebar-item" href="#">
+    <a class="{{ request()->routeIs("admin.equipments.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.equipments.index') }}">
       <span class="material-symbols-outlined">inventory_2</span>
       <span>Trang thiết bị</span>
+    </a>
+    <a class="{{ request()->routeIs("admin.equipment-categories.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.equipment-categories.index') }}">
+      <span class="material-symbols-outlined">category</span>
+      <span>Quản lý loại thiết bị</span>
     </a>
     <a class="sidebar-item" href="#">
       <span class="material-symbols-outlined">build</span>
@@ -62,7 +62,7 @@
       <span class="material-symbols-outlined">list_alt</span>
       <span>Loại dịch vụ</span>
     </a>
-    <a class="sidebar-item" href="#">
+    <a class="{{ request()->routeIs('admin.utilities.*') ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.utilities.index') }}">
       <span class="material-symbols-outlined">spa</span>
       <span>Quản lý tiện ích</span>
     </a>

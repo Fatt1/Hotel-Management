@@ -1,4 +1,5 @@
 @extends("layouts.admin")
+@section('title', "Quản lý vai trò")
 @section('content')
 
   <div class="p-8 space-y-6">

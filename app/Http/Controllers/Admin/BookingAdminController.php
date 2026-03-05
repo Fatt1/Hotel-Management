@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Actions\Bookings\GetAllBookingsAction;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class BookingAdminController extends Controller
@@ -18,5 +19,9 @@ class BookingAdminController extends Controller
         $bookings = $getAllBookingsAction->handle($page_number, $page_size, $search, $from_date, $to_date, $status);
         
         return view("admin.bookings.index", compact('bookings'));
+    }
+    public function create()
+    {
+        return view("admin.bookings.create");
     }
 }
