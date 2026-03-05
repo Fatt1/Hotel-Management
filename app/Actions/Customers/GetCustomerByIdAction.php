@@ -11,9 +11,9 @@ class GetCustomerByIdAction
 {
     public function handle(int $id): Customer
     {
-        $customer = Customer::with(['booking' => function($q){
+        $customer = Customer::with(['bookings' => function($q){
             $q-> orderBy('booking_date', 'desc');
-        },'booking.bookingDetails'])->find($id);
+        },'bookings.bookingDetails'])->find($id);
         if (!$customer) {
             throw new \Exception('Khách hàng không tồn tại');
         }

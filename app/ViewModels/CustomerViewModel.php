@@ -21,7 +21,7 @@ class CustomerViewModel
         return $this->customer ?? new Customer();
     }
 
-    public function country(): array
+    public function countries(): array
     {
         return ["Việt Nam", "Mỹ", "Anh", "Pháp", "Đức", "Nhật Bản", "Hàn Quốc", "Trung Quốc", "Thái Lan", "Malaysia"];
     }

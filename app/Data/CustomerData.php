@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace App\Data;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 class CustomerData extends Data
 {
@@ -27,7 +28,7 @@ class CustomerData extends Data
             'email.unique' => 'Email đã tồn tại',
         ];
     }
-    public static function rules(): array
+    public static function rules(ValidationContext|null $context = null): array
     {
         $customerId = $context->payload['id'] ?? null;
         $isUpdate = $customerId !== null;
