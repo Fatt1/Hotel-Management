@@ -10,6 +10,8 @@ use App\Http\Controllers\Admin\EquipmentCategoryAdminController;
 use App\Http\Controllers\Admin\EquipmentAdminController;
 use App\Http\Controllers\Admin\UtilityAdminController;
 use App\Http\Controllers\Admin\RoomTypeAdminController;
+use App\Http\Controllers\Admin\ServiceGroupAdminController;
+use App\Http\Controllers\Admin\ServiceAdminController;
 use App\Http\Controllers\Client\AmenityController;
 use App\Http\Controllers\Client\BookingCheckoutController;
 use App\Http\Controllers\Client\DiningController;
@@ -81,13 +83,35 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
 
     // Utility routes
     Route::resource('utilities', UtilityAdminController::class)->names([
-        'index' => 'admin.utilities.index',
-        'create' => 'admin.utilities.create',
-        'store' => 'admin.utilities.store',
-        'show' => 'admin.utilities.show',
-        'edit' => 'admin.utilities.edit',
-        'update' => 'admin.utilities.update',
+        'index'   => 'admin.utilities.index',
+        'create'  => 'admin.utilities.create',
+        'store'   => 'admin.utilities.store',
+        'show'    => 'admin.utilities.show',
+        'edit'    => 'admin.utilities.edit',
+        'update'  => 'admin.utilities.update',
         'destroy' => 'admin.utilities.destroy',
+    ]);
+
+    // Service Group routes
+    Route::resource('service-groups', ServiceGroupAdminController::class)->names([
+        'index'   => 'admin.service-groups.index',
+        'create'  => 'admin.service-groups.create',
+        'store'   => 'admin.service-groups.store',
+        'show'    => 'admin.service-groups.show',
+        'edit'    => 'admin.service-groups.edit',
+        'update'  => 'admin.service-groups.update',
+        'destroy' => 'admin.service-groups.destroy',
+    ]);
+
+    // Service routes
+    Route::resource('services', ServiceAdminController::class)->names([
+        'index'   => 'admin.services.index',
+        'create'  => 'admin.services.create',
+        'store'   => 'admin.services.store',
+        'show'    => 'admin.services.show',
+        'edit'    => 'admin.services.edit',
+        'update'  => 'admin.services.update',
+        'destroy' => 'admin.services.destroy',
     ]);
     
     Route::post("/logout", [AuthAdminController::class, "logout"])->name('admin.logout');
