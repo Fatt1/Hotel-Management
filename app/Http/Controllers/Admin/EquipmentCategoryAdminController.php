@@ -8,9 +8,9 @@ use App\Actions\EquipmentCategories\GetEquipmentCategoryListAction;
 use App\Actions\EquipmentCategories\UpdateEquipmentCategoryAction;
 use App\Data\EquipmentCategoryData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\EquipmentCategoryRequest;
 use App\Models\EquipmentCategory;
 use App\ViewModels\EquipmentCategoryViewModel;
+use Illuminate\Http\Request;
 
 class EquipmentCategoryAdminController extends Controller
 {
@@ -35,10 +35,10 @@ class EquipmentCategoryAdminController extends Controller
     /**
      * Lưu loại thiết bị mới
      */
-    public function store(EquipmentCategoryRequest $request, CreateEquipmentCategoryAction $action)
+    public function store(Request $request, CreateEquipmentCategoryAction $action)
     {
         try {
-            $data = EquipmentCategoryData::from($request->validated());
+            $data = EquipmentCategoryData::from($request->all());
             $category = $action->execute($data);
 
             // Check if it's an AJAX request
@@ -89,10 +89,10 @@ class EquipmentCategoryAdminController extends Controller
     /**
      * Cập nhật loại thiết bị
      */
-    public function update(EquipmentCategoryRequest $request, EquipmentCategory $equipment_category, UpdateEquipmentCategoryAction $action)
+    public function update(Request $request, EquipmentCategory $equipment_category, UpdateEquipmentCategoryAction $action)
     {
         try {
-            $data = EquipmentCategoryData::from($request->validated());
+            $data = EquipmentCategoryData::from($request->all());
             $category = $action->execute($equipment_category->id, $data);
 
             // Check if it's an AJAX request
@@ -127,7 +127,7 @@ class EquipmentCategoryAdminController extends Controller
     public function destroy(EquipmentCategory $equipment_category, DeleteEquipmentCategoryAction $action)
     {
         try {
-            $action->execute($equipment_category->id);
+            $action->execute($equipment_category);
 
             // Check if it's an AJAX request
             if (request()->expectsJson()) {

@@ -66,7 +66,7 @@
                   class="w-full px-4 py-3 border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 outline-none transition-all bg-white"
                 >
                   <option value="">Chọn danh mục...</option>
-                  @foreach($categories as $category)
+                  @foreach($viewModel->categories() as $category)
                     <option value="{{ $category->id }}" {{ old('equipment_category_id') == $category->id ? 'selected' : '' }}>
                       {{ $category->name }}
                     </option>

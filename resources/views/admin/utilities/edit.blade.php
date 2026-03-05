@@ -40,35 +40,38 @@
         <!-- Icon Selection -->
         <div class="flex flex-col gap-2">
           <label for="iconSearch" class="text-sm font-bold text-slate-700">Chọn biểu tượng</label>
-          <div class="flex gap-3">
+          <div class="flex gap-2">
             <input 
               type="text" 
               id="iconSearch" 
               placeholder="Tìm kiếm biểu tượng..."
-              class="flex-1 px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-900/20 outline-none"
+              class="flex-1 px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-900/20 outline-none text-sm"
             />
-            <button type="button" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-medium transition-all" id="clearIconBtn">
+            <button type="button" class="px-6 py-2.5 bg-slate-200 hover:bg-slate-300 rounded-lg text-slate-700 font-medium transition-all text-sm" id="clearIconBtn">
               Xóa
             </button>
           </div>
 
           <!-- Icon Grid -->
-          <div id="iconGrid" class="grid grid-cols-8 gap-2 p-4 bg-slate-50 border border-slate-200 rounded-lg overflow-y-auto max-h-64">
+          <div id="iconGrid" class="grid grid-cols-8 gap-2 p-4 bg-slate-50 border border-slate-200 rounded-lg max-h-80 overflow-y-auto">
             @php
-              $icons = ['wifi', 'ac_unit', 'groups', 'restaurant', 'sports_gymnastics', 'spa', 'pool', 'local_parking', 
-                       'local_florist', 'local_bar', 'local_cafe', 'fitness_center', 'tv', 'videogame_asset_lock', 'beach_access', 
-                       'desk', 'chair', 'bed', 'bathtub', 'wc', 'shower', 'kitchen', 'room_service', 'business_center',
-                       'meeting_room', 'conference_room', 'event_available', 'event_busy', 'directions_run', 'landscape',
-                       'local_library', 'music_note', 'theater_comedy', 'nightlife', 'card_giftcard'];
+              $icons = [
+                'wifi', 'ac_unit', 'chair', 'bed', 'bathtub', 'restaurant', 'fitness_center', 'spa',
+                'pool', 'local_parking', 'tv', 'shower', 'kitchen', 'room_service', 'business_center', 'event_available',
+                'directions_run', 'landscape', 'music_note', 'theater_comedy', 'local_bar', 'local_cafe', 'desk', 'groups',
+                'meeting_room', 'beach_access', 'wc', 'dry_cleaning', 'local_florist', 'concierge', 'card_giftcard', 'balcony',
+                'door_front', 'elevator', 'stairs', 'window', 'blinds', 'luggage', 'safe', 'mirror',
+                'lamp', 'phone', 'lock', 'key', 'towel', 'iron', 'sofa', 'pillow'
+              ];
             @endphp
             @foreach($icons as $icon)
               <button 
                 type="button" 
-                class="icon-option p-3 rounded-lg border border-slate-200 hover:border-blue-900 hover:bg-blue-50 transition-all cursor-pointer flex items-center justify-center" 
+                class="icon-option p-3 rounded-lg border-2 border-slate-200 hover:border-blue-900 hover:bg-blue-50 transition-all cursor-pointer flex items-center justify-center group relative" 
                 data-icon="{{ $icon }}"
                 title="{{ $icon }}"
               >
-                <span class="material-symbols-outlined text-2xl text-slate-600">{{ $icon }}</span>
+                <span class="material-symbols-outlined text-3xl text-slate-500 group-hover:text-blue-900">{{ $icon }}</span>
               </button>
             @endforeach
           </div>
@@ -81,9 +84,11 @@
           />
           
           @if(old('icon', $utility->icon))
-            <div class="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-              <span class="material-symbols-outlined text-2xl text-blue-900">{{ old('icon', $utility->icon) }}</span>
-              <span class="text-sm text-blue-900 font-medium">Đã chọn: {{ old('icon', $utility->icon) }}</span>
+            <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div class="p-2 bg-blue-100 rounded-lg">
+                <span class="material-symbols-outlined text-3xl text-blue-900">{{ old('icon', $utility->icon) }}</span>
+              </div>
+              <span class="text-sm text-blue-900 font-medium">Biểu tượng: <span class="font-bold">{{ old('icon', $utility->icon) }}</span></span>
             </div>
           @endif
         </div>
@@ -118,9 +123,19 @@
       const icon = option.getAttribute('data-icon');
       iconInput.value = icon;
       
-      // Update UI
-      iconOptions.forEach(opt => opt.classList.remove('border-blue-900', 'bg-blue-50'));
-      option.classList.add('border-blue-900', 'bg-blue-50');
+      // Update UI - Remove old selection
+      iconOptions.forEach(opt => {
+        opt.classList.remove('border-2', 'border-blue-900', 'bg-blue-900', 'shadow-lg');
+        opt.classList.add('border-2', 'border-slate-200');
+        opt.querySelector('span').classList.remove('text-white');
+        opt.querySelector('span').classList.add('text-slate-500');
+      });
+      
+      // Add new selection with prominent color
+      option.classList.remove('border-slate-200');
+      option.classList.add('border-blue-900', 'bg-blue-900', 'shadow-lg', 'shadow-blue-900/30');
+      option.querySelector('span').classList.remove('text-slate-500');
+      option.querySelector('span').classList.add('text-white');
     });
   });
 
@@ -144,7 +159,10 @@
   if (iconInput.value) {
     const selectedOption = document.querySelector(`[data-icon="${iconInput.value}"]`);
     if (selectedOption) {
-      selectedOption.classList.add('border-blue-900', 'bg-blue-50');
+      selectedOption.classList.remove('border-slate-200');
+      selectedOption.classList.add('border-blue-900', 'bg-blue-900', 'shadow-lg', 'shadow-blue-900/30');
+      selectedOption.querySelector('span').classList.remove('text-slate-500');
+      selectedOption.querySelector('span').classList.add('text-white');
     }
   }
 </script>

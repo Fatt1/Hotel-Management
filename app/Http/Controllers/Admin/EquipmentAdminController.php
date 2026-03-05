@@ -8,9 +8,9 @@ use App\Actions\Equipments\GetEquipmentListAction;
 use App\Actions\Equipments\UpdateEquipmentAction;
 use App\Data\EquipmentData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\EquipmentRequest;
 use App\Models\Equipment;
-use App\Models\EquipmentCategory;
+use App\ViewModels\EquipmentViewModel;
+use Illuminate\Http\Request;
 
 class EquipmentAdminController extends Controller
 {
@@ -25,29 +25,29 @@ class EquipmentAdminController extends Controller
 
     public function create()
     {
-        $categories = EquipmentCategory::all();
+        $viewModel = new EquipmentViewModel();
 
         return view('admin.equipments.create', [
-            'categories' => $categories,
+            'viewModel' => $viewModel,
         ]);
     }
 
-    public function store(EquipmentRequest $request, CreateEquipmentAction $action)
+    public function store(EquipmentData $request, CreateEquipmentAction $action)
     {
         try {
-            $data = EquipmentData::from($request->validated());
-            $equipment = $action->execute($data);
+            // $data = EquipmentData::from($request->all());
+            $equipment = $action->execute($request);
 
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Thêm thiết bị thành công!',
-                    'data' => $equipment,
-                ], 201);
-            }
+            // if ($request->expectsJson()) {
+            //     return response()->json([
+            //         'success' => true,
+            //         'message' => 'Thêm thiết bị thành công!',
+            //         'data' => $equipment,
+            //     ], 201);
+            // }
 
             return redirect()->route('admin.equipments.index')->with('success', 'Thêm thiết bị thành công!');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
@@ -60,21 +60,20 @@ class EquipmentAdminController extends Controller
 
     public function edit(Equipment $equipment)
     {
-        $categories = EquipmentCategory::all();
+        $viewModel = new EquipmentViewModel($equipment);
 
         return view('admin.equipments.edit', [
-            'equipment' => $equipment,
-            'categories' => $categories,
+            'viewModel' => $viewModel,
         ]);
     }
 
     public function update(
-        EquipmentRequest $request,
+        Request $request,
         Equipment $equipment,
         UpdateEquipmentAction $action
     ) {
         try {
-            $data = EquipmentData::from($request->validated());
+            $data = EquipmentData::from($request->all());
             $updated = $action->execute($equipment, $data);
 
             if ($request->expectsJson()) {
@@ -99,6 +98,7 @@ class EquipmentAdminController extends Controller
 
     public function destroy(Equipment $equipment, DeleteEquipmentAction $action)
     {
+        
         try {
             $action->execute($equipment);
 

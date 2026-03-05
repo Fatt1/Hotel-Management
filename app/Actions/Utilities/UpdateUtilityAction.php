@@ -13,11 +13,11 @@ class UpdateUtilityAction
 
     public function execute(Utility $utility, UtilityData $data): Utility
     {
-        $utility->update([
-            'name' => $data->name,
-            'icon' => $data->icon,
-        ]);
-
-        return $utility->fresh();
+        $utility->name = $data->name;
+        $utility->icon = $data->icon;
+        
+        $this->utilityRepository->save($utility);
+        
+        return $utility;
     }
 }

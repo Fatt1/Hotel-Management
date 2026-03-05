@@ -8,7 +8,6 @@ use App\Actions\RoomTypes\GetRoomTypeListAction;
 use App\Actions\RoomTypes\UpdateRoomTypeAction;
 use App\Data\RoomTypeData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\RoomTypeRequest;
 use App\Models\RoomType;
 use App\ViewModels\RoomTypeViewModel;
 use Illuminate\Http\Request;
@@ -36,11 +35,10 @@ class RoomTypeAdminController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(RoomTypeRequest $request, CreateRoomTypeAction $action)
+    public function store(RoomTypeData $request, CreateRoomTypeAction $action)
     {
         try {
-            $data = RoomTypeData::from($request->validated());
-            $action->execute($data);
+            $action->execute($request);
 
             return redirect()
                 ->route('admin.room-types.index')
@@ -55,9 +53,9 @@ class RoomTypeAdminController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(GetRoomTypeListAction $action, string $id)
     {
-        $roomType = RoomType::findOrFail($id);
+        $roomType = $action->execute()->firstWhere('id', (int) $id);
         $viewModel = new RoomTypeViewModel($roomType);
         return view('admin.room-type.show', compact('viewModel', 'roomType'));
     }
@@ -65,9 +63,9 @@ class RoomTypeAdminController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(GetRoomTypeListAction $action, string $id)
     {
-        $roomType = RoomType::findOrFail($id);
+        $roomType = $action->execute()->firstWhere('id', (int) $id);
         $viewModel = new RoomTypeViewModel($roomType);
         return view('admin.room-type.edit', compact('viewModel', 'roomType'));
     }
@@ -75,11 +73,10 @@ class RoomTypeAdminController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(RoomTypeRequest $request, string $id, UpdateRoomTypeAction $action)
+    public function update(RoomTypeData $request, string $id, UpdateRoomTypeAction $action)
     {
         try {
-            $data = RoomTypeData::from($request->validated());
-            $action->execute((int) $id, $data);
+            $action->execute((int) $id, $request);
 
             return redirect()
                 ->route('admin.room-types.index')

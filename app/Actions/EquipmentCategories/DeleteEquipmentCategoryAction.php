@@ -6,6 +6,7 @@ namespace App\Actions\EquipmentCategories;
 
 use App\Abstractions\Repositories\EquipmentCategoryRepository;
 use App\Models\Equipment;
+use App\Models\EquipmentCategory;
 use Exception;
 
 class DeleteEquipmentCategoryAction
@@ -19,16 +20,10 @@ class DeleteEquipmentCategoryAction
      * 
      * Business Rule: Không được xóa nếu có thiết bị thuộc loại này
      */
-    public function execute(int $id): void
+    public function execute(EquipmentCategory $equipmentCategory): void
     {
-        $equipmentCategory = $this->equipmentCategoryRepository->findById($id);
-
-        if (!$equipmentCategory) {
-            throw new Exception("Loại thiết bị không tồn tại");
-        }
-
         // Kiểm tra có thiết bị thuộc loại này không
-        $equipmentCount = Equipment::where('equipment_category_id', $id)->count();
+        $equipmentCount = Equipment::where('equipment_category_id', $equipmentCategory->id)->count();
 
         if ($equipmentCount > 0) {
             throw new Exception(

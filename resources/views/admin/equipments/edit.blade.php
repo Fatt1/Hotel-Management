@@ -17,7 +17,7 @@
 
     <!-- Form Container -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
-      <form action="{{ route('admin.equipments.update', $equipment->id) }}" method="POST" id="equipmentForm">
+      <form action="{{ route('admin.equipments.update', $viewModel->equipment()->id) }}" method="POST" id="equipmentForm">
         @csrf
         @method('PUT')
 
@@ -33,7 +33,7 @@
               <input 
                 type="text" 
                 name="name" 
-                value="{{ old('name', $equipment->name) }}"
+                value="{{ old('name', $viewModel->equipment()->name) }}"
                 placeholder="VD: Tủ lạnh công nghiệp"
                 class="w-full px-4 py-3 border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 outline-none transition-all"
               />
@@ -49,7 +49,7 @@
                 <label class="text-xs font-bold text-slate-700 uppercase">Mã thiết bị (SKU)</label>
                 <input 
                   type="text" 
-                  value="EQ-{{ str_pad($equipment->id, 3, '0', STR_PAD_LEFT) }}"
+                  value="EQ-{{ str_pad($viewModel->equipment()->id, 3, '0', STR_PAD_LEFT) }}"
                   disabled
                   class="w-full px-4 py-3 border border-slate-300 rounded-lg text-slate-500 bg-slate-50 cursor-not-allowed"
                 />
@@ -64,8 +64,8 @@
                   class="w-full px-4 py-3 border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 outline-none transition-all bg-white"
                 >
                   <option value="">Chọn danh mục...</option>
-                  @foreach($categories as $category)
-                    <option value="{{ $category->id }}" {{ old('equipment_category_id', $equipment->equipment_category_id) == $category->id ? 'selected' : '' }}>
+                  @foreach($viewModel->categories() as $category)
+                    <option value="{{ $category->id }}" {{ old('equipment_category_id', $viewModel->equipment()->equipment_category_id) == $category->id ? 'selected' : '' }}>
                       {{ $category->name }}
                     </option>
                   @endforeach
@@ -83,7 +83,7 @@
                 <input 
                   type="number" 
                   name="import_price" 
-                  value="{{ old('import_price', $equipment->import_price ?? 0) }}"
+                  value="{{ old('import_price', $viewModel->equipment()->import_price ?? 0) }}"
                   min="0"
                   placeholder="0"
                   class="flex-1 px-4 py-3 border border-slate-300 border-r-0 rounded-l-lg text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 outline-none transition-all"

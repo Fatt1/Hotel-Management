@@ -8,9 +8,10 @@ use App\Actions\Utilities\GetUtilityListAction;
 use App\Actions\Utilities\UpdateUtilityAction;
 use App\Data\UtilityData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\UtilityRequest;
 use App\Models\Utility;
 use Exception;
+use GuzzleHttp\Promise\Create;
+use Illuminate\Http\Request;
 
 class UtilityAdminController extends Controller
 {
@@ -27,16 +28,14 @@ class UtilityAdminController extends Controller
 
     public function create()
     {
+        // $viewModel = new Ul();
         return view('admin.utilities.create');
     }
 
-    public function store(UtilityRequest $request, CreateUtilityAction $action)
+    public function store(Request $request, CreateUtilityAction $action)
     {
         try {
-            $data = UtilityData::from([
-                'name' => $request->validated('name'),
-                'icon' => $request->validated('icon'),
-            ]);
+            $data = UtilityData::from($request->all());
 
             $utility = $action->execute($data);
 
@@ -59,13 +58,10 @@ class UtilityAdminController extends Controller
         return view('admin.utilities.edit', compact('utility'));
     }
 
-    public function update(UtilityRequest $request, Utility $utility, UpdateUtilityAction $action)
+    public function update(Request $request, Utility $utility, UpdateUtilityAction $action)
     {
         try {
-            $data = UtilityData::from([
-                'name' => $request->validated('name'),
-                'icon' => $request->validated('icon'),
-            ]);
+            $data = UtilityData::from($request->all());
 
             $updatedUtility = $action->execute($utility, $data);
 
@@ -86,7 +82,7 @@ class UtilityAdminController extends Controller
     public function destroy(Utility $utility, DeleteUtilityAction $action)
     {
         try {
-            $action->execute($utility->id);
+            $action->execute($utility);
 
             return response()->json(['message' => 'Tiện ích đã được xóa thành công!']);
         } catch (Exception $e) {

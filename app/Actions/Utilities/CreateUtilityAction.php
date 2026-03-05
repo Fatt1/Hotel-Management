@@ -12,9 +12,12 @@ class CreateUtilityAction
 
     public function execute(UtilityData $data): Utility
     {
-        return Utility::create([
-            'name' => $data->name,
-            'icon' => $data->icon,
-        ]);
+        $utility = new Utility();
+        $utility->name = $data->name;
+        $utility->icon = $data->icon;
+        
+        $this->utilityRepository->save($utility);
+        
+        return $utility;
     }
 }
