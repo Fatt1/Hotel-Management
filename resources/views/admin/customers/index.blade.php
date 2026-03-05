@@ -46,13 +46,13 @@
 
                 {{-- Dropdown + Sort - bên phải --}}
                 <div class="flex items-center gap-2 ml-auto">
-                    <select name="country" onchange="document.getElementById('filter-form').submit()"
-                        class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none">
-                        <option value="">Quốc gia (Tất cả)</option>
-                        @foreach($countries as $c)
-                            <option value="{{ $c }}" {{ request('country') === $c ? 'selected' : '' }}>{{ $c }}</option>
-                        @endforeach
-                    </select>
+                    @include('admin.customers._country_picker', [
+                        'selectedValue'   => request('country', ''),
+                        'formId'          => 'filter-form',
+                        'placeholder'     => 'Quốc gia (Tất cả)',
+                        'autoWidth'       => true,
+                        'pickerCountries' => $countries,
+                    ])
 
                     {{-- Nút sort --}}
                     <button type="button" id="sort-btn" title="Sắp xếp"
@@ -143,11 +143,4 @@
 
 @push('scripts')
     @vite(['resources/js/admin/customers/index.js'])
-    <script>
-        document.getElementById('sort-btn')?.addEventListener('click', function () {
-            const dirInput = document.getElementById('sort-dir-input');
-            dirInput.value = dirInput.value === 'desc' ? 'asc' : 'desc';
-            document.getElementById('filter-form').submit();
-        });
-    </script>
 @endpush

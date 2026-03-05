@@ -70,13 +70,7 @@
                 {{-- Quốc gia --}}
                 <div class="flex flex-col gap-1 md:col-span-2">
                     <label class="text-sm font-semibold text-slate-700">Quốc gia <span class="text-red-500">*</span></label>
-                    <select name="country"
-                        class="w-full rounded-xl border @error('country') border-red-400 @else border-slate-200 @enderror bg-slate-50 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 outline-none">
-                        <option value="">Chọn quốc gia</option>
-                        @foreach($viewModel->countries() as $c)
-                            <option value="{{ $c }}" {{ old('country') === $c ? 'selected' : '' }}>{{ $c }}</option>
-                        @endforeach
-                    </select>
+                    @include('admin.customers._country_picker', ['selectedValue' => old('country', '')])
                     @error('country')
                         <span class="text-red-500 text-xs">{{ $message }}</span>
                     @enderror
