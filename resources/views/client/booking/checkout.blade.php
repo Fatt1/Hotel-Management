@@ -88,15 +88,17 @@
               <label class="block text-[11px] font-bold tracking-widest uppercase text-gray-500 mb-1.5">
                 Họ <span class="text-red-500">*</span>
               </label>
-              <input type="text" name="last_name" placeholder="vd. Nguyễn"
-                     class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all" required>
+              <input type="text" name="last_name" id="lastNameInput" placeholder="vd. Nguyễn"
+                     class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all"
+                     oninput="validateCheckout()" required>
             </div>
             <div>
               <label class="block text-[11px] font-bold tracking-widest uppercase text-gray-500 mb-1.5">
                 Tên <span class="text-red-500">*</span>
               </label>
-              <input type="text" name="first_name" placeholder="vd. Văn An"
-                     class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all" required>
+              <input type="text" name="first_name" id="firstNameInput" placeholder="vd. Văn An"
+                     class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all"
+                     oninput="validateCheckout()" required>
             </div>
           </div>
 
@@ -106,8 +108,9 @@
               Quốc gia / Khu vực <span class="text-red-500">*</span>
             </label>
             <div class="relative">
-              <select name="country"
-                      class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-700 bg-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all appearance-none" required>
+              <select name="country" id="countryInput"
+                      class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-700 bg-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all appearance-none"
+                      onchange="validateCheckout()" required>
                 <option value="">Chọn quốc gia của bạn</option>
                 <option value="VN" selected>Việt Nam</option>
                 <option value="US">Hoa Kỳ</option>
@@ -145,8 +148,10 @@
                 </select>
                 <i class="fas fa-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
               </div>
-              <input type="tel" name="phone" placeholder="(012) 345-6789"
-                     class="flex-1 border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all" required>
+              <input type="tel" name="phone" id="phoneInput" placeholder="(012) 345-6789"
+                     class="flex-1 border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all"
+                     oninput="validateCheckout()" required>
+
             </div>
           </div>{{-- /phone --}}
 
@@ -259,8 +264,9 @@
 
           {{-- CTA --}}
           <div class="px-6 pb-6">
-            <button onclick="document.getElementById('checkoutForm').submit()"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm tracking-wider uppercase py-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
+            <button id="checkoutBtn" disabled
+                    onclick="if(!this.disabled){ document.getElementById('checkoutForm').submit(); }"
+                    class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold text-sm tracking-wider uppercase py-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
               Tiếp Tục Thanh Toán <i class="fas fa-arrow-right text-xs"></i>
             </button>
             <div class="flex items-center justify-center gap-1.5 mt-3 text-[10px] text-gray-400">
@@ -291,3 +297,19 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+function validateCheckout() {
+  var lastName  = document.getElementById('lastNameInput').value.trim();
+  var firstName = document.getElementById('firstNameInput').value.trim();
+  var country   = document.getElementById('countryInput').value;
+  var phone     = document.getElementById('phoneInput').value.trim();
+
+  var ok = lastName.length > 0 && firstName.length > 0 && country !== '' && phone.length >= 6;
+  document.getElementById('checkoutBtn').disabled = !ok;
+}
+// run on page load in case browser auto-fills
+document.addEventListener('DOMContentLoaded', validateCheckout);
+</script>
+@endpush
