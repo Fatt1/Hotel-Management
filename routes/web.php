@@ -2,23 +2,32 @@
 
 use App\Http\Controllers\Admin\AuthAdminController;
 use App\Http\Controllers\Admin\BookingAdminController;
+use App\Http\Controllers\Admin\CustomerAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\RoleAdminController;
 use App\Http\Controllers\Admin\RoomDiagramAdminController;
+<<<<<<< HEAD
 use App\Http\Controllers\Admin\RoomTypeAdminController;
 use App\Http\Controllers\Admin\EquipmentCategoryAdminController;
 use App\Http\Controllers\Admin\EquipmentAdminController;
 use App\Http\Controllers\Admin\UtilityAdminController;
+=======
+use App\Http\Controllers\Admin\EquipmentCategoryAdminController;
+use App\Http\Controllers\Admin\EquipmentAdminController;
+use App\Http\Controllers\Admin\UtilityAdminController;
+use App\Http\Controllers\Admin\RoomTypeAdminController;
+>>>>>>> 84a6bc64988f2399f8204cc59d5174df0e707c17
 use App\Http\Controllers\Client\AmenityController;
+use App\Http\Controllers\Client\BookingCheckoutController;
 use App\Http\Controllers\Client\DiningController;
 use App\Http\Controllers\Client\GalleryController;
 use App\Http\Controllers\Client\RoomController;
 use App\Http\Controllers\RoomAdminController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+use App\Http\Controllers\Client\HomeController;
+
+Route::get('/', [HomeController::class, 'index'])->name('client.home');
 
 Route::prefix('admin')->middleware("guest:staff")->group(function () {
     Route::get("/login", [AuthAdminController::class, "index"])->name('admin.login');
@@ -89,6 +98,8 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     ]);
     
     Route::post("/logout", [AuthAdminController::class, "logout"])->name('admin.logout');
+    Route::get("/customers", [CustomerAdminController::class, "index"])->name('admin.customers.index');
+    
 });
 
 // =========================================================
@@ -109,4 +120,16 @@ Route::name('client.')->group(function () {
 
     // Thư viện ảnh khách sạn
     Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
+
+    // Checkout — nhận dữ liệu phòng từ trang rooms và hiển thị form thông tin khách
+    Route::post('/booking/checkout', [BookingCheckoutController::class, 'checkout'])->name('booking.checkout');
+
+    // Payment page (Step 3) — receives guest info + booking data from checkout form
+    Route::post('/booking/payment', [BookingCheckoutController::class, 'payment'])->name('booking.payment');
+
+    // Confirm — processes payment form, saves to session, redirects to confirmation
+    Route::post('/booking/confirm', [BookingCheckoutController::class, 'confirm'])->name('booking.confirm');
+
+    // Confirmation (Step 4) — shows booking confirmed page
+    Route::get('/booking/confirmation', [BookingCheckoutController::class, 'confirmation'])->name('booking.confirmation');
 });

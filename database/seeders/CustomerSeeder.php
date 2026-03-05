@@ -16,7 +16,6 @@ class CustomerSeeder extends Seeder
                 'phone_number' => '0901234567',
                 'country'      => 'Vietnam',
                 'email'        => 'nguyenvanan@example.com',
-                'password'     => bcrypt('password'),
             ],
             [
                 'first_name'   => 'Trần',
@@ -24,7 +23,6 @@ class CustomerSeeder extends Seeder
                 'phone_number' => '0912345678',
                 'country'      => 'Vietnam',
                 'email'        => 'tranthibinh@example.com',
-                'password'     => bcrypt('password'),
             ],
         ];
 

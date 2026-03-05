@@ -13,6 +13,7 @@ class RoomType extends Model
     protected $fillable = [
         'name',
         'code',
+        'description',
         'adult_quantity',
         'child_quantity',
         'single_bed_quantity',
@@ -21,6 +22,7 @@ class RoomType extends Model
         'height',
         'hourly_price',
         'daily_price',
+        'is_active',
     ];
 
     protected $casts = [

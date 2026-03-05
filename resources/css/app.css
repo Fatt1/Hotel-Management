@@ -181,3 +181,30 @@ body {
     color: #94a3b8 !important;
     font-weight: 700 !important;
 }
+
+/* ===== Booking Flow Animations & Utilities ===== */
+@keyframes booking-pop-in {
+  0%   { transform: scale(.5); opacity: 0; }
+  70%  { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes booking-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.booking-anim-pop  { animation: booking-pop-in  .55s cubic-bezier(.34,1.56,.64,1) forwards; }
+.booking-anim-fadeup  { animation: booking-fade-up .5s ease .25s both; }
+.booking-anim-fadeup2 { animation: booking-fade-up .5s ease .45s both; }
+
+/* Payment method tabs */
+.method-tab { cursor:pointer; border:2px solid #e5e7eb; border-radius:12px; padding:18px 12px; text-align:center; transition:all .2s; }
+.method-tab:hover { border-color:#93c5fd; background:#f0f7ff; }
+.method-tab.active { border-color:#3b82f6; background:#eff6ff; }
+.method-tab.active .tab-label { color:#2563eb; font-weight:700; }
+.method-tab .tab-dot { display:none; }
+.method-tab.active .tab-dot { display:block; }
+
+/* Payment panels */
+.payment-panel { display:none; }
+.payment-panel.active { display:block; }
+

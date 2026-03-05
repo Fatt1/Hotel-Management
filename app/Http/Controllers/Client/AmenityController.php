@@ -8,12 +8,10 @@ use App\Models\Amenity;
 class AmenityController extends Controller
 {
     /**
-     * Hiển thị tất cả tiện ích của khách sạn (dùng Eloquent trực tiếp - Query Action theo rule.md)
+     * Hiển thị tất cả tiện ích của khách sạn (static HTML)
      */
     public function index()
     {
-        $amenities = Amenity::all();
-
-        return view('client.amenities.index', compact('amenities'));
+        return view('client.amenities.index');
     }
 }

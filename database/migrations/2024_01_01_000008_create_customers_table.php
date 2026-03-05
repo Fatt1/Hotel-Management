@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('phone_number', 20);
             $table->string('country', 100);
             $table->string('email', 255)->unique();
-            $table->string('password', 255);
             $table->rememberToken();
         });
     }
