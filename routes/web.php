@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthAdminController;
+use App\Http\Controllers\Admin\CustomerAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\RoleAdminController;
 use App\Http\Controllers\BookingAdminController;
@@ -27,4 +28,6 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     // Booking routes
     Route::get("/bookings", [BookingAdminController::class, "index"])->name("admin.bookings.index");
     Route::post("/logout", [AuthAdminController::class, "logout"])->name('admin.logout');
+    Route::get("/customers", [CustomerAdminController::class, "index"])->name('admin.customers.index');
+    
 });

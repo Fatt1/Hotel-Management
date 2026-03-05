@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Abstractions\Repositories\BookingRepository;
+use App\Abstractions\Repositories\CustomerRepository;
 use App\Abstractions\Repositories\RoleRepository;
 use App\Models\Staff;
 use App\Repositories\EloquentBookingRepository;
+use App\Repositories\EloquentCustomerRepository;
 use App\Repositories\EloquentRoleRepository;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -19,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
     {
        $this->app->bind(RoleRepository::class, EloquentRoleRepository::class);
        $this->app->bind(BookingRepository::class, EloquentBookingRepository::class);
+       $this->app->bind(CustomerRepository::class, EloquentCustomerRepository::class);
     }
 
     /**
