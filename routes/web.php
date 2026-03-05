@@ -104,7 +104,12 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
 // =========================================================
 // Client Routes
 // =========================================================
+use App\Http\Controllers\Client\AuthController;
+
 Route::name('client.')->group(function () {
+    // Đăng nhập Client
+    Route::get('/login', [AuthController::class, 'index'])->name('login');
+
     // Danh sách loại phòng
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
 
