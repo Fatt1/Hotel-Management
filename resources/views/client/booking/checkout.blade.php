@@ -12,7 +12,7 @@
 {{-- ============================================================
      HERO – dark city background with step indicator
      ============================================================ --}}
-<div class="relative overflow-hidden" style="background: #0a0a0a; min-height: 200px; padding-top: 64px; padding-bottom: 48px;">
+<div class="relative overflow-hidden" style="background: #0a0a0a; min-height: 220px; padding-top: 96px; padding-bottom: 56px;">
   <img src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=1920&q=80"
        alt="" aria-hidden="true"
        class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
@@ -69,7 +69,7 @@
         </div>
 
         {{-- The actual booking form —uses POST to /booking/checkout but we reuse the same route --}}
-        <form method="POST" action="#" id="checkoutForm">
+        <form method="POST" action="{{ route('client.booking.payment') }}" id="checkoutForm">
           @csrf
 
           {{-- Pass through all booking params as hidden fields --}}
@@ -148,25 +148,10 @@
               <input type="tel" name="phone" placeholder="(012) 345-6789"
                      class="flex-1 border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all" required>
             </div>
-          </div>
-
-          {{-- Special requests --}}
-          <div class="mb-6">
-            <label class="block text-[11px] font-bold tracking-widest uppercase text-gray-500 mb-1.5">
-              Yêu cầu đặc biệt <span class="text-gray-300">(không bắt buộc)</span>
-            </label>
-            <textarea name="special_requests" rows="3" placeholder="Phòng tầng cao, giường thêm, đón sân bay..."
-                      class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all resize-none"></textarea>
-          </div>
-
-          {{-- Submit --}}
-          <button type="submit"
-                  class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm tracking-wider uppercase py-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
-            Tiếp Tục Thanh Toán <i class="fas fa-arrow-right text-xs"></i>
-          </button>
+          </div>{{-- /phone --}}
 
         </form>
-      </div>
+      </div>{{-- /left card --}}
 
       {{-- ======================================================
            RIGHT — Stay Summary Sidebar

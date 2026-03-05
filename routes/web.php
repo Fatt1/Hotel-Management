@@ -113,4 +113,13 @@ Route::name('client.')->group(function () {
 
     // Checkout — nhận dữ liệu phòng từ trang rooms và hiển thị form thông tin khách
     Route::post('/booking/checkout', [BookingCheckoutController::class, 'checkout'])->name('booking.checkout');
+
+    // Payment page (Step 3) — receives guest info + booking data from checkout form
+    Route::post('/booking/payment', [BookingCheckoutController::class, 'payment'])->name('booking.payment');
+
+    // Confirm — processes payment form, saves to session, redirects to confirmation
+    Route::post('/booking/confirm', [BookingCheckoutController::class, 'confirm'])->name('booking.confirm');
+
+    // Confirmation (Step 4) — shows booking confirmed page
+    Route::get('/booking/confirmation', [BookingCheckoutController::class, 'confirmation'])->name('booking.confirmation');
 });
