@@ -12,8 +12,6 @@ class CustomerData extends Data
         public string $phone_number,
         public string $country,
         public string $email,
-        public ?string $password = null,
-        public ?string $password_confirmation = null,
         public ?int $id = null,
     ) {
     }
@@ -27,9 +25,6 @@ class CustomerData extends Data
             'email.required' => 'Vui lòng nhập email',
             'email.email' => 'Email không hợp lệ',
             'email.unique' => 'Email đã tồn tại',
-            'password.required' => 'Vui lòng nhập mật khẩu',
-            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự',
-            'password.confirmed' => 'Mật khẩu xác nhận không khớp',
         ];
     }
     public static function rules(): array
@@ -46,7 +41,6 @@ class CustomerData extends Data
                 'email',
                 Rule::unique('customers', 'email')->ignore($customerId),
             ],
-            'password' => $isUpdate ? 'nullable|string|min:6|confirmed' : 'required|string|min:6|confirmed',
         ];
     }
         

@@ -23,7 +23,6 @@ class AddCustomerAction
         $customer->phone_number = $data->phone_number;
         $customer->country = $data->country;
         $customer->email = $data->email;
-        $customer->password = bcrypt($data->password);
         $this->customerRepository->save($customer);
         return $customer;
     }
