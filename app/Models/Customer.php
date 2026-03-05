@@ -19,16 +19,10 @@ class Customer extends Authenticatable
         'phone_number',
         'country',
         'email',
-        'password',
     ];
 
     protected $hidden = [
-        'password',
         'remember_token',
-    ];
-
-    protected $casts = [
-        'password' => 'hashed',
     ];
 
     public function bookings(): HasMany

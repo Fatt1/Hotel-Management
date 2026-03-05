@@ -49,7 +49,7 @@
       <span>Phiếu sửa chữa</span>
     </a>
     <div class="sidebar-group-label">KHÁCH HÀNG</div>
-    <a class="sidebar-item" href="#">
+    <a class="{{ request()->routeIs("admin.customers.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.customers.index') }}">
       <span class="material-symbols-outlined">groups</span>
       <span>Quản lý khách hàng</span>
     </a>

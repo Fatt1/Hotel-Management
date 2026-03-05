@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuthAdminController;
 use App\Http\Controllers\Admin\BookingAdminController;
+use App\Http\Controllers\Admin\CustomerAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\RoleAdminController;
 use App\Http\Controllers\Admin\RoomDiagramAdminController;
@@ -114,6 +115,14 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     ]);
     
     Route::post("/logout", [AuthAdminController::class, "logout"])->name('admin.logout');
+
+    Route::get("/customers", [CustomerAdminController::class, "index"])->name('admin.customers.index');
+    Route::get("/customers/create", [CustomerAdminController::class, "create"])->name('admin.customers.create');
+    Route::post("/customers", [CustomerAdminController::class, "store"])->name('admin.customers.store');
+    Route::get("/customers/{id}", [CustomerAdminController::class, "show"])->name('admin.customers.show');
+    Route::get("/customers/{id}/edit", [CustomerAdminController::class, "edit"])->name('admin.customers.edit');
+    Route::put("/customers/{id}", [CustomerAdminController::class, "update"])->name('admin.customers.update');
+    Route::delete("/customers/{id}", [CustomerAdminController::class, "destroy"])->name('admin.customers.destroy');
 });
 
 // =========================================================
