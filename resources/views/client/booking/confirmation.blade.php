@@ -5,13 +5,6 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  @keyframes popIn { 0%{transform:scale(.5);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-  .anim-pop { animation: popIn .55s cubic-bezier(.34,1.56,.64,1) forwards; }
-  .anim-fadeup { animation: fadeUp .5s ease .25s both; }
-  .anim-fadeup2 { animation: fadeUp .5s ease .45s both; }
-</style>
 @endpush
 
 @section('content')
@@ -19,20 +12,19 @@
 {{-- ============================================================
      HERO — Booking Confirmed
      ============================================================ --}}
-<div class="relative overflow-hidden" style="background:#0a0a0a; min-height:280px; padding-top:72px; padding-bottom:64px;">
+<div class="relative overflow-hidden bg-[#0a0a0a] min-h-[280px] pt-[72px] pb-16">
   <img src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=1920&q=80"
        alt="" aria-hidden="true"
-       class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
-       style="opacity:.3; filter:grayscale(15%);">
-  <div class="absolute inset-0" style="background:linear-gradient(180deg,rgba(5,5,5,.55) 0%,rgba(5,5,5,.7) 100%);"></div>
+       class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none opacity-30 grayscale-[15%]">
+  <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,5,5,.55)_0%,rgba(5,5,5,.7)_100%)]"></div>
 
   <div class="relative z-10 max-w-2xl mx-auto px-8 text-center">
     {{-- Green checkmark circle --}}
-    <div class="anim-pop mx-auto mb-5 w-16 h-16 rounded-full bg-green-500 flex items-center justify-center shadow-lg shadow-green-500/30">
+    <div class="booking-anim-pop mx-auto mb-5 w-16 h-16 rounded-full bg-green-500 flex items-center justify-center shadow-lg shadow-green-500/30">
       <i class="fas fa-check text-white text-2xl"></i>
     </div>
 
-    <div class="anim-fadeup">
+    <div class="booking-anim-fadeup">
       <h1 class="font-['Playfair_Display'] text-4xl md:text-5xl font-bold text-white mb-3">
         Đặt Phòng Thành Công!
       </h1>
@@ -56,7 +48,7 @@
      MAIN CONTENT — white card
      ============================================================ --}}
 <div class="bg-[#f0f2f5] py-10 min-h-screen">
-  <div class="max-w-3xl mx-auto px-8 anim-fadeup2">
+  <div class="max-w-3xl mx-auto px-8 booking-anim-fadeup2">
 
     <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
 
@@ -83,7 +75,7 @@
       </div>
 
       {{-- 4-column summary row --}}
-      <div class="grid grid-cols-4 gap-0 divide-x divide-gray-100 px-0 border-b border-gray-100" style="background:#fafafa;">
+      <div class="grid grid-cols-4 gap-0 divide-x divide-gray-100 px-0 border-b border-gray-100 bg-[#fafafa]">
         <div class="px-7 py-5">
           <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-1.5">Nhận Phòng</div>
           <div class="text-base font-bold text-gray-900">{{ $checkInDate->format('d/m/Y') }}</div>
@@ -176,7 +168,7 @@
         {{-- Total --}}
         <div class="flex items-center justify-between mb-7">
           <div class="text-sm font-bold text-gray-700">Tổng Thanh Toán</div>
-          <div class="text-2xl font-bold text-gray-900" style="font-family:'Playfair Display',serif;">
+          <div class="text-2xl font-bold text-gray-900 font-[Playfair_Display,serif]">
             {{ number_format($bookingData['subtotal'], 0, ',', '.') }} ₫
           </div>
         </div>

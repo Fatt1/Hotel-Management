@@ -12,12 +12,12 @@
 {{-- ============================================================
      HERO – dark city background with step indicator
      ============================================================ --}}
-<div class="relative overflow-hidden" style="background: #0a0a0a; min-height: 220px; padding-top: 96px; padding-bottom: 56px;">
+<div class="relative overflow-hidden bg-[#0a0a0a] min-h-[220px] pt-24 pb-14">
   <img src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=1920&q=80"
        alt="" aria-hidden="true"
        class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
-       style="opacity: 0.25; filter: grayscale(20%);">
-  <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(5,5,5,0.6) 0%, rgba(5,5,5,0.75) 100%);"></div>
+       class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none opacity-25 grayscale-[20%]">
+  <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,5,5,0.6)_0%,rgba(5,5,5,0.75)_100%)]"></div>
 
   <div class="relative z-10 max-w-3xl mx-auto px-8 text-center">
     {{-- Step indicator --}}
@@ -35,7 +35,7 @@
      ============================================================ --}}
 <div class="bg-[#f0f2f5] min-h-screen py-10">
   <div class="max-w-6xl mx-auto px-8">
-    <div class="flex gap-7 items-start" style="align-items: flex-start;">
+    <div class="flex gap-7 items-start">
 
       {{-- ======================================================
            LEFT — Guest Information Form
@@ -256,7 +256,7 @@
                 <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Tổng Thanh Toán</div>
                 <div class="text-[10px] text-gray-400">Thanh toán ngay</div>
               </div>
-              <div class="text-2xl font-bold text-gray-900" style="font-family: 'Playfair Display', serif;">
+              <div class="text-2xl font-bold text-gray-900 font-[Playfair_Display,serif]">
                 {{ number_format($subtotal, 0, ',', '.') }} ₫
               </div>
             </div>

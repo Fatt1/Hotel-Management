@@ -5,16 +5,6 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  .method-tab { cursor:pointer; border:2px solid #e5e7eb; border-radius:12px; padding:18px 12px; text-align:center; transition:all .2s; }
-  .method-tab:hover { border-color:#93c5fd; background:#f0f7ff; }
-  .method-tab.active { border-color:#3b82f6; background:#eff6ff; }
-  .method-tab.active .tab-label { color:#2563eb; font-weight:700; }
-  .method-tab .tab-dot { display:none; }
-  .method-tab.active .tab-dot { display:block; }
-  .payment-panel { display:none; }
-  .payment-panel.active { display:block; }
-</style>
 @endpush
 
 @section('content')
@@ -22,12 +12,11 @@
 {{-- ============================================================
      HERO — STEP 3 / 3
      ============================================================ --}}
-<div class="relative overflow-hidden" style="background:#0a0a0a; min-height:220px; padding-top:96px; padding-bottom:56px;">
+<div class="relative overflow-hidden bg-[#0a0a0a] min-h-[220px] pt-24 pb-14">
   <img src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=1920&q=80"
        alt="" aria-hidden="true"
-       class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
-       style="opacity:.25; filter:grayscale(20%);">
-  <div class="absolute inset-0" style="background:linear-gradient(180deg,rgba(5,5,5,.6) 0%,rgba(5,5,5,.75) 100%);"></div>
+       class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none opacity-25 grayscale-[20%]">
+  <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,5,5,.6)_0%,rgba(5,5,5,.75)_100%)]"></div>
   <div class="relative z-10 max-w-3xl mx-auto px-8 text-center">
     <div class="flex items-center justify-center gap-2 mb-4">
       <span class="w-2 h-2 rounded-full bg-green-400 inline-block"></span>
@@ -344,7 +333,7 @@
                 <div class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Tổng Thanh Toán</div>
                 <div class="text-[10px] text-gray-400">Thanh toán ngay</div>
               </div>
-              <div class="text-2xl font-bold text-gray-900" style="font-family:'Playfair Display',serif;">
+              <div class="text-2xl font-bold text-gray-900 font-[Playfair_Display,serif]">
                 {{ number_format($subtotal, 0, ',', '.') }} ₫
               </div>
             </div>
@@ -368,7 +357,7 @@
           {{-- CTA --}}
           <div class="px-6 pb-6">
             {{-- Hidden form that submits all booking data to confirm route --}}
-            <form id="confirmForm" method="POST" action="{{ route('client.booking.confirm') }}" style="display:none;">
+            <form id="confirmForm" method="POST" action="{{ route('client.booking.confirm') }}" class="hidden">
               @csrf
               {{-- Pass all booking inputs through --}}
               @foreach($allInputs as $key => $val)
