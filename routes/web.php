@@ -17,9 +17,9 @@ use App\Http\Controllers\Client\RoomController;
 use App\Http\Controllers\RoomAdminController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+use App\Http\Controllers\Client\HomeController;
+
+Route::get('/', [HomeController::class, 'index'])->name('client.home');
 
 Route::prefix('admin')->middleware("guest:staff")->group(function () {
     Route::get("/login", [AuthAdminController::class, "index"])->name('admin.login');
