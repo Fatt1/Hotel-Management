@@ -19,7 +19,7 @@ class DeleteCustomerAction
             throw new \Exception('Khách hàng không tồn tại');
         }
 
-        if($customer->booking()->exists()){
+        if($customer->bookings()->exists()){
             throw new \Exception('Không thể xóa khách hàng có đặt phòng');
         }
         $this->customerRepository->delete($customer);
