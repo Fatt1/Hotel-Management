@@ -40,6 +40,7 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::get("/bookings", [BookingAdminController::class, "index"])->name("admin.bookings.index");
     Route::get('/bookings/create', [BookingAdminController::class,'create'])->name('admin.bookings.create');
     // Room Type routes
+    Route::get('room-types/all', [RoomTypeAdminController::class, 'getAll'])->name('admin.room-types.all');
     Route::resource('room-types', RoomTypeAdminController::class)->names([
         'index' => 'admin.room-types.index',
         'create' => 'admin.room-types.create',
