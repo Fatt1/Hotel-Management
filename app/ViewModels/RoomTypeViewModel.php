@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\ViewModels;
 
+use App\Models\Amenity;
+use App\Models\Equipment;
 use App\Models\RoomType;
 use Illuminate\Support\Collection;
 
@@ -110,7 +112,7 @@ class RoomTypeViewModel
     }
 
     /**
-     * Lấy tiện ích (amenities)
+     * Lấy tiện ích (amenities) của loại phòng này
      */
     public function amenities(): Collection
     {
@@ -122,19 +124,31 @@ class RoomTypeViewModel
     }
 
     /**
-     * Lấy thiết bị (equipment) - Mock Data
-     * TODO: Khi có Equipment model, bỏ mock data và lấy từ DB
+     * Lấy TẤT CẢ tiện ích từ database (cho modal picker)
+     */
+    public function allAmenities(): Collection
+    {
+        return Amenity::orderBy('name')->get();
+    }
+
+    /**
+     * Lấy thiết bị (equipment) của loại phòng này
      */
     public function equipment(): Collection
     {
-        // Mock data - sẽ thay thế bằng dữ liệu thực từ DB khi triển khai Equipment
-        return collect([
-            (object)['id' => 1, 'name' => 'Điều hòa Daikin 1.5HP', 'pivot' => (object)['quantity' => 1]],
-            (object)['id' => 2, 'name' => 'Tủ lạnh mini Samsung', 'pivot' => (object)['quantity' => 1]],
-            (object)['id' => 3, 'name' => 'Smart TV 55 inch', 'pivot' => (object)['quantity' => 1]],
-            (object)['id' => 4, 'name' => 'Wifi Router', 'pivot' => (object)['quantity' => 1]],
-            (object)['id' => 5, 'name' => 'Máy nước nóng', 'pivot' => (object)['quantity' => 1]],
-        ]);
+        if (!$this->roomType || !$this->roomType->exists) {
+            return collect();
+        }
+
+        return $this->roomType->equipments()->with('category')->get();
+    }
+
+    /**
+     * Lấy TẤT CẢ thiết bị từ database (cho modal picker)
+     */
+    public function allEquipments(): Collection
+    {
+        return Equipment::with('category')->orderBy('name')->get();
     }
 
     /**

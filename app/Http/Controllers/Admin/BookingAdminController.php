@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\Bookings\CreateBookingAction;
 use App\Actions\Bookings\GetAllBookingsAction;
+use App\Data\BookingData;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -22,6 +24,24 @@ class BookingAdminController extends Controller
     }
     public function create()
     {
-        return view("admin.bookings.create");
+        $countries = (new \App\ViewModels\CustomerViewModel())->countries();
+        return view("admin.bookings.create", compact('countries'));
+    }
+
+    public function store(BookingData $bookingData, CreateBookingAction $createBookingAction) {
+        try{
+            $booking = $createBookingAction->execute($bookingData);
+            return response()->json([
+                'message' => 'Đặt phòng thành công',
+                'booking_id' => $booking->id
+            ], 201);
+        }
+        catch(\Exception $e){
+           return response()->json([
+                'message' => 'Đặt phòng thất bại: ' . $e->getMessage()
+            ], 500);
+        }
+       
+       
     }
 }

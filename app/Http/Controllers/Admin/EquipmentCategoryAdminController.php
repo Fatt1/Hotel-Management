@@ -8,9 +8,10 @@ use App\Actions\EquipmentCategories\GetEquipmentCategoryListAction;
 use App\Actions\EquipmentCategories\UpdateEquipmentCategoryAction;
 use App\Data\EquipmentCategoryData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\EquipmentCategoryRequest;
 use App\Models\EquipmentCategory;
 use App\ViewModels\EquipmentCategoryViewModel;
+use Exception;
+use Illuminate\Http\Request;
 
 class EquipmentCategoryAdminController extends Controller
 {
@@ -35,32 +36,15 @@ class EquipmentCategoryAdminController extends Controller
     /**
      * Lưu loại thiết bị mới
      */
-    public function store(EquipmentCategoryRequest $request, CreateEquipmentCategoryAction $action)
+    public function store(EquipmentCategoryData $request, CreateEquipmentCategoryAction $action)
     {
         try {
-            $data = EquipmentCategoryData::from($request->validated());
-            $category = $action->execute($data);
-
-            // Check if it's an AJAX request
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Loại thiết bị đã được tạo thành công',
-                    'data' => $category
-                ], 201);
-            }
+            $category = $action->execute($request);
 
             return redirect()
                 ->route('admin.equipment-categories.index')
                 ->with('success', 'Loại thiết bị đã được tạo thành công');
         } catch (\Exception $e) {
-            if (request()->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $e->getMessage()
-                ], 400);
-            }
-            
             return redirect()
                 ->back()
                 ->with('error', $e->getMessage());
@@ -89,31 +73,14 @@ class EquipmentCategoryAdminController extends Controller
     /**
      * Cập nhật loại thiết bị
      */
-    public function update(EquipmentCategoryRequest $request, EquipmentCategory $equipment_category, UpdateEquipmentCategoryAction $action)
+    public function update(EquipmentCategoryData $request, EquipmentCategory $equipment_category, UpdateEquipmentCategoryAction $action)
     {
         try {
-            $data = EquipmentCategoryData::from($request->validated());
-            $category = $action->execute($equipment_category->id, $data);
-
-            // Check if it's an AJAX request
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Loại thiết bị đã được cập nhật thành công',
-                    'data' => $category
-                ], 200);
-            }
-
+            $category = $action->execute($equipment_category->id, $request);
             return redirect()
                 ->route('admin.equipment-categories.index')
                 ->with('success', 'Loại thiết bị đã được cập nhật thành công');
-        } catch (\Exception $e) {
-            if (request()->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $e->getMessage()
-                ], 400);
-            }
+        } catch (Exception $e) {
 
             return redirect()
                 ->back()
@@ -127,26 +94,12 @@ class EquipmentCategoryAdminController extends Controller
     public function destroy(EquipmentCategory $equipment_category, DeleteEquipmentCategoryAction $action)
     {
         try {
-            $action->execute($equipment_category->id);
-
-            // Check if it's an AJAX request
-            if (request()->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Loại thiết bị đã được xóa thành công'
-                ], 200);
-            }
+            $action->execute($equipment_category);
 
             return redirect()
                 ->route('admin.equipment-categories.index')
                 ->with('success', 'Loại thiết bị đã được xóa thành công');
         } catch (\Exception $e) {
-            if (request()->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $e->getMessage()
-                ], 400);
-            }
 
             return redirect()
                 ->route('admin.equipment-categories.index')

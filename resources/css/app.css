@@ -68,6 +68,7 @@
     .badge-no-show-booking {
         @apply inline-block px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800;
     }
+    
 }
 [x-cloak] {
     display: none !important;

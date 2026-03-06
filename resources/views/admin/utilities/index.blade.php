@@ -44,7 +44,7 @@
           <thead>
             <tr class="bg-slate-50 border-b border-slate-100">
               <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">ID</th>
-              <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Biểu tượng</th>
+              <th class="px-2 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">Biểu tượng</th>
               <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tên tiện ích</th>
               <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">Hành động</th>
             </tr>

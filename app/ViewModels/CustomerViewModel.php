@@ -1,0 +1,263 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\ViewModels;
+
+use App\Models\Customer;
+use Illuminate\Support\Collection;
+
+class CustomerViewModel
+{
+    private ?Customer $customer;
+    public function __construct(
+        ?Customer $customer = null
+    ) {
+        $this->customer = $customer;
+    }
+
+    public function customer(): Customer
+    {
+        return $this->customer ?? new Customer();
+    }
+
+    public function countries(): array
+{
+    return [
+        ['value' => 'Afghanistan',                 'flag' => '🇦🇫'],
+        ['value' => 'Ai Cập',                      'flag' => '🇪🇬'],
+        ['value' => 'Albania',                     'flag' => '🇦🇱'],
+        ['value' => 'Algeria',                     'flag' => '🇩🇿'],
+        ['value' => 'Andorra',                     'flag' => '🇦🇩'],
+        ['value' => 'Angola',                      'flag' => '🇦🇴'],
+        ['value' => 'Antigua và Barbuda',          'flag' => '🇦🇬'],
+        ['value' => 'Áo',                          'flag' => '🇦🇹'],
+        ['value' => 'Ả Rập Xê Út',                 'flag' => '🇸🇦'],
+        ['value' => 'Argentina',                   'flag' => '🇦🇷'],
+        ['value' => 'Armenia',                     'flag' => '🇦🇲'],
+        ['value' => 'Azerbaijan',                  'flag' => '🇦🇿'],
+        ['value' => 'Ấn Độ',                       'flag' => '🇮🇳'],
+        ['value' => 'Ba Lan',                      'flag' => '🇵🇱'],
+        ['value' => 'Bahamas',                     'flag' => '🇧🇸'],
+        ['value' => 'Bahrain',                     'flag' => '🇧🇭'],
+        ['value' => 'Bangladesh',                  'flag' => '🇧🇩'],
+        ['value' => 'Barbados',                    'flag' => '🇧🇧'],
+        ['value' => 'Bắc Macedonia',               'flag' => '🇲🇰'],
+        ['value' => 'Belarus',                     'flag' => '🇧🇾'],
+        ['value' => 'Belize',                      'flag' => '🇧🇿'],
+        ['value' => 'Bénin',                       'flag' => '🇧🇯'],
+        ['value' => 'Bỉ',                          'flag' => '🇧🇪'],
+        ['value' => 'Bờ Biển Ngà (Côte d\'Ivoire)', 'flag' => '🇨🇮'],
+        ['value' => 'Bồ Đào Nha',                  'flag' => '🇵🇹'],
+        ['value' => 'Bolivia',                     'flag' => '🇧🇴'],
+        ['value' => 'Bosnia và Herzegovina',       'flag' => '🇧🇦'],
+        ['value' => 'Botswana',                    'flag' => '🇧🇼'],
+        ['value' => 'Brazil',                      'flag' => '🇧🇷'],
+        ['value' => 'Brunei',                      'flag' => '🇧🇳'],
+        ['value' => 'Bulgaria',                    'flag' => '🇧🇬'],
+        ['value' => 'Burkina Faso',                'flag' => '🇧🇫'],
+        ['value' => 'Burundi',                     'flag' => '🇧🇮'],
+        ['value' => 'Bhutan',                      'flag' => '🇧🇹'],
+        ['value' => 'Các Tiểu Vương quốc Ả Rập Thống nhất', 'flag' => '🇦🇪'],
+        ['value' => 'Cameroon',                    'flag' => '🇨🇲'],
+        ['value' => 'Campuchia',                   'flag' => '🇰🇭'],
+        ['value' => 'Canada',                      'flag' => '🇨🇦'],
+        ['value' => 'Cape Verde',                  'flag' => '🇨🇻'],
+        ['value' => 'Chad',                        'flag' => '🇹🇩'],
+        ['value' => 'Chile',                       'flag' => '🇨🇱'],
+        ['value' => 'Colombia',                    'flag' => '🇨🇴'],
+        ['value' => 'Comoros',                     'flag' => '🇰🇲'],
+        ['value' => 'Cộng hòa Dân chủ Congo',      'flag' => '🇨🇩'],
+        ['value' => 'Cộng hòa Congo',              'flag' => '🇨🇬'],
+        ['value' => 'Cộng hòa Dominica',           'flag' => '🇩🇴'],
+        ['value' => 'Cộng hòa Séc',                'flag' => '🇨🇿'],
+        ['value' => 'Cộng hòa Trung Phi',          'flag' => '🇨🇫'],
+        ['value' => 'Costa Rica',                  'flag' => '🇨🇷'],
+        ['value' => 'Croatia',                     'flag' => '🇭🇷'],
+        ['value' => 'Cuba',                        'flag' => '🇨🇺'],
+        ['value' => 'Djibouti',                    'flag' => '🇩🇯'],
+        ['value' => 'Dominica',                    'flag' => '🇩🇲'],
+        ['value' => 'Đài Loan',                    'flag' => '🇹🇼'],
+        ['value' => 'Đan Mạch',                    'flag' => '🇩🇰'],
+        ['value' => 'Đông Timor',                  'flag' => '🇹🇱'],
+        ['value' => 'Đức',                         'flag' => '🇩🇪'],
+        ['value' => 'Ecuador',                     'flag' => '🇪🇨'],
+        ['value' => 'El Salvador',                 'flag' => '🇸🇻'],
+        ['value' => 'Eritrea',                     'flag' => '🇪🇷'],
+        ['value' => 'Estonia',                     'flag' => '🇪🇪'],
+        ['value' => 'Eswatini',                    'flag' => '🇸🇿'],
+        ['value' => 'Ethiopia',                    'flag' => '🇪🇹'],
+        ['value' => 'Fiji',                        'flag' => '🇫🇯'],
+        ['value' => 'Gabon',                       'flag' => '🇬🇦'],
+        ['value' => 'Gambia',                      'flag' => '🇬🇲'],
+        ['value' => 'Georgia',                     'flag' => '🇬🇪'],
+        ['value' => 'Ghana',                       'flag' => '🇬🇭'],
+        ['value' => 'Grenada',                     'flag' => '🇬🇩'],
+        ['value' => 'Guatemala',                   'flag' => '🇬🇹'],
+        ['value' => 'Guinea',                      'flag' => '🇬🇳'],
+        ['value' => 'Guinea Bissau',               'flag' => '🇬🇼'],
+        ['value' => 'Guinea Xích Đạo',             'flag' => '🇬🇶'],
+        ['value' => 'Guyana',                      'flag' => '🇬🇾'],
+        ['value' => 'Haiti',                       'flag' => '🇭🇹'],
+        ['value' => 'Hà Lan',                      'flag' => '🇳🇱'],
+        ['value' => 'Hàn Quốc',                    'flag' => '🇰🇷'],
+        ['value' => 'Honduras',                    'flag' => '🇭🇳'],
+        ['value' => 'Hoa Kỳ (Mỹ)',                 'flag' => '🇺🇸'],
+        ['value' => 'Hungary',                     'flag' => '🇭🇺'],
+        ['value' => 'Hy Lạp',                      'flag' => '🇬🇷'],
+        ['value' => 'Iceland',                     'flag' => '🇮🇸'],
+        ['value' => 'Indonesia',                   'flag' => '🇮🇩'],
+        ['value' => 'Iran',                        'flag' => '🇮🇷'],
+        ['value' => 'Iraq',                        'flag' => '🇮🇶'],
+        ['value' => 'Ireland',                     'flag' => '🇮🇪'],
+        ['value' => 'Israel',                      'flag' => '🇮🇱'],
+        ['value' => 'Jamaica',                     'flag' => '🇯🇲'],
+        ['value' => 'Jordan',                      'flag' => '🇯🇴'],
+        ['value' => 'Kazakhstan',                  'flag' => '🇰🇿'],
+        ['value' => 'Kenya',                       'flag' => '🇰🇪'],
+        ['value' => 'Kiribati',                    'flag' => '🇰🇮'],
+        ['value' => 'Kuwait',                      'flag' => '🇰🇼'],
+        ['value' => 'Kyrgyzstan',                  'flag' => '🇰🇬'],
+        ['value' => 'Lào',                         'flag' => '🇱🇦'],
+        ['value' => 'Latvia',                      'flag' => '🇱🇻'],
+        ['value' => 'Lebanon',                     'flag' => '🇱🇧'],
+        ['value' => 'Lesotho',                     'flag' => '🇱🇸'],
+        ['value' => 'Liberia',                     'flag' => '🇱🇷'],
+        ['value' => 'Libya',                       'flag' => '🇱🇾'],
+        ['value' => 'Liechtenstein',               'flag' => '🇱🇮'],
+        ['value' => 'Lithuania',                   'flag' => '🇱🇹'],
+        ['value' => 'Luxembourg',                  'flag' => '🇱🇺'],
+        ['value' => 'Madagascar',                  'flag' => '🇲🇬'],
+        ['value' => 'Malawi',                      'flag' => '🇲🇼'],
+        ['value' => 'Malaysia',                    'flag' => '🇲🇾'],
+        ['value' => 'Maldives',                    'flag' => '🇲🇻'],
+        ['value' => 'Mali',                        'flag' => '🇲🇱'],
+        ['value' => 'Malta',                       'flag' => '🇲🇹'],
+        ['value' => 'Mauritania',                  'flag' => '🇲🇷'],
+        ['value' => 'Mauritius',                   'flag' => '🇲🇺'],
+        ['value' => 'Mexico',                      'flag' => '🇲🇽'],
+        ['value' => 'Micronesia',                  'flag' => '🇫🇲'],
+        ['value' => 'Moldova',                     'flag' => '🇲🇩'],
+        ['value' => 'Monaco',                      'flag' => '🇲🇨'],
+        ['value' => 'Mông Cổ',                     'flag' => '🇲🇳'],
+        ['value' => 'Montenegro',                  'flag' => '🇲🇪'],
+        ['value' => 'Morocco',                     'flag' => '🇲🇦'],
+        ['value' => 'Mozambique',                  'flag' => '🇲🇿'],
+        ['value' => 'Myanmar',                     'flag' => '🇲🇲'],
+        ['value' => 'Namibia',                     'flag' => '🇳🇦'],
+        ['value' => 'Nam Phi',                     'flag' => '🇿🇦'],
+        ['value' => 'Nam Sudan',                   'flag' => '🇸🇸'],
+        ['value' => 'Nauru',                       'flag' => '🇳🇷'],
+        ['value' => 'Na Uy',                       'flag' => '🇳🇴'],
+        ['value' => 'Nepal',                       'flag' => '🇳🇵'],
+        ['value' => 'New Zealand',                 'flag' => '🇳🇿'],
+        ['value' => 'Nga',                         'flag' => '🇷🇺'],
+        ['value' => 'Nhật Bản',                    'flag' => '🇯🇵'],
+        ['value' => 'Nicaragua',                   'flag' => '🇳🇮'],
+        ['value' => 'Niger',                       'flag' => '🇳🇪'],
+        ['value' => 'Nigeria',                     'flag' => '🇳🇬'],
+        ['value' => 'Oman',                        'flag' => '🇴🇲'],
+        ['value' => 'Pakistan',                    'flag' => '🇵🇰'],
+        ['value' => 'Palau',                       'flag' => '🇵🇼'],
+        ['value' => 'Palestine',                   'flag' => '🇵🇸'],
+        ['value' => 'Panama',                      'flag' => '🇵🇦'],
+        ['value' => 'Papua New Guinea',            'flag' => '🇵🇬'],
+        ['value' => 'Paraguay',                    'flag' => '🇵🇾'],
+        ['value' => 'Peru',                        'flag' => '🇵🇪'],
+        ['value' => 'Pháp',                        'flag' => '🇫🇷'],
+        ['value' => 'Phần Lan',                    'flag' => '🇫🇮'],
+        ['value' => 'Philippines',                 'flag' => '🇵🇭'],
+        ['value' => 'Quần đảo Marshall',           'flag' => '🇲🇭'],
+        ['value' => 'Quần đảo Solomon',            'flag' => '🇸🇧'],
+        ['value' => 'Qatar',                       'flag' => '🇶🇦'],
+        ['value' => 'Romania',                     'flag' => '🇷🇴'],
+        ['value' => 'Rwanda',                      'flag' => '🇷🇼'],
+        ['value' => 'Saint Kitts và Nevis',        'flag' => '🇰🇳'],
+        ['value' => 'Saint Lucia',                 'flag' => '🇱🇨'],
+        ['value' => 'Saint Vincent và Grenadines', 'flag' => '🇻🇨'],
+        ['value' => 'Samoa',                       'flag' => '🇼🇸'],
+        ['value' => 'San Marino',                  'flag' => '🇸🇲'],
+        ['value' => 'São Tomé và Príncipe',        'flag' => '🇸🇹'],
+        ['value' => 'Senegal',                     'flag' => '🇸🇳'],
+        ['value' => 'Serbia',                      'flag' => '🇷🇸'],
+        ['value' => 'Seychelles',                  'flag' => '🇸🇨'],
+        ['value' => 'Sierra Leone',                'flag' => '🇸🇱'],
+        ['value' => 'Singapore',                   'flag' => '🇸🇬'],
+        ['value' => 'Síp (Cyprus)',                'flag' => '🇨🇾'],
+        ['value' => 'Slovakia',                    'flag' => '🇸🇰'],
+        ['value' => 'Slovenia',                    'flag' => '🇸🇮'],
+        ['value' => 'Somalia',                     'flag' => '🇸🇴'],
+        ['value' => 'Sri Lanka',                   'flag' => '🇱🇰'],
+        ['value' => 'Sudan',                       'flag' => '🇸🇩'],
+        ['value' => 'Suriname',                    'flag' => '🇸🇷'],
+        ['value' => 'Syria',                       'flag' => '🇸🇾'],
+        ['value' => 'Tajikistan',                  'flag' => '🇹🇯'],
+        ['value' => 'Tanzania',                    'flag' => '🇹🇿'],
+        ['value' => 'Tây Ban Nha',                 'flag' => '🇪🇸'],
+        ['value' => 'Thái Lan',                    'flag' => '🇹🇭'],
+        ['value' => 'Thổ Nhĩ Kỳ',                  'flag' => '🇹🇷'],
+        ['value' => 'Thụy Điển',                   'flag' => '🇸🇪'],
+        ['value' => 'Thụy Sĩ',                     'flag' => '🇨🇭'],
+        ['value' => 'Togo',                        'flag' => '🇹🇬'],
+        ['value' => 'Tonga',                       'flag' => '🇹🇴'],
+        ['value' => 'Triều Tiên',                  'flag' => '🇰🇵'],
+        ['value' => 'Trinidad và Tobago',          'flag' => '🇹🇹'],
+        ['value' => 'Trung Quốc',                  'flag' => '🇨🇳'],
+        ['value' => 'Tunisia',                     'flag' => '🇹🇳'],
+        ['value' => 'Turkmenistan',                'flag' => '🇹🇲'],
+        ['value' => 'Tuvalu',                      'flag' => '🇹🇻'],
+        ['value' => 'Úc',                          'flag' => '🇦🇺'],
+        ['value' => 'Uganda',                      'flag' => '🇺🇬'],
+        ['value' => 'Ukraine',                     'flag' => '🇺🇦'],
+        ['value' => 'Uruguay',                     'flag' => '🇺🇾'],
+        ['value' => 'Uzbekistan',                  'flag' => '🇺🇿'],
+        ['value' => 'Vanuatu',                     'flag' => '🇻🇺'],
+        ['value' => 'Vatican',                     'flag' => '🇻🇦'],
+        ['value' => 'Venezuela',                   'flag' => '🇻🇪'],
+        ['value' => 'Việt Nam',                    'flag' => '🇻🇳'],
+        ['value' => 'Vương quốc Anh',              'flag' => '🇬🇧'],
+        ['value' => 'Ý',                           'flag' => '🇮🇹'],
+        ['value' => 'Yemen',                       'flag' => '🇾🇪'],
+        ['value' => 'Zambia',                      'flag' => '🇿🇲'],
+        ['value' => 'Zimbabwe',                    'flag' => '🇿🇼'],
+    ];
+}
+
+    public function bookingHistory(): Collection
+    {
+        if(!$this->customer || !$this->customer->exists) {
+            return collect();
+        }
+        return $this->customer->bookings->map( function($booking) {
+            $details = $booking->bookingDetails;
+            $checkinDate = $details->min('checkin_date');
+            $checkoutDate = $details->max('checkout_date');
+            return [
+                'code'                  => '#BK-' . $booking->id,
+                'checkin_date'          => $checkinDate
+                    ? \Carbon\Carbon::parse($checkinDate)->format('d/m/Y')
+                    : '—',
+                'checkout_date'         => $checkoutDate
+                    ? \Carbon\Carbon::parse($checkoutDate)->format('d/m/Y')
+                    : '—',
+                'total_room_amount'     => $booking->total_room_amount,
+                'total_service_amount'  => $booking->total_service_amount,
+                'final_amount'          => $booking->final_amount,
+            ];
+        }); 
+    }
+    public function formatCustomerId(): string
+    {
+        if (!$this->customer || !$this->customer->exists) {
+            return "-";
+        }
+        return "CUS-" . str_pad((string)$this->customer->id, 4, '0', STR_PAD_LEFT);
+    }
+    public function formatAccountId(): string
+    {
+        if (!$this->customer || !$this->customer->exists){
+            return "-";
+        }
+        return "ACC-" .str_pad((string)$this->customer->id,4,'0', STR_PAD_LEFT);
+    }
+}

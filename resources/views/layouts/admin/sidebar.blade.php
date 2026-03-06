@@ -49,16 +49,16 @@
       <span>Phiếu sửa chữa</span>
     </a>
     <div class="sidebar-group-label">KHÁCH HÀNG</div>
-    <a class="sidebar-item" href="#">
+    <a class="{{ request()->routeIs("admin.customers.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.customers.index') }}">
       <span class="material-symbols-outlined">groups</span>
       <span>Quản lý khách hàng</span>
     </a>
     <div class="sidebar-group-label">DỊCH VỤ &amp; TIỆN ÍCH</div>
-    <a class="sidebar-item" href="#">
+    <a class="{{ request()->routeIs('admin.services.*') ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.services.index') }}">
       <span class="material-symbols-outlined">room_service</span>
       <span>Quản lý dịch vụ</span>
     </a>
-    <a class="sidebar-item" href="#">
+    <a class="{{ request()->routeIs('admin.service-groups.*') ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.service-groups.index') }}">
       <span class="material-symbols-outlined">list_alt</span>
       <span>Loại dịch vụ</span>
     </a>

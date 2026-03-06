@@ -42,40 +42,23 @@
               @enderror
             </div>
 
-            <!-- SKU/Code Field -->
-            <div class="grid grid-cols-2 gap-4">
-              <div class="flex flex-col gap-2">
-                <label class="text-xs font-bold text-slate-700 uppercase">Mã thiết bị (SKU) <span class="text-red-500">*</span></label>
-                <input 
-                  type="text" 
-                  name="sku" 
-                  value="{{ old('sku') }}"
-                  placeholder="VD: EQ-FR-001"
-                  class="w-full px-4 py-3 border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 outline-none transition-all"
-                />
-                @error('sku')
-                  <div class="text-red-500 text-sm">{{ $message }}</div>
-                @enderror
-              </div>
-
-              <!-- Category Field -->
-              <div class="flex flex-col gap-2">
-                <label class="text-xs font-bold text-slate-700 uppercase">Loại thiết bị <span class="text-red-500">*</span></label>
-                <select 
-                  name="equipment_category_id"
-                  class="w-full px-4 py-3 border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 outline-none transition-all bg-white"
-                >
-                  <option value="">Chọn danh mục...</option>
-                  @foreach($categories as $category)
-                    <option value="{{ $category->id }}" {{ old('equipment_category_id') == $category->id ? 'selected' : '' }}>
-                      {{ $category->name }}
-                    </option>
-                  @endforeach
-                </select>
-                @error('equipment_category_id')
-                  <div class="text-red-500 text-sm">{{ $message }}</div>
-                @enderror
-              </div>
+            <!-- Category Field -->
+            <div class="flex flex-col gap-2">
+              <label class="text-xs font-bold text-slate-700 uppercase">Loại thiết bị <span class="text-red-500">*</span></label>
+              <select 
+                name="equipment_category_id"
+                class="w-full px-4 py-3 border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 outline-none transition-all bg-white"
+              >
+                <option value="">Chọn danh mục...</option>
+                @foreach($viewModel->categories() as $category)
+                  <option value="{{ $category->id }}" {{ old('equipment_category_id') == $category->id ? 'selected' : '' }}>
+                    {{ $category->name }}
+                  </option>
+                @endforeach
+              </select>
+              @error('equipment_category_id')
+                <div class="text-red-500 text-sm">{{ $message }}</div>
+              @enderror
             </div>
 
             <!-- Import Price Field -->

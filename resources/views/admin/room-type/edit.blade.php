@@ -25,6 +25,21 @@
       </div>
     </div>
 
+    <!-- Validation Errors -->
+    @if ($errors->any())
+      <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div class="flex items-center gap-2 text-red-700 font-bold mb-2">
+          <span class="material-symbols-outlined">error</span>
+          Vui lòng kiểm tra lại thông tin:
+        </div>
+        <ul class="list-disc list-inside text-red-600 text-sm space-y-1">
+          @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </div>
+    @endif
+
     <!-- Form -->
     <form id="roomTypeForm" action="{{ route('admin.room-types.update', $roomType->id) }}" method="POST" enctype="multipart/form-data" class="grid grid-cols-3 gap-6">
       @csrf
@@ -51,22 +66,21 @@
 
             <!-- Mã loại phòng -->
             <div>
-              <label class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2 block">Mã loại phòng <span class="text-red-500">*</span></label>
-              <input type="text" name="code" value="{{ old('code') ?? $viewModel->roomType()->code }}" placeholder="Ví dụ: DLX-001" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('code') border-red-500 @enderror">
-              @error('code')
-                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-              @enderror
+              <label class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2 block">Mã loại phòng</label>
+              <input type="text" name="code" value="{{ $viewModel->roomType()->code }}" class="w-full px-4 py-2 border border-slate-200 rounded-lg bg-slate-100 text-slate-500 cursor-not-allowed" readonly>
+              <p class="text-slate-400 text-xs mt-1">Mã loại phòng không thể thay đổi</p>
             </div>
 
             <!-- Trạng thái -->
             <div>
               <label class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2 block">Trạng thái <span class="text-red-500">*</span></label>
-              <select name="status" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('status') border-red-500 @enderror bg-white">
-                <option value="">-- Chọn trạng thái --</option>
-                <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>Đang kinh doanh</option>
-                <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Không kinh doanh</option>
+              @php $currentStatus = old('is_active', $viewModel->roomType()->is_active->value ?? 1); @endphp
+              <select name="is_active" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('is_active') border-red-500 @enderror bg-white" required>
+                @foreach(\App\Enums\RoomTypeStatus::cases() as $status)
+                  <option value="{{ $status->value }}" {{ $currentStatus == $status->value ? 'selected' : '' }}>{{ $status->label() }}</option>
+                @endforeach
               </select>
-              @error('status')
+              @error('is_active')
                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
               @enderror
             </div>
@@ -74,7 +88,7 @@
             <!-- Mô tả -->
             <div>
               <label class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2 block">Mô tả</label>
-              <textarea name="description" rows="4" placeholder="Nhập mô tả chi tiết về loại phòng..." class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
+              <textarea name="description" rows="4" placeholder="Nhập mô tả chi tiết về loại phòng..." class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('description') border-red-500 @enderror">{{ old('description', $viewModel->roomType()->description) }}</textarea>
               @error('description')
                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
               @enderror
@@ -96,14 +110,14 @@
               <div class="space-y-3">
                 <div>
                   <label class="text-xs text-slate-500 font-medium mb-1 block">Rộng (m) <span class="text-red-500">*</span></label>
-                  <input type="number" name="width" value="{{ old('width') }}" placeholder="5.0" step="0.01" min="1" max="999.99" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('width') border-red-500 @enderror">
+                  <input type="number" name="width" value="{{ old('width', $viewModel->dimensions()['width']) }}" placeholder="5.0" step="0.01" min="1" max="999.99" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('width') border-red-500 @enderror">
                   @error('width')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                   @enderror
                 </div>
                 <div>
                   <label class="text-xs text-slate-500 font-medium mb-1 block">Dài (m) <span class="text-red-500">*</span></label>
-                  <input type="number" name="height" value="{{ old('height') }}" placeholder="8.0" step="0.01" min="1" max="999.99" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('height') border-red-500 @enderror">
+                  <input type="number" name="height" value="{{ old('height', $viewModel->dimensions()['height']) }}" placeholder="8.0" step="0.01" min="1" max="999.99" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('height') border-red-500 @enderror">
                   @error('height')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                   @enderror
@@ -115,14 +129,14 @@
             <div class="space-y-4">
               <div>
                 <label class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2 block">Giá giờ (VNĐ) <span class="text-red-500">*</span></label>
-                <input type="number" name="hourly_price" value="{{ old('hourly_price') }}" placeholder="200000" step="0.01" min="0" max="999999.99" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('hourly_price') border-red-500 @enderror">
+                <input type="number" name="hourly_price" value="{{ old('hourly_price', $viewModel->pricing()['hourly_price']) }}" placeholder="200000" step="0.01" min="0" max="999999.99" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('hourly_price') border-red-500 @enderror">
                 @error('hourly_price')
                   <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
               </div>
               <div>
                 <label class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2 block">Giá ngày (VNĐ) <span class="text-red-500">*</span></label>
-                <input type="number" name="daily_price" value="{{ old('daily_price') }}" placeholder="1500000" step="0.01" min="0" max="999999.99" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('daily_price') border-red-500 @enderror">
+                <input type="number" name="daily_price" value="{{ old('daily_price', $viewModel->pricing()['daily_price']) }}" placeholder="1500000" step="0.01" min="0" max="999999.99" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('daily_price') border-red-500 @enderror">
                 @error('daily_price')
                   <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
@@ -221,15 +235,31 @@
           </div>
           
           <div class="p-4 space-y-3">
-            <div id="imageGallery" class="space-y-3">
-              <div class="w-full h-48 bg-slate-100 rounded-lg flex items-center justify-center">
-                <div class="text-center">
-                  <span class="material-symbols-outlined text-slate-400 text-4xl block mb-2">image_not_supported</span>
-                  <p class="text-xs text-slate-500">Không có ảnh nào được tải lên</p>
-                </div>
+            <!-- Existing Images -->
+            @if($viewModel->images()->count() > 0)
+              <div class="space-y-2 mb-4">
+                <p class="text-xs text-slate-500 font-bold uppercase">Hình ảnh hiện có:</p>
+                @foreach($viewModel->images() as $image)
+                  <div class="flex items-center gap-3 p-2 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-all group relative" id="image-item-{{ $image->id }}">
+                    <img src="{{ asset('storage/' . $image->image_url) }}" alt="Image" class="w-12 h-12 object-cover rounded">
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-medium text-slate-900 truncate" title="{{ basename($image->image_url) }}">
+                        {{ Str::limit(basename($image->image_url), 20) }}
+                      </p>
+                      <p class="text-xs text-slate-500">Đã lưu</p>
+                    </div>
+                    <button type="button" onclick="toggleDeleteImage({{ $image->id }})" class="delete-btn p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-all opacity-0 group-hover:opacity-100">
+                      <span class="material-symbols-outlined text-lg">close</span>
+                    </button>
+                    <!-- Hidden input for deletion (added via JS when marked) -->
+                  </div>
+                @endforeach
               </div>
-            </div>
-            <p class="text-xs text-slate-500 text-center"><span id="imageCount">0</span> image(s) displayed</p>
+            @endif
+            
+            <!-- New Upload Area -->
+            <div id="imageGallery" class="space-y-3"></div>
+            <p class="text-xs text-slate-500 text-center">Hiện có {{ $viewModel->images()->count() }} ảnh | Thêm mới: <span id="imageCount">0</span> ảnh</p>
           </div>
         </div>
 
@@ -241,21 +271,11 @@
           </div>
           
           <div class="flex flex-wrap gap-2" id="amenitiesList">
-            @php
-              $defaultAmenities = ['Free Wifi', 'Điều hòa', 'Bãi đỗ', 'Hộp bảo'];
-            @endphp
-            @foreach($defaultAmenities as $amenity)
-              <span class="inline-flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-900 rounded-full text-sm font-medium cursor-pointer hover:bg-blue-200 transition-all" onclick="removeAmenity(this)">
-                @if($amenity === 'Free Wifi')
-                  <span class="material-symbols-outlined text-sm">wifi</span>
-                @elseif($amenity === 'Điều hòa')
-                  <span class="material-symbols-outlined text-sm">ac_unit</span>
-                @elseif($amenity === 'Bãi đỗ')
-                  <span class="material-symbols-outlined text-sm">local_parking</span>
-                @else
-                  <span class="material-symbols-outlined text-sm">security</span>
-                @endif
-                {{ $amenity }}
+            @foreach($viewModel->amenities() as $amenity)
+              <span class="inline-flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-900 rounded-full text-sm font-medium cursor-pointer hover:bg-blue-200 transition-all" onclick="removeAmenity(this)" data-id="{{ $amenity->id }}">
+                <span class="material-symbols-outlined text-sm">{{ $amenity->icon ?? 'star' }}</span>
+                {{ $amenity->name }}
+                <input type="hidden" name="amenities[]" value="{{ $amenity->id }}">
                 <span class="material-symbols-outlined text-sm cursor-pointer">close</span>
               </span>
             @endforeach
@@ -286,9 +306,37 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr class="hover:bg-slate-50">
-                    <td colspan="3" class="px-6 py-8 text-center text-slate-500 text-sm">Chưa có thiết bị nào</td>
-                  </tr>
+                  @forelse($viewModel->equipment() as $equipment)
+                    <tr class="hover:bg-slate-50 border-b border-slate-100">
+                      <td class="px-6 py-4">
+                        <div>
+                          <p class="font-medium text-slate-900">{{ $equipment->name }}</p>
+                          <p class="text-xs text-slate-500">{{ $equipment->category->name ?? 'Chưa phân loại' }}</p>
+                        </div>
+                        <input type="hidden" name="equipments[]" value="{{ $equipment->id }}">
+                      </td>
+                      <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end">
+                          <button type="button" onclick="decrementValue(this)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 border border-slate-300 rounded-l-lg">
+                            <span class="material-symbols-outlined text-sm">remove</span>
+                          </button>
+                          <input type="number" name="equipment_quantities[{{ $equipment->id }}]" value="{{ $equipment->pivot->quantity ?? 1 }}" class="w-12 h-8 text-center border-y border-slate-300 text-sm" min="1">
+                          <button type="button" onclick="incrementValue(this)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 border border-slate-300 rounded-r-lg">
+                            <span class="material-symbols-outlined text-sm">add</span>
+                          </button>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 text-center">
+                        <button type="button" onclick="removeEquipmentRow(this)" class="text-red-500 hover:text-red-700 transition-all">
+                          <span class="material-symbols-outlined">delete</span>
+                        </button>
+                      </td>
+                    </tr>
+                  @empty
+                    <tr class="hover:bg-slate-50 empty-row">
+                      <td colspan="3" class="px-6 py-8 text-center text-slate-500 text-sm">Chưa có thiết bị nào</td>
+                    </tr>
+                  @endforelse
                 </tbody>
               </table>
             </div>
@@ -307,6 +355,52 @@
 </div>
 
 <script>
+  // Helper function to truncate filename
+  function truncateFilename(filename, maxLength = 25) {
+    if (filename.length <= maxLength) return filename;
+    const ext = filename.split('.').pop();
+    const nameWithoutExt = filename.substring(0, filename.lastIndexOf('.'));
+    const truncatedName = nameWithoutExt.substring(0, maxLength - ext.length - 4) + '...';
+    return truncatedName + '.' + ext;
+  }
+
+  // Toggle image for deletion
+  function toggleDeleteImage(imageId) {
+    const item = document.getElementById('image-item-' + imageId);
+    const isMarked = item.classList.contains('marked-delete');
+    
+    if (isMarked) {
+      // Undo delete mark
+      item.classList.remove('marked-delete', 'bg-red-50', 'border-red-300');
+      item.classList.add('bg-white', 'border-slate-200');
+      item.querySelector('img').classList.remove('opacity-40');
+      item.querySelector('.flex-1 p:first-child').classList.remove('line-through', 'text-red-400');
+      item.querySelector('.flex-1 p:last-child').textContent = 'Đã lưu';
+      item.querySelector('.flex-1 p:last-child').classList.remove('text-red-500');
+      item.querySelector('.flex-1 p:last-child').classList.add('text-slate-500');
+      item.querySelector('.delete-btn span').textContent = 'close';
+      // Remove hidden input
+      const hiddenInput = item.querySelector('input[name="delete_images[]"]');
+      if (hiddenInput) hiddenInput.remove();
+    } else {
+      // Mark for deletion
+      item.classList.add('marked-delete', 'bg-red-50', 'border-red-300');
+      item.classList.remove('bg-white', 'border-slate-200');
+      item.querySelector('img').classList.add('opacity-40');
+      item.querySelector('.flex-1 p:first-child').classList.add('line-through', 'text-red-400');
+      item.querySelector('.flex-1 p:last-child').textContent = 'Sẽ xóa';
+      item.querySelector('.flex-1 p:last-child').classList.add('text-red-500');
+      item.querySelector('.flex-1 p:last-child').classList.remove('text-slate-500');
+      item.querySelector('.delete-btn span').textContent = 'undo';
+      // Add hidden input
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'delete_images[]';
+      input.value = imageId;
+      item.appendChild(input);
+    }
+  }
+
   function incrementValue(btn) {
     const input = btn.parentElement.querySelector('input');
     input.value = parseInt(input.value) + 1;
@@ -314,8 +408,19 @@
 
   function decrementValue(btn) {
     const input = btn.parentElement.querySelector('input');
-    if (parseInt(input.value) > 0) {
+    if (parseInt(input.value) > 1) {
       input.value = parseInt(input.value) - 1;
+    }
+  }
+
+  function removeEquipmentRow(btn) {
+    const row = btn.closest('tr');
+    row.remove();
+    
+    // Check if table is empty and show empty row
+    const tbody = document.querySelector('#equipmentTable tbody');
+    if (tbody.querySelectorAll('tr:not(.empty-row)').length === 0) {
+      tbody.innerHTML = '<tr class="hover:bg-slate-50 empty-row"><td colspan="3" class="px-6 py-8 text-center text-slate-500 text-sm">Chưa có thiết bị nào</td></tr>';
     }
   }
 
@@ -324,41 +429,36 @@
     const gallery = document.getElementById('imageGallery');
     const count = document.getElementById('imageCount');
     
-    gallery.innerHTML = '';
-    
-    if (files.length === 0) {
-      gallery.innerHTML = `
-        <div class="w-full h-48 bg-slate-100 rounded-lg flex items-center justify-center">
-          <div class="text-center">
-            <span class="material-symbols-outlined text-slate-400 text-4xl block mb-2">image_not_supported</span>
-            <p class="text-xs text-slate-500">Không có ảnh nào được tải lên</p>
+    Array.from(files).forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-4 p-3 border border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-all group';
+        row.setAttribute('data-image-item', 'true');
+        row.innerHTML = `
+          <img src="${e.target.result}" alt="${file.name}" class="w-16 h-16 object-cover rounded">
+          <div class="flex-1">
+            <p class="text-sm font-medium text-slate-900 truncate" title="${file.name}">${truncateFilename(file.name)}</p>
+            <p class="text-xs text-green-600">${(file.size / 1024).toFixed(2)} KB - Ảnh mới</p>
           </div>
-        </div>
-      `;
-    } else {
-      Array.from(files).forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = document.createElement('div');
-          img.className = 'relative';
-          img.innerHTML = `
-            <img src="${e.target.result}" alt="Preview ${index}" class="w-full h-32 object-cover rounded-lg">
-            <button type="button" onclick="this.parentElement.remove(); updateImageCount();" class="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-all">
-              <span class="material-symbols-outlined text-sm">delete</span>
-            </button>
-          `;
-          gallery.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-      });
-    }
+          <button type="button" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded transition-all opacity-0 group-hover:opacity-100" onclick="this.closest('div').remove(); updateImageCount();">
+            <span class="material-symbols-outlined text-lg">delete</span>
+          </button>
+        `;
+        gallery.appendChild(row);
+        updateImageCount();
+      };
+      reader.readAsDataURL(file);
+    });
     
     count.textContent = files.length;
   }
 
   function updateImageCount() {
-    const input = document.getElementById('imageUpload');
-    document.getElementById('imageCount').textContent = input.files.length;
+    const gallery = document.getElementById('imageGallery');
+    const count = document.getElementById('imageCount');
+    const items = gallery.querySelectorAll('[data-image-item]');
+    count.textContent = items.length;
   }
 
   function removeAmenity(element) {
@@ -369,6 +469,27 @@
     document.getElementById('amenityModal').classList.remove('hidden');
     document.getElementById('amenitySearch').value = '';
     filterAmenities('');
+    
+    // Mark already selected amenities
+    const selectedIds = Array.from(document.querySelectorAll('#amenitiesList input[name="amenities[]"]')).map(input => input.value);
+    document.querySelectorAll('#amenityGrid .amenity-item').forEach(item => {
+      const id = item.getAttribute('data-id');
+      if (selectedIds.includes(id)) {
+        item.classList.add('ring-2', 'ring-green-500', 'bg-green-50', 'opacity-50', 'pointer-events-none');
+        item.querySelector('input[type="checkbox"]').checked = false;
+        // Add "Đã chọn" label
+        if (!item.querySelector('.selected-label')) {
+          const label = document.createElement('span');
+          label.className = 'selected-label text-xs text-green-600 font-bold';
+          label.textContent = 'Đã chọn';
+          item.appendChild(label);
+        }
+      } else {
+        item.classList.remove('ring-2', 'ring-green-500', 'bg-green-50', 'ring-blue-900', 'opacity-50', 'pointer-events-none');
+        const label = item.querySelector('.selected-label');
+        if (label) label.remove();
+      }
+    });
   }
 
   function closeAmenityModal() {
@@ -405,6 +526,7 @@
   function confirmAmenities() {
     const selected = Array.from(document.querySelectorAll('#amenityGrid .amenity-item input[type="checkbox"]:checked'))
       .map(input => ({
+        id: input.closest('.amenity-item').getAttribute('data-id'),
         name: input.getAttribute('data-name'),
         icon: input.getAttribute('data-icon')
       }));
@@ -417,15 +539,17 @@
     const list = document.getElementById('amenitiesList');
     
     selected.forEach(amenity => {
-      // Check if already exists
-      const exists = Array.from(list.querySelectorAll('span')).some(span => span.textContent.includes(amenity.name));
+      // Check if already exists by ID
+      const exists = list.querySelector(`input[name="amenities[]"][value="${amenity.id}"]`);
       if (!exists) {
         const span = document.createElement('span');
         span.className = 'inline-flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-900 rounded-full text-sm font-medium cursor-pointer hover:bg-blue-200 transition-all';
+        span.setAttribute('data-id', amenity.id);
         span.onclick = function() { removeAmenity(this); };
         span.innerHTML = `
           <span class="material-symbols-outlined text-sm">${amenity.icon}</span>
           ${amenity.name}
+          <input type="hidden" name="amenities[]" value="${amenity.id}">
           <span class="material-symbols-outlined text-sm cursor-pointer">close</span>
         `;
         list.insertBefore(span, list.lastElementChild);
@@ -435,24 +559,45 @@
     closeAmenityModal();
   }
 
-  function addEquipmentRow(name, quantity) {
+  function addEquipmentRow(id, name, category, quantity) {
     const table = document.getElementById('equipmentTable');
     const tbody = table.querySelector('tbody');
     
-    if (tbody.querySelector('tr td[colspan]')) {
-      tbody.innerHTML = '';
+    // Check if already exists
+    if (tbody.querySelector(`input[name="equipments[]"][value="${id}"]`)) {
+      return; // Already exists
+    }
+    
+    // Remove empty row if exists
+    const emptyRow = tbody.querySelector('tr.empty-row');
+    if (emptyRow) {
+      emptyRow.remove();
     }
     
     const row = document.createElement('tr');
     row.className = 'border-b border-slate-100 hover:bg-slate-50';
     row.innerHTML = `
-      <td class="px-6 py-3 text-sm text-slate-900">${name}</td>
-      <td class="px-6 py-3 text-sm text-slate-900 text-right">
-        <input type="number" value="${quantity}" min="1" class="w-20 px-2 py-1 border border-slate-300 rounded text-center focus:outline-none focus:border-blue-900">
+      <td class="px-6 py-4">
+        <div>
+          <p class="font-medium text-slate-900">${name}</p>
+          <p class="text-xs text-slate-500">${category || 'Chưa phân loại'}</p>
+        </div>
+        <input type="hidden" name="equipments[]" value="${id}">
       </td>
-      <td class="px-6 py-3 text-center">
-        <button type="button" onclick="this.closest('tr').remove();" class="text-red-500 hover:text-red-700 transition-all">
-          <span class="material-symbols-outlined text-lg">delete</span>
+      <td class="px-6 py-4 text-right">
+        <div class="flex items-center justify-end">
+          <button type="button" onclick="decrementValue(this)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 border border-slate-300 rounded-l-lg">
+            <span class="material-symbols-outlined text-sm">remove</span>
+          </button>
+          <input type="number" name="equipment_quantities[${id}]" value="${quantity}" class="w-12 h-8 text-center border-y border-slate-300 text-sm" min="1">
+          <button type="button" onclick="incrementValue(this)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 border border-slate-300 rounded-r-lg">
+            <span class="material-symbols-outlined text-sm">add</span>
+          </button>
+        </div>
+      </td>
+      <td class="px-6 py-4 text-center">
+        <button type="button" onclick="removeEquipmentRow(this)" class="text-red-500 hover:text-red-700 transition-all">
+          <span class="material-symbols-outlined">delete</span>
         </button>
       </td>
     `;
@@ -463,6 +608,22 @@
     document.getElementById('equipmentModal').classList.remove('hidden');
     document.getElementById('equipmentSearch').value = '';
     filterEquipment('');
+    
+    // Mark already selected equipment
+    const selectedIds = Array.from(document.querySelectorAll('#equipmentTable input[name="equipments[]"]')).map(input => input.value);
+    document.querySelectorAll('#equipmentGrid .equipment-item').forEach(item => {
+      const id = item.getAttribute('data-id');
+      const iconDiv = item.querySelector('div:last-of-type');
+      if (selectedIds.includes(id)) {
+        item.classList.add('ring-2', 'ring-green-500', 'bg-green-50', 'opacity-50', 'pointer-events-none');
+        item.classList.remove('ring-blue-900');
+        item.querySelector('input[type="checkbox"]').checked = false;
+        iconDiv.innerHTML = '<span class="material-symbols-outlined text-green-500">check_circle</span><span class="text-xs text-green-600 font-bold ml-1">Đã chọn</span>';
+      } else {
+        item.classList.remove('ring-2', 'ring-green-500', 'bg-green-50', 'ring-blue-900', 'opacity-50', 'pointer-events-none');
+        iconDiv.innerHTML = '<span class="material-symbols-outlined text-slate-300">radio_button_unchecked</span>';
+      }
+    });
   }
 
   function closeEquipmentModal() {
@@ -483,23 +644,42 @@
   }
 
   function toggleEquipment(element) {
-    element.classList.toggle('ring-2');
+    // Don't toggle if already selected (disabled state)
+    if (element.classList.contains('pointer-events-none')) {
+      return;
+    }
+    
+    const isSelected = element.classList.toggle('ring-2');
     element.classList.toggle('ring-blue-900');
     element.classList.toggle('bg-blue-50');
     const checkbox = element.querySelector('input[type="checkbox"]');
     checkbox.checked = !checkbox.checked;
+    
+    // Update icon
+    const iconDiv = element.querySelector('div:last-of-type');
+    if (checkbox.checked) {
+      iconDiv.innerHTML = '<span class="material-symbols-outlined text-blue-900">check_circle</span>';
+    } else {
+      iconDiv.innerHTML = '<span class="material-symbols-outlined text-slate-300">radio_button_unchecked</span>';
+    }
   }
 
   function uncheckAllEquipment() {
     document.querySelectorAll('#equipmentGrid .equipment-item').forEach(item => {
-      item.classList.remove('ring-2', 'ring-blue-900', 'bg-blue-50');
-      item.querySelector('input[type="checkbox"]').checked = false;
+      // Don't uncheck already selected (disabled) items
+      if (!item.classList.contains('pointer-events-none')) {
+        item.classList.remove('ring-2', 'ring-blue-900', 'bg-blue-50');
+        item.querySelector('input[type="checkbox"]').checked = false;
+        const iconDiv = item.querySelector('div:last-of-type');
+        iconDiv.innerHTML = '<span class="material-symbols-outlined text-slate-300">radio_button_unchecked</span>';
+      }
     });
   }
 
   function confirmEquipment() {
     const selected = Array.from(document.querySelectorAll('#equipmentGrid .equipment-item input[type="checkbox"]:checked'))
       .map(input => ({
+        id: input.closest('.equipment-item').getAttribute('data-id'),
         name: input.getAttribute('data-name'),
         category: input.getAttribute('data-category')
       }));
@@ -510,20 +690,10 @@
     }
 
     selected.forEach(equipment => {
-      addEquipmentRow(equipment.name, '1');
+      addEquipmentRow(equipment.id, equipment.name, equipment.category, '1');
     });
 
     closeEquipmentModal();
-  }
-
-  function addEquipmentModal() {
-    const name = prompt('Tên thiết bị:');
-    if (!name) return;
-    
-    const quantity = prompt('Số lượng:', '1');
-    if (!quantity) return;
-    
-    addEquipmentRow(name, quantity);
   }
 </script>
 
@@ -551,89 +721,18 @@
 
     <!-- Grid -->
     <div id="amenityGrid" class="grid grid-cols-4 gap-3 p-6">
-      <!-- Mini bar -->
-      <div class="amenity-item p-4 border border-slate-300 rounded-lg text-center cursor-pointer hover:bg-slate-50 transition-all" onclick="toggleAmenity(this)" data-text="mini bar" data-name="Mini bar" data-icon="local_bar">
-        <input type="checkbox" hidden>
-        <span class="material-symbols-outlined text-2xl block mb-2">local_bar</span>
-        <p class="text-xs font-bold text-slate-600">Mini bar</p>
-      </div>
-
-      <!-- Ban công -->
-      <div class="amenity-item p-4 border border-slate-300 rounded-lg text-center cursor-pointer hover:bg-slate-50 transition-all" onclick="toggleAmenity(this)" data-text="ban công" data-name="Ban công" data-icon="balcony">
-        <input type="checkbox" hidden>
-        <span class="material-symbols-outlined text-2xl block mb-2">balcony</span>
-        <p class="text-xs font-bold text-slate-600">Ban công</p>
-      </div>
-
-      <!-- Bồn tắm -->
-      <div class="amenity-item p-4 border border-slate-300 rounded-lg text-center cursor-pointer hover:bg-slate-50 transition-all ring-2 ring-blue-900 bg-blue-50" onclick="toggleAmenity(this)" data-text="bồn tắm" data-name="Bồn tắm" data-icon="bathtub">
-        <input type="checkbox" hidden checked>
-        <span class="material-symbols-outlined text-2xl block mb-2">bathtub</span>
-        <p class="text-xs font-bold text-slate-600">Bồn tắm</p>
-      </div>
-
-      <!-- Máy cà phê -->
-      <div class="amenity-item p-4 border border-slate-300 rounded-lg text-center cursor-pointer hover:bg-slate-50 transition-all" onclick="toggleAmenity(this)" data-text="máy cà phê" data-name="Máy cà phê" data-icon="coffee">
-        <input type="checkbox" hidden>
-        <span class="material-symbols-outlined text-2xl block mb-2">coffee</span>
-        <p class="text-xs font-bold text-slate-600">Máy cà phê</p>
-      </div>
-
-      <!-- Kết sát -->
-      <div class="amenity-item p-4 border border-slate-300 rounded-lg text-center cursor-pointer hover:bg-slate-50 transition-all" onclick="toggleAmenity(this)" data-text="kết sát" data-name="Kết sát" data-icon="lock">
-        <input type="checkbox" hidden>
-        <span class="material-symbols-outlined text-2xl block mb-2">lock</span>
-        <p class="text-xs font-bold text-slate-600">Kết sát</p>
-      </div>
-
-      <!-- Dịch vụ phòng -->
-      <div class="amenity-item p-4 border border-slate-300 rounded-lg text-center cursor-pointer hover:bg-slate-50 transition-all" onclick="toggleAmenity(this)" data-text="dịch vụ phòng" data-name="Dịch vụ phòng" data-icon="room_service">
-        <input type="checkbox" hidden>
-        <span class="material-symbols-outlined text-2xl block mb-2">room_service</span>
-        <p class="text-xs font-bold text-slate-600">Dịch vụ phòng</p>
-      </div>
-
-      <!-- TV -->
-      <div class="amenity-item p-4 border border-slate-300 rounded-lg text-center cursor-pointer hover:bg-slate-50 transition-all ring-2 ring-blue-900 bg-blue-50" onclick="toggleAmenity(this)" data-text="tv" data-name="TV" data-icon="smart_display">
-        <input type="checkbox" hidden checked>
-        <span class="material-symbols-outlined text-2xl block mb-2">smart_display</span>
-        <p class="text-xs font-bold text-slate-600">TV</p>
-      </div>
-
-      <!-- View phố -->
-      <div class="amenity-item p-4 border border-slate-300 rounded-lg text-center cursor-pointer hover:bg-slate-50 transition-all" onclick="toggleAmenity(this)" data-text="view phố" data-name="View phố" data-icon="landscape">
-        <input type="checkbox" hidden>
-        <span class="material-symbols-outlined text-2xl block mb-2">landscape</span>
-        <p class="text-xs font-bold text-slate-600">View phố</p>
-      </div>
-
-      <!-- Free Wifi -->
-      <div class="amenity-item p-4 border border-slate-300 rounded-lg text-center cursor-pointer hover:bg-slate-50 transition-all ring-2 ring-blue-900 bg-blue-50" onclick="toggleAmenity(this)" data-text="free wifi" data-name="Free Wifi" data-icon="wifi">
-        <input type="checkbox" hidden checked>
-        <span class="material-symbols-outlined text-2xl block mb-2">wifi</span>
-        <p class="text-xs font-bold text-slate-600">Free Wifi</p>
-      </div>
-
-      <!-- Điều hòa -->
-      <div class="amenity-item p-4 border border-slate-300 rounded-lg text-center cursor-pointer hover:bg-slate-50 transition-all ring-2 ring-blue-900 bg-blue-50" onclick="toggleAmenity(this)" data-text="điều hòa" data-name="Điều hòa" data-icon="ac_unit">
-        <input type="checkbox" hidden checked>
-        <span class="material-symbols-outlined text-2xl block mb-2">ac_unit</span>
-        <p class="text-xs font-bold text-slate-600">Điều hòa</p>
-      </div>
-
-      <!-- Bãi đỗ -->
-      <div class="amenity-item p-4 border border-slate-300 rounded-lg text-center cursor-pointer hover:bg-slate-50 transition-all" onclick="toggleAmenity(this)" data-text="bãi đỗ" data-name="Bãi đỗ" data-icon="local_parking">
-        <input type="checkbox" hidden>
-        <span class="material-symbols-outlined text-2xl block mb-2">local_parking</span>
-        <p class="text-xs font-bold text-slate-600">Bãi đỗ</p>
-      </div>
-
-      <!-- Hộp bảo -->
-      <div class="amenity-item p-4 border border-slate-300 rounded-lg text-center cursor-pointer hover:bg-slate-50 transition-all ring-2 ring-blue-900 bg-blue-50" onclick="toggleAmenity(this)" data-text="hộp bảo" data-name="Hộp bảo" data-icon="security">
-        <input type="checkbox" hidden checked>
-        <span class="material-symbols-outlined text-2xl block mb-2">security</span>
-        <p class="text-xs font-bold text-slate-600">Hộp bảo</p>
-      </div>
+      @forelse($viewModel->allAmenities() as $amenity)
+        <div class="amenity-item p-4 border border-slate-300 rounded-lg text-center cursor-pointer hover:bg-slate-50 transition-all" onclick="toggleAmenity(this)" data-text="{{ strtolower($amenity->name) }}" data-id="{{ $amenity->id }}">
+          <input type="checkbox" hidden data-name="{{ $amenity->name }}" data-icon="{{ $amenity->icon ?? 'star' }}">
+          <span class="material-symbols-outlined text-2xl block mb-2">{{ $amenity->icon ?? 'star' }}</span>
+          <p class="text-xs font-bold text-slate-600">{{ $amenity->name }}</p>
+        </div>
+      @empty
+        <div class="col-span-4 text-center text-slate-500 py-8">
+          <span class="material-symbols-outlined text-4xl block mb-2">info</span>
+          <p>Chưa có tiện ích nào trong hệ thống</p>
+        </div>
+      @endforelse
     </div>
 
     <!-- Footer -->
@@ -672,89 +771,23 @@
 
     <!-- Equipment List -->
     <div id="equipmentGrid" class="p-4 space-y-3">
-      <!-- Smart TV 55 inch -->
-      <div class="equipment-item p-4 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition-all ring-2 ring-blue-900 bg-blue-50 flex items-start justify-between" onclick="toggleEquipment(this)" data-text="smart tv 55 inch electronics">
-        <div>
-          <p class="font-bold text-slate-900">Smart TV 55 inch</p>
-          <p class="text-xs text-slate-500">Electronics</p>
+      @forelse($viewModel->allEquipments() as $equipment)
+        <div class="equipment-item p-4 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition-all flex items-start justify-between" onclick="toggleEquipment(this)" data-text="{{ strtolower($equipment->name . ' ' . ($equipment->category->name ?? '')) }}" data-id="{{ $equipment->id }}">
+          <div>
+            <p class="font-bold text-slate-900">{{ $equipment->name }}</p>
+            <p class="text-xs text-slate-500">{{ $equipment->category->name ?? 'Chưa phân loại' }}</p>
+          </div>
+          <div class="text-slate-300">
+            <span class="material-symbols-outlined">radio_button_unchecked</span>
+          </div>
+          <input type="checkbox" hidden data-name="{{ $equipment->name }}" data-category="{{ $equipment->category->name ?? '' }}">
         </div>
-        <div class="text-blue-900">
-          <span class="material-symbols-outlined">check_circle</span>
+      @empty
+        <div class="text-center text-slate-500 py-8">
+          <span class="material-symbols-outlined text-4xl block mb-2">info</span>
+          <p>Chưa có thiết bị nào trong hệ thống</p>
         </div>
-        <input type="checkbox" hidden checked data-name="Smart TV 55 inch" data-category="Electronics">
-      </div>
-
-      <!-- Tủ lạnh mini Samsung -->
-      <div class="equipment-item p-4 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition-all ring-2 ring-blue-900 bg-blue-50 flex items-start justify-between" onclick="toggleEquipment(this)" data-text="tủ lạnh mini samsung kitchen">
-        <div>
-          <p class="font-bold text-slate-900">Tủ lạnh mini Samsung</p>
-          <p class="text-xs text-slate-500">Kitchen</p>
-        </div>
-        <div class="text-blue-900">
-          <span class="material-symbols-outlined">check_circle</span>
-        </div>
-        <input type="checkbox" hidden checked data-name="Tủ lạnh mini Samsung" data-category="Kitchen">
-      </div>
-
-      <!-- Điều hòa Daikin 1.5HP -->
-      <div class="equipment-item p-4 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition-all ring-2 ring-blue-900 bg-blue-50 flex items-start justify-between" onclick="toggleEquipment(this)" data-text="điều hòa daikin 1.5hp cooling">
-        <div>
-          <p class="font-bold text-slate-900">Điều hòa Daikin 1.5HP</p>
-          <p class="text-xs text-slate-500">Cooling</p>
-        </div>
-        <div class="text-blue-900">
-          <span class="material-symbols-outlined">check_circle</span>
-        </div>
-        <input type="checkbox" hidden checked data-name="Điều hòa Daikin 1.5HP" data-category="Cooling">
-      </div>
-
-      <!-- Máy sấy tóc Panasonic -->
-      <div class="equipment-item p-4 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition-all flex items-start justify-between" onclick="toggleEquipment(this)" data-text="máy sấy tóc panasonic bathroom">
-        <div>
-          <p class="font-bold text-slate-900">Máy sấy tóc Panasonic</p>
-          <p class="text-xs text-slate-500">Bathroom</p>
-        </div>
-        <div class="text-slate-300">
-          <span class="material-symbols-outlined">radio_button_unchecked</span>
-        </div>
-        <input type="checkbox" hidden data-name="Máy sấy tóc Panasonic" data-category="Bathroom">
-      </div>
-
-      <!-- Ấm đun nước siêu tốc -->
-      <div class="equipment-item p-4 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition-all flex items-start justify-between" onclick="toggleEquipment(this)" data-text="ấm đun nước siêu tốc kitchen">
-        <div>
-          <p class="font-bold text-slate-900">Ấm đun nước siêu tốc</p>
-          <p class="text-xs text-slate-500">Kitchen</p>
-        </div>
-        <div class="text-slate-300">
-          <span class="material-symbols-outlined">radio_button_unchecked</span>
-        </div>
-        <input type="checkbox" hidden data-name="Ấm đun nước siêu tốc" data-category="Kitchen">
-      </div>
-
-      <!-- Bàn là hơi nước -->
-      <div class="equipment-item p-4 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition-all flex items-start justify-between" onclick="toggleEquipment(this)" data-text="bàn là hơi nước laundry">
-        <div>
-          <p class="font-bold text-slate-900">Bàn là hơi nước</p>
-          <p class="text-xs text-slate-500">Laundry</p>
-        </div>
-        <div class="text-slate-300">
-          <span class="material-symbols-outlined">radio_button_unchecked</span>
-        </div>
-        <input type="checkbox" hidden data-name="Bàn là hơi nước" data-category="Laundry">
-      </div>
-
-      <!-- Loa Bluetooth JBL -->
-      <div class="equipment-item p-4 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50 transition-all flex items-start justify-between" onclick="toggleEquipment(this)" data-text="loa bluetooth jbl electronics">
-        <div>
-          <p class="font-bold text-slate-900">Loa Bluetooth JBL</p>
-          <p class="text-xs text-slate-500">Electronics</p>
-        </div>
-        <div class="text-slate-300">
-          <span class="material-symbols-outlined">radio_button_unchecked</span>
-        </div>
-        <input type="checkbox" hidden data-name="Loa Bluetooth JBL" data-category="Electronics">
-      </div>
+      @endforelse
     </div>
 
     <!-- Footer -->

@@ -7,23 +7,19 @@ use App\Models\Utility;
 
 class EloquentUtilityRepository implements UtilityRepository
 {
-    public function findById(int $id)
+    public function findById(int $id): ?Utility
     {
         return Utility::find($id);
     }
 
-    public function save(array $data)
+    public function save(Utility $utility): bool
     {
-        return Utility::create($data);
+        // Eloquent tự phân biệt INSERT / UPDATE dựa vào $utility->exists
+        return $utility->save();
     }
 
-    public function delete(int $id)
+    public function delete(Utility $utility): bool
     {
-        return Utility::destroy($id);
-    }
-
-    public function all()
-    {
-        return Utility::all();
+        return $utility->delete();
     }
 }

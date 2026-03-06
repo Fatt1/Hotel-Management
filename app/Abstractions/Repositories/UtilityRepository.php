@@ -2,13 +2,13 @@
 
 namespace App\Abstractions\Repositories;
 
+use App\Models\Utility;
+
 interface UtilityRepository
 {
-    public function findById(int $id);
+    public function findById(int $id): ?Utility;
 
-    public function save(array $data);
+    public function save(Utility $utility): bool;
 
-    public function delete(int $id);
-
-    public function all();
+    public function delete(Utility $utility): bool;
 }

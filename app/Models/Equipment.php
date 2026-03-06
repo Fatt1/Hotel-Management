@@ -30,7 +30,7 @@ class Equipment extends Model
 
     public function roomTypes(): BelongsToMany
     {
-        return $this->belongsToMany(RoomType::class, 'room_equipment')
+        return $this->belongsToMany(RoomType::class, 'room_equipments')
             ->withPivot('quantity');
     }
 

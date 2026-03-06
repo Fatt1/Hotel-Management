@@ -8,13 +8,13 @@ use App\Models\Role;
 
 class GetAllRoleAction
 {
-    public function handle($page_size = 10, $page_number = 1, $search = null){
+    public function handle($page_size = 10, $page = 1, $search = null){
       $query = Role::query();
       if($search)
          {
         $query->where('name', 'like','%'. $search. '%'); 
       }
       $query = $query->orderBy('name', 'asc');  
-    return $query->paginate($page_size, ['*'], 'page', $page_number);
+    return $query->paginate($page_size, ['*'], 'page', $page);
     }
 }

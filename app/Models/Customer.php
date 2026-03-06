@@ -14,21 +14,15 @@ class Customer extends Authenticatable
     public $timestamps = false;
 
     protected $fillable = [
-        'first_name',
         'last_name',
+        'first_name',
         'phone_number',
         'country',
         'email',
-        'password',
     ];
 
     protected $hidden = [
-        'password',
         'remember_token',
-    ];
-
-    protected $casts = [
-        'password' => 'hashed',
     ];
 
     public function bookings(): HasMany
