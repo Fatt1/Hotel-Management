@@ -22,9 +22,10 @@ class EquipmentData extends Data
         #[Exists('equipment_categories', 'id')]
         public int $equipment_category_id,
 
+        #[Required]
         #[Numeric]
         #[Min(0)]
-        public ?float $import_price = null,
+        public float $import_price,
     ) {}
 
     public static function messages(): array
@@ -33,8 +34,10 @@ class EquipmentData extends Data
             'name.required' => 'Tên thiết bị không được để trống.',
             'name.string' => 'Tên thiết bị phải là chuỗi ký tự.',
             'name.max' => 'Tên thiết bị không được vượt quá 255 ký tự.',
-            'equipment_category_id.required' => 'Vui lòng chọn loại thiết bị.',
+            // 'equipment_category_id.required' => 'Vui lòng chọn loại thiết bị.',
+            'equipment_category_id.numeric' => 'Vui lòng chọn loại thiết bị.',
             'equipment_category_id.exists' => 'Loại thiết bị không tồn tại.',
+            'import_price.required' => 'Giá nhập không được để trống.',
             'import_price.numeric' => 'Giá nhập phải là con số.',
             'import_price.min' => 'Giá nhập không được âm.',
         ];

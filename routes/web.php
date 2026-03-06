@@ -6,17 +6,10 @@ use App\Http\Controllers\Admin\CustomerAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\RoleAdminController;
 use App\Http\Controllers\Admin\RoomDiagramAdminController;
-<<<<<<< HEAD
-use App\Http\Controllers\Admin\RoomTypeAdminController;
-use App\Http\Controllers\Admin\EquipmentCategoryAdminController;
-use App\Http\Controllers\Admin\EquipmentAdminController;
-use App\Http\Controllers\Admin\UtilityAdminController;
-=======
 use App\Http\Controllers\Admin\EquipmentCategoryAdminController;
 use App\Http\Controllers\Admin\EquipmentAdminController;
 use App\Http\Controllers\Admin\UtilityAdminController;
 use App\Http\Controllers\Admin\RoomTypeAdminController;
->>>>>>> 84a6bc64988f2399f8204cc59d5174df0e707c17
 use App\Http\Controllers\Client\AmenityController;
 use App\Http\Controllers\Client\BookingCheckoutController;
 use App\Http\Controllers\Client\DiningController;
@@ -63,6 +56,16 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::get('room-diagrams', [RoomDiagramAdminController::class, 'index'])->name('admin.room-diagrams.index');
     Route::get('room-diagrams/edit', [RoomDiagramAdminController::class, 'edit'])->name('admin.room-diagrams.edit');
     Route::post('room-diagrams/update', [RoomDiagramAdminController::class, 'update'])->name('admin.room-diagrams.update');
+    
+    // Floor API routes
+    Route::post('floors', [RoomDiagramAdminController::class, 'storeFloor'])->name('admin.floors.store');
+    Route::put('floors/{id}', [RoomDiagramAdminController::class, 'updateFloor'])->name('admin.floors.update');
+    Route::delete('floors/{id}', [RoomDiagramAdminController::class, 'destroyFloor'])->name('admin.floors.destroy');
+    
+    // Room API routes
+    Route::post('rooms', [RoomDiagramAdminController::class, 'storeRoom'])->name('admin.rooms.store');
+    Route::put('rooms/{id}', [RoomDiagramAdminController::class, 'updateRoom'])->name('admin.rooms.update');
+    Route::delete('rooms/{id}', [RoomDiagramAdminController::class, 'destroyRoom'])->name('admin.rooms.destroy');
 
     // Equipment Category routes
     Route::resource('equipment-categories', EquipmentCategoryAdminController::class)->names([

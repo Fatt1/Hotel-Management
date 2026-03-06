@@ -33,7 +33,7 @@ function getFormModalHtml(category = null) {
                         Hủy
                     </button>
                     <button type="submit" id="submitBtn" class="px-6 py-3 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors cursor-pointer font-bold text-sm">
-                        🔒 ${submitButtonText}
+                        ${submitButtonText}
                     </button>
                 </div>
             </form>

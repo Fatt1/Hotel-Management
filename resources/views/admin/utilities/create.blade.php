@@ -38,32 +38,21 @@
 
         <!-- Icon Selection -->
         <div class="flex flex-col gap-2">
-          <label for="iconSearch" class="text-sm font-bold text-slate-700">Chọn biểu tượng</label>
-          <div class="flex gap-2">
-            <input 
-              type="text" 
-              id="iconSearch" 
-              placeholder="Tìm kiếm biểu tượng..."
-              class="flex-1 px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-900/20 outline-none text-sm"
-            />
-            <button type="button" class="px-6 py-2.5 bg-slate-200 hover:bg-slate-300 rounded-lg text-slate-700 font-medium transition-all text-sm" id="clearIconBtn">
-              Xóa
-            </button>
-          </div>
+          <label for="iconSearch" class="text-sm font-bold text-slate-700">Chọn biểu tượng <span class="text-red-500">*</span></label>
+          <input 
+            type="text" 
+            id="iconSearch" 
+            placeholder="Tìm kiếm biểu tượng (VD: wifi, bed, pool...)"
+            class="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-900/20 outline-none text-sm"
+          />
+          <span class="text-xs text-slate-500">
+            Nhập tên icon tiếng Anh để tìm. Xem thêm icon tại 
+            <a href="https://fonts.google.com/icons" target="_blank" class="text-blue-600 hover:underline">Google Material Symbols</a>
+          </span>
 
           <!-- Icon Grid -->
           <div id="iconGrid" class="grid grid-cols-8 gap-2 p-4 bg-slate-50 border border-slate-200 rounded-lg max-h-80 overflow-y-auto">
-            @php
-              $icons = [
-                'wifi', 'ac_unit', 'chair', 'bed', 'bathtub', 'restaurant', 'fitness_center', 'spa',
-                'pool', 'local_parking', 'tv', 'shower', 'kitchen', 'room_service', 'business_center', 'event_available',
-                'directions_run', 'landscape', 'music_note', 'theater_comedy', 'local_bar', 'local_cafe', 'desk', 'groups',
-                'meeting_room', 'beach_access', 'wc', 'dry_cleaning', 'local_florist', 'concierge', 'card_giftcard', 'balcony',
-                'door_front', 'elevator', 'stairs', 'window', 'blinds', 'luggage', 'safe', 'mirror',
-                'lamp', 'phone', 'lock', 'key', 'towel', 'iron', 'sofa', 'pillow'
-              ];
-            @endphp
-            @foreach($icons as $icon)
+            @foreach($viewModel->availableIcons() as $icon)
               <button 
                 type="button" 
                 class="icon-option p-3 rounded-lg border-2 border-slate-200 hover:border-blue-900 hover:bg-blue-50 transition-all cursor-pointer flex items-center justify-center group relative" 
@@ -81,15 +70,21 @@
             name="icon" 
             value="{{ old('icon') }}"
           />
+
+          @error('icon')
+            <span class="text-xs text-red-500 font-medium">{{ $message }}</span>
+          @enderror
           
-          @if(old('icon'))
-            <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <div class="p-2 bg-blue-100 rounded-lg">
-                <span class="material-symbols-outlined text-3xl text-blue-900">{{ old('icon') }}</span>
+          <div id="iconPreview">
+            @if(old('icon'))
+              <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div class="p-2 bg-blue-100 rounded-lg">
+                  <span class="material-symbols-outlined text-3xl text-blue-900">{{ old('icon') }}</span>
+                </div>
+                <span class="text-sm text-blue-900 font-medium">Đã chọn: <span class="font-bold">{{ old('icon') }}</span></span>
               </div>
-              <span class="text-sm text-blue-900 font-medium">Biểu tượng: <span class="font-bold">{{ old('icon') }}</span></span>
-            </div>
-          @endif
+            @endif
+          </div>
         </div>
 
         <!-- Form Actions -->
@@ -114,55 +109,76 @@
   const iconOptions = document.querySelectorAll('.icon-option');
   const iconInput = document.getElementById('icon');
   const iconSearch = document.getElementById('iconSearch');
-  const clearIconBtn = document.getElementById('clearIconBtn');
 
+  // Select icon from grid
   iconOptions.forEach(option => {
     option.addEventListener('click', (e) => {
       e.preventDefault();
-      const icon = option.getAttribute('data-icon');
-      iconInput.value = icon;
-      
-      // Update UI - Remove old selection
-      iconOptions.forEach(opt => {
-        opt.classList.remove('border-2', 'border-blue-900', 'bg-blue-900', 'shadow-lg');
-        opt.classList.add('border-2', 'border-slate-200');
-        opt.querySelector('span').classList.remove('text-white');
-        opt.querySelector('span').classList.add('text-slate-500');
-      });
-      
-      // Add new selection with prominent color
-      option.classList.remove('border-slate-200');
-      option.classList.add('border-blue-900', 'bg-blue-900', 'shadow-lg', 'shadow-blue-900/30');
-      option.querySelector('span').classList.remove('text-slate-500');
-      option.querySelector('span').classList.add('text-white');
+      selectIcon(option.getAttribute('data-icon'));
     });
   });
 
-  // Icon search
-  iconSearch.addEventListener('keyup', (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    iconOptions.forEach(option => {
-      const iconName = option.getAttribute('data-icon');
-      option.style.display = iconName.includes(searchTerm) ? '' : 'none';
+  // Function to select/highlight icon
+  function selectIcon(iconName) {
+    iconInput.value = iconName;
+    
+    // Reset all icons
+    iconOptions.forEach(opt => {
+      opt.classList.remove('border-blue-900', 'bg-blue-900', 'shadow-lg');
+      opt.classList.add('border-slate-200');
+      opt.querySelector('span').classList.remove('text-white');
+      opt.querySelector('span').classList.add('text-slate-500');
     });
-  });
-
-  // Clear icon
-  clearIconBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    iconInput.value = '';
-    iconOptions.forEach(opt => opt.classList.remove('border-blue-900', 'bg-blue-50'));
-  });
-
-  // Highlight selected icon on load
-  if (iconInput.value) {
-    const selectedOption = document.querySelector(`[data-icon="${iconInput.value}"]`);
+    
+    // Highlight selected icon if in grid
+    const selectedOption = document.querySelector(`[data-icon="${iconName}"]`);
     if (selectedOption) {
       selectedOption.classList.remove('border-slate-200');
       selectedOption.classList.add('border-blue-900', 'bg-blue-900', 'shadow-lg', 'shadow-blue-900/30');
       selectedOption.querySelector('span').classList.remove('text-slate-500');
       selectedOption.querySelector('span').classList.add('text-white');
     }
+
+    // Update preview
+    updateIconPreview(iconName);
+  }
+
+  // Update icon preview
+  function updateIconPreview(iconName) {
+    const previewContainer = document.getElementById('iconPreview');
+    if (iconName) {
+      previewContainer.innerHTML = `
+        <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div class="p-2 bg-blue-100 rounded-lg">
+            <span class="material-symbols-outlined text-3xl text-blue-900">${iconName}</span>
+          </div>
+          <span class="text-sm text-blue-900 font-medium">Đã chọn: <span class="font-bold">${iconName}</span></span>
+        </div>
+      `;
+    } else {
+      previewContainer.innerHTML = '';
+    }
+  }
+
+  // Icon search - filter grid AND allow custom input
+  iconSearch.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase().trim();
+    
+    // Filter icons in grid
+    iconOptions.forEach(option => {
+      const iconName = option.getAttribute('data-icon');
+      option.style.display = iconName.includes(searchTerm) ? '' : 'none';
+    });
+
+    // If user types a custom icon name (press Enter or blur)
+    if (searchTerm) {
+      selectIcon(searchTerm);
+    }
+  });
+
+  // Highlight selected icon on page load
+  if (iconInput.value) {
+    selectIcon(iconInput.value);
   }
 </script>
 

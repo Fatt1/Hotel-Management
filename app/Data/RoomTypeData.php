@@ -24,7 +24,6 @@ class RoomTypeData extends Data
         #[Required]
         #[StringType]
         #[Max(100)]
-        #[Unique('room_types', 'code')]
         public string $code,
 
         #[Required]
@@ -54,30 +53,36 @@ class RoomTypeData extends Data
         #[Required]
         #[Numeric]
         #[Min(1)]
-        #[Max(999.99)]
+        #[Max(1000)]
         public float $width,
 
         #[Required]
         #[Numeric]
         #[Min(1)]
-        #[Max(999.99)]
+        #[Max(1000)]
         public float $height,
 
         #[Required]
         #[Numeric]
         #[Min(0)]
-        #[Max(999999.99)]
+        #[Max(1000000000)]
         public float $hourly_price,
 
         #[Required]
         #[Numeric]
         #[Min(0)]
-        #[Max(999999.99)]
+        #[Max(1000000000)]
         public float $daily_price,
 
         #[StringType]
         #[Max(200)]
         public ?string $description = null,
+
+        #[Required]
+        #[IntegerType]
+        #[Min(0)]
+        #[Max(2)]
+        public int $is_active = 1,
     ) {}
 
     public static function messages(): array
@@ -110,6 +115,7 @@ class RoomTypeData extends Data
             'daily_price.required' => 'Giá theo ngày là bắt buộc',
             'daily_price.numeric' => 'Giá theo ngày phải là số',
             'daily_price.min' => 'Giá theo ngày không được âm',
+            'is_active.required' => 'Trạng thái là bắt buộc',
         ];
     }
 }

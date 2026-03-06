@@ -13,11 +13,12 @@ class UtilityData extends Data
         #[Required]
         #[StringType]
         #[Max(255)]
-        public string $name,
+        public ?string $name,
 
+        #[Required]
         #[StringType]
         #[Max(255)]
-        public ?string $icon,
+        public ?string $icon = null,
     ) {}
 
     public static function messages(): array
@@ -25,6 +26,7 @@ class UtilityData extends Data
         return [
             'name.required' => 'Tên tiện ích không được để trống',
             'name.max' => 'Tên tiện ích tối đa 255 ký tự',
+            'icon.required' => 'Vui lòng chọn một biểu tượng',
         ];
     }
 }

@@ -35,10 +35,17 @@ class RoomTypeAdminController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(RoomTypeData $request, CreateRoomTypeAction $action)
+    public function store(Request $httpRequest, RoomTypeData $request, CreateRoomTypeAction $action)
     {
         try {
-            $action->execute($request);
+            $images = $httpRequest->file('images') ?? [];
+            $amenityIds = $httpRequest->input('amenities', []);
+            $equipmentData = [
+                'ids' => $httpRequest->input('equipments', []),
+                'quantities' => $httpRequest->input('equipment_quantities', [])
+            ];
+            
+            $action->execute($request, $images, $amenityIds, $equipmentData);
 
             return redirect()
                 ->route('admin.room-types.index')
@@ -73,10 +80,18 @@ class RoomTypeAdminController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(RoomTypeData $request, string $id, UpdateRoomTypeAction $action)
+    public function update(Request $httpRequest, RoomTypeData $request, string $id, UpdateRoomTypeAction $action)
     {
         try {
-            $action->execute((int) $id, $request);
+            $images = $httpRequest->file('images') ?? [];
+            $amenityIds = $httpRequest->input('amenities', []);
+            $equipmentData = [
+                'ids' => $httpRequest->input('equipments', []),
+                'quantities' => $httpRequest->input('equipment_quantities', [])
+            ];
+            $deleteImageIds = $httpRequest->input('delete_images', []);
+            
+            $action->execute((int) $id, $request, $images, $amenityIds, $equipmentData, $deleteImageIds);
 
             return redirect()
                 ->route('admin.room-types.index')

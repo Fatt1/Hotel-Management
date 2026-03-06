@@ -10,6 +10,7 @@ use App\Data\EquipmentData;
 use App\Http\Controllers\Controller;
 use App\Models\Equipment;
 use App\ViewModels\EquipmentViewModel;
+use Exception;
 use Illuminate\Http\Request;
 
 class EquipmentAdminController extends Controller
@@ -35,25 +36,10 @@ class EquipmentAdminController extends Controller
     public function store(EquipmentData $request, CreateEquipmentAction $action)
     {
         try {
-            // $data = EquipmentData::from($request->all());
             $equipment = $action->execute($request);
-
-            // if ($request->expectsJson()) {
-            //     return response()->json([
-            //         'success' => true,
-            //         'message' => 'Thêm thiết bị thành công!',
-            //         'data' => $equipment,
-            //     ], 201);
-            // }
 
             return redirect()->route('admin.equipments.index')->with('success', 'Thêm thiết bị thành công!');
         } catch (Exception $e) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ], 400);
-            }
             return back()->with('error', $e->getMessage())->withInput();
         }
     }
@@ -68,30 +54,16 @@ class EquipmentAdminController extends Controller
     }
 
     public function update(
-        Request $request,
+        EquipmentData $request,
         Equipment $equipment,
         UpdateEquipmentAction $action
     ) {
         try {
-            $data = EquipmentData::from($request->all());
-            $updated = $action->execute($equipment, $data);
-
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Cập nhật thiết bị thành công!',
-                    'data' => $updated,
-                ], 200);
-            }
+            $updated = $action->execute($equipment, $request);
 
             return redirect()->route('admin.equipments.index')->with('success', 'Cập nhật thiết bị thành công!');
         } catch (\Exception $e) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ], 400);
-            }
+
             return back()->with('error', $e->getMessage())->withInput();
         }
     }
@@ -102,11 +74,7 @@ class EquipmentAdminController extends Controller
         try {
             $action->execute($equipment);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Xóa thiết bị thành công!',
-            ], 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
