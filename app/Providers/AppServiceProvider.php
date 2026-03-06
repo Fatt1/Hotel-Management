@@ -8,6 +8,7 @@ use App\Abstractions\Repositories\RoomTypeRepository;
 use App\Abstractions\Repositories\EquipmentCategoryRepository;
 use App\Abstractions\Repositories\EquipmentRepository;
 use App\Abstractions\Repositories\UtilityRepository;
+use App\Abstractions\Repositories\IStaffRepository;
 use App\Models\Staff;
 use App\Repositories\EloquentBookingRepository;
 use App\Repositories\EloquentRoleRepository;
@@ -15,6 +16,7 @@ use App\Repositories\EloquentRoomTypeRepository;
 use App\Repositories\EloquentEquipmentCategoryRepository;
 use App\Repositories\EloquentEquipmentRepository;
 use App\Repositories\EloquentUtilityRepository;
+use App\Repositories\EloquentStaffRepository;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -30,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
        $this->app->bind(RoomTypeRepository::class, EloquentRoomTypeRepository::class);
        $this->app->bind(EquipmentCategoryRepository::class, EloquentEquipmentCategoryRepository::class);
        $this->app->bind(EquipmentRepository::class, EloquentEquipmentRepository::class);
+       $this->app->bind(IStaffRepository::class, EloquentStaffRepository::class);
        $this->app->bind(UtilityRepository::class, EloquentUtilityRepository::class);
     }
 

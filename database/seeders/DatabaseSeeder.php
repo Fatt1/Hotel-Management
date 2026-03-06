@@ -33,15 +33,16 @@ class DatabaseSeeder extends Seeder
 
         
 
-        Staff::create([
-            'role_id' => $adminRole->id, // Assuming the Admin role has ID 1
-            'first_name' => "Admin",
-            'last_name' => "User",
-            'phone_number' => "1234567890",
-            'email' => "admin@gmail.com",
-            'is_active' => true,
-            'password' => 'admin', 
-        ]); 
+        // Staff được tạo trong StaffSeeder
+        // Staff::create([
+        //     'role_id' => $adminRole->id,
+        //     'first_name' => "Admin",
+        //     'last_name' => "User",
+        //     'phone_number' => "1234567890",
+        //     'email' => "admin@gmail.com",
+        //     'is_active' => true,
+        //     'password' => 'admin', 
+        // ]); 
 
         // Tạo các permissions và gán chúng cho vai trò Admin
          foreach(Module::cases() as $module) {
@@ -56,6 +57,7 @@ class DatabaseSeeder extends Seeder
 
         // Seed dữ liệu phòng và đặt phòng
         $this->call([
+            StaffSeeder::class,
             FloorSeeder::class,
             AmenitySeeder::class,
             RoomTypeSeeder::class,

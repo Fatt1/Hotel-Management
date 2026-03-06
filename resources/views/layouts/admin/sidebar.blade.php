@@ -67,6 +67,11 @@
       <span>Quản lý tiện ích</span>
     </a>
     <div class="sidebar-group-label">HỆ THỐNG</div>
+    <a class="{{ request()->routeIs('admin.staffs.*') ? 'sidebar-item-active' : 'sidebar-item' }}"
+      href="{{ route('admin.staffs.index') }}">
+      <span class="material-symbols-outlined">groups</span>
+      <span>Quản lý nhân viên</span>
+    </a>
     <a class="{{ request()->routeIs('admin.roles.*') ? 'sidebar-item-active' : 'sidebar-item' }}"
       href="{{ route('admin.roles.index') }}">
       <span class="material-symbols-outlined">admin_panel_settings</span>

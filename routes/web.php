@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuthAdminController;
 use App\Http\Controllers\Admin\BookingAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\RoleAdminController;
+use App\Http\Controllers\Admin\StaffAdminController;
 use App\Http\Controllers\Admin\RoomDiagramAdminController;
 use App\Http\Controllers\Admin\EquipmentCategoryAdminController;
 use App\Http\Controllers\Admin\EquipmentAdminController;
@@ -34,6 +35,15 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::delete("/roles/{id}", [RoleAdminController::class, "destroy"])->name('admin.roles.destroy');
     Route::get('/roles/{id}/permissions', [RoleAdminController::class, 'editPermission'])->name('admin.roles.edit-permission');
     Route::post('/roles/{id}/permissions', [RoleAdminController::class, 'updatePermission'])->name('admin.roles.update-permissions');
+
+    // Staff routes
+    Route::get("/staffs", [StaffAdminController::class, "index"])->name('admin.staffs.index');
+    Route::get("/staffs/create", [StaffAdminController::class, "create"])->name('admin.staffs.create');
+    Route::get("/staffs/{id}", [StaffAdminController::class, "show"])->name('admin.staffs.show');
+    Route::get("/staffs/{id}/edit", [StaffAdminController::class, "edit"])->name('admin.staffs.edit');
+    Route::post("/staffs", [StaffAdminController::class, "store"])->name('admin.staffs.store');
+    Route::put("/staffs/{id}", [StaffAdminController::class, "update"])->name('admin.staffs.update');
+    Route::delete("/staffs/{id}", [StaffAdminController::class, "destroy"])->name('admin.staffs.destroy');
 
     // Booking routes
     Route::get("/bookings", [BookingAdminController::class, "index"])->name("admin.bookings.index");
