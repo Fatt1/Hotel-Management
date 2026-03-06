@@ -17,7 +17,7 @@
 
     <!-- Form Container -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
-      <form id="utilityForm" action="{{ route('admin.utilities.update', $utility->id) }}" method="POST" class="space-y-6">
+      <form id="utilityForm" action="{{ route('admin.utilities.update', $viewModel->utility()->id) }}" method="POST" class="space-y-6">
         @csrf
         @method('PUT')
 
@@ -28,7 +28,7 @@
             type="text" 
             id="name" 
             name="name" 
-            value="{{ old('name', $utility->name) }}"
+            value="{{ old('name', $viewModel->utility()->name) }}"
             placeholder="VD: Wifi tốc độ cao"
             class="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-900/20 focus:border-transparent outline-none transition-all"
           />
@@ -39,36 +39,28 @@
 
         <!-- Icon Selection -->
         <div class="flex flex-col gap-2">
-          <label for="iconSearch" class="text-sm font-bold text-slate-700">Chọn biểu tượng</label>
-          <div class="flex gap-3">
-            <input 
-              type="text" 
-              id="iconSearch" 
-              placeholder="Tìm kiếm biểu tượng..."
-              class="flex-1 px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-900/20 outline-none"
-            />
-            <button type="button" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-medium transition-all" id="clearIconBtn">
-              Xóa
-            </button>
-          </div>
+          <label for="iconSearch" class="text-sm font-bold text-slate-700">Chọn biểu tượng <span class="text-red-500">*</span></label>
+          <input 
+            type="text" 
+            id="iconSearch" 
+            placeholder="Tìm kiếm biểu tượng (VD: wifi, bed, pool...)"
+            class="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-900/20 outline-none text-sm"
+          />
+          <span class="text-xs text-slate-500">
+            Nhập tên icon tiếng Anh để tìm. Xem thêm icon tại 
+            <a href="https://fonts.google.com/icons" target="_blank" class="text-blue-600 hover:underline">Google Material Symbols</a>
+          </span>
 
           <!-- Icon Grid -->
-          <div id="iconGrid" class="grid grid-cols-8 gap-2 p-4 bg-slate-50 border border-slate-200 rounded-lg overflow-y-auto max-h-64">
-            @php
-              $icons = ['wifi', 'ac_unit', 'groups', 'restaurant', 'sports_gymnastics', 'spa', 'pool', 'local_parking', 
-                       'local_florist', 'local_bar', 'local_cafe', 'fitness_center', 'tv', 'videogame_asset_lock', 'beach_access', 
-                       'desk', 'chair', 'bed', 'bathtub', 'wc', 'shower', 'kitchen', 'room_service', 'business_center',
-                       'meeting_room', 'conference_room', 'event_available', 'event_busy', 'directions_run', 'landscape',
-                       'local_library', 'music_note', 'theater_comedy', 'nightlife', 'card_giftcard'];
-            @endphp
-            @foreach($icons as $icon)
+          <div id="iconGrid" class="grid grid-cols-8 gap-2 p-4 bg-slate-50 border border-slate-200 rounded-lg max-h-80 overflow-y-auto">
+            @foreach($viewModel->availableIcons() as $icon)
               <button 
                 type="button" 
-                class="icon-option p-3 rounded-lg border border-slate-200 hover:border-blue-900 hover:bg-blue-50 transition-all cursor-pointer flex items-center justify-center" 
+                class="icon-option p-3 rounded-lg border-2 border-slate-200 hover:border-blue-900 hover:bg-blue-50 transition-all cursor-pointer flex items-center justify-center group relative" 
                 data-icon="{{ $icon }}"
                 title="{{ $icon }}"
               >
-                <span class="material-symbols-outlined text-2xl text-slate-600">{{ $icon }}</span>
+                <span class="material-symbols-outlined text-3xl text-slate-500 group-hover:text-blue-900">{{ $icon }}</span>
               </button>
             @endforeach
           </div>
@@ -77,15 +69,23 @@
             type="hidden" 
             id="icon" 
             name="icon" 
-            value="{{ old('icon', $utility->icon) }}"
+            value="{{ old('icon', $viewModel->utility()->icon) }}"
           />
+
+          @error('icon')
+            <span class="text-xs text-red-500 font-medium">{{ $message }}</span>
+          @enderror
           
-          @if(old('icon', $utility->icon))
-            <div class="flex items-center gap-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-              <span class="material-symbols-outlined text-2xl text-blue-900">{{ old('icon', $utility->icon) }}</span>
-              <span class="text-sm text-blue-900 font-medium">Đã chọn: {{ old('icon', $utility->icon) }}</span>
-            </div>
-          @endif
+          <div id="iconPreview">
+            @if(old('icon', $viewModel->utility()->icon))
+              <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div class="p-2 bg-blue-100 rounded-lg">
+                  <span class="material-symbols-outlined text-3xl text-blue-900">{{ old('icon', $viewModel->utility()->icon) }}</span>
+                </div>
+                <span class="text-sm text-blue-900 font-medium">Đã chọn: <span class="font-bold">{{ old('icon', $viewModel->utility()->icon) }}</span></span>
+              </div>
+            @endif
+          </div>
         </div>
 
         <!-- Form Actions -->
@@ -110,42 +110,76 @@
   const iconOptions = document.querySelectorAll('.icon-option');
   const iconInput = document.getElementById('icon');
   const iconSearch = document.getElementById('iconSearch');
-  const clearIconBtn = document.getElementById('clearIconBtn');
 
+  // Select icon from grid
   iconOptions.forEach(option => {
     option.addEventListener('click', (e) => {
       e.preventDefault();
-      const icon = option.getAttribute('data-icon');
-      iconInput.value = icon;
-      
-      // Update UI
-      iconOptions.forEach(opt => opt.classList.remove('border-blue-900', 'bg-blue-50'));
-      option.classList.add('border-blue-900', 'bg-blue-50');
+      selectIcon(option.getAttribute('data-icon'));
     });
   });
 
-  // Icon search
-  iconSearch.addEventListener('keyup', (e) => {
-    const searchTerm = e.target.value.toLowerCase();
+  // Function to select/highlight icon
+  function selectIcon(iconName) {
+    iconInput.value = iconName;
+    
+    // Reset all icons
+    iconOptions.forEach(opt => {
+      opt.classList.remove('border-blue-900', 'bg-blue-900', 'shadow-lg');
+      opt.classList.add('border-slate-200');
+      opt.querySelector('span').classList.remove('text-white');
+      opt.querySelector('span').classList.add('text-slate-500');
+    });
+    
+    // Highlight selected icon if in grid
+    const selectedOption = document.querySelector(`[data-icon="${iconName}"]`);
+    if (selectedOption) {
+      selectedOption.classList.remove('border-slate-200');
+      selectedOption.classList.add('border-blue-900', 'bg-blue-900', 'shadow-lg', 'shadow-blue-900/30');
+      selectedOption.querySelector('span').classList.remove('text-slate-500');
+      selectedOption.querySelector('span').classList.add('text-white');
+    }
+
+    // Update preview
+    updateIconPreview(iconName);
+  }
+
+  // Update icon preview
+  function updateIconPreview(iconName) {
+    const previewContainer = document.getElementById('iconPreview');
+    if (iconName) {
+      previewContainer.innerHTML = `
+        <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div class="p-2 bg-blue-100 rounded-lg">
+            <span class="material-symbols-outlined text-3xl text-blue-900">${iconName}</span>
+          </div>
+          <span class="text-sm text-blue-900 font-medium">Đã chọn: <span class="font-bold">${iconName}</span></span>
+        </div>
+      `;
+    } else {
+      previewContainer.innerHTML = '';
+    }
+  }
+
+  // Icon search - filter grid AND allow custom input
+  iconSearch.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase().trim();
+    
+    // Filter icons in grid
     iconOptions.forEach(option => {
       const iconName = option.getAttribute('data-icon');
       option.style.display = iconName.includes(searchTerm) ? '' : 'none';
     });
-  });
 
-  // Clear icon
-  clearIconBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    iconInput.value = '';
-    iconOptions.forEach(opt => opt.classList.remove('border-blue-900', 'bg-blue-50'));
-  });
-
-  // Highlight selected icon on load
-  if (iconInput.value) {
-    const selectedOption = document.querySelector(`[data-icon="${iconInput.value}"]`);
-    if (selectedOption) {
-      selectedOption.classList.add('border-blue-900', 'bg-blue-50');
+    // If user types a custom icon name (press Enter or blur)
+    if (searchTerm) {
+      selectIcon(searchTerm);
     }
+  });
+
+  // Highlight selected icon on page load
+  if (iconInput.value) {
+    selectIcon(iconInput.value);
   }
 </script>
 

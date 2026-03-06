@@ -18,7 +18,8 @@ class ServiceGroupAdminController extends Controller
      */
     public function index(GetServiceGroupListAction $action)
     {
-        $serviceGroups = $action->executePaginated(perPage: 10);
+        $filters = request()->only(['search']);
+        $serviceGroups = $action->executePaginated($filters, perPage: 10);
         return view('admin.service-groups.index', compact('serviceGroups'));
     }
 

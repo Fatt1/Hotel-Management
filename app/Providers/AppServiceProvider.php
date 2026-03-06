@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Abstractions\Repositories\BookingRepository;
 use App\Abstractions\Repositories\CustomerRepository;
+use App\Abstractions\Repositories\FloorRepository;
 use App\Abstractions\Repositories\RoleRepository;
+use App\Abstractions\Repositories\RoomRepository;
 use App\Abstractions\Repositories\RoomTypeRepository;
 use App\Abstractions\Repositories\EquipmentCategoryRepository;
 use App\Abstractions\Repositories\EquipmentRepository;
@@ -14,7 +16,9 @@ use App\Abstractions\Repositories\ServiceRepository;
 use App\Models\Staff;
 use App\Repositories\EloquentBookingRepository;
 use App\Repositories\EloquentCustomerRepository;
+use App\Repositories\EloquentFloorRepository;
 use App\Repositories\EloquentRoleRepository;
+use App\Repositories\EloquentRoomRepository;
 use App\Repositories\EloquentRoomTypeRepository;
 use App\Repositories\EloquentEquipmentCategoryRepository;
 use App\Repositories\EloquentEquipmentRepository;
@@ -38,6 +42,8 @@ class AppServiceProvider extends ServiceProvider
        $this->app->bind(EquipmentCategoryRepository::class, EloquentEquipmentCategoryRepository::class);
        $this->app->bind(EquipmentRepository::class, EloquentEquipmentRepository::class);
        $this->app->bind(UtilityRepository::class, EloquentUtilityRepository::class);
+       $this->app->bind(FloorRepository::class, EloquentFloorRepository::class);
+       $this->app->bind(RoomRepository::class, EloquentRoomRepository::class);
        $this->app->bind(ServiceGroupRepository::class, EloquentServiceGroupRepository::class);
        $this->app->bind(ServiceRepository::class, EloquentServiceRepository::class);
     }

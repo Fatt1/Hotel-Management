@@ -8,7 +8,6 @@ use App\Actions\RoomTypes\GetRoomTypeListAction;
 use App\Actions\RoomTypes\UpdateRoomTypeAction;
 use App\Data\RoomTypeData;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\RoomTypeRequest;
 use App\Models\RoomType;
 use App\ViewModels\RoomTypeViewModel;
 use Illuminate\Http\Request;
@@ -40,11 +39,17 @@ class RoomTypeAdminController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(RoomTypeRequest $request, CreateRoomTypeAction $action)
+    public function store(Request $httpRequest, RoomTypeData $request, CreateRoomTypeAction $action)
     {
         try {
-            $data = RoomTypeData::from($request->validated());
-            $action->execute($data);
+            $images = $httpRequest->file('images') ?? [];
+            $amenityIds = $httpRequest->input('amenities', []);
+            $equipmentData = [
+                'ids' => $httpRequest->input('equipments', []),
+                'quantities' => $httpRequest->input('equipment_quantities', [])
+            ];
+            
+            $action->execute($request, $images, $amenityIds, $equipmentData);
 
             return redirect()
                 ->route('admin.room-types.index')
@@ -59,9 +64,9 @@ class RoomTypeAdminController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(GetRoomTypeListAction $action, string $id)
     {
-        $roomType = RoomType::findOrFail($id);
+        $roomType = $action->execute()->firstWhere('id', (int) $id);
         $viewModel = new RoomTypeViewModel($roomType);
         return view('admin.room-type.show', compact('viewModel', 'roomType'));
     }
@@ -69,9 +74,9 @@ class RoomTypeAdminController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(GetRoomTypeListAction $action, string $id)
     {
-        $roomType = RoomType::findOrFail($id);
+        $roomType = $action->execute()->firstWhere('id', (int) $id);
         $viewModel = new RoomTypeViewModel($roomType);
         return view('admin.room-type.edit', compact('viewModel', 'roomType'));
     }
@@ -79,11 +84,18 @@ class RoomTypeAdminController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(RoomTypeRequest $request, string $id, UpdateRoomTypeAction $action)
+    public function update(Request $httpRequest, RoomTypeData $request, string $id, UpdateRoomTypeAction $action)
     {
         try {
-            $data = RoomTypeData::from($request->validated());
-            $action->execute((int) $id, $data);
+            $images = $httpRequest->file('images') ?? [];
+            $amenityIds = $httpRequest->input('amenities', []);
+            $equipmentData = [
+                'ids' => $httpRequest->input('equipments', []),
+                'quantities' => $httpRequest->input('equipment_quantities', [])
+            ];
+            $deleteImageIds = $httpRequest->input('delete_images', []);
+            
+            $action->execute((int) $id, $request, $images, $amenityIds, $equipmentData, $deleteImageIds);
 
             return redirect()
                 ->route('admin.room-types.index')

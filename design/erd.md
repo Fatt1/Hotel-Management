@@ -88,10 +88,10 @@ CREATE TABLE equipments (
 
 ---
 
-## 6. room_equipment
+## 6. room_equipments
 
 ```sql
-CREATE TABLE room_equipment (
+CREATE TABLE room_equipments (
     room_type_id INT UNSIGNED NOT NULL,
     equipment_id INT UNSIGNED NOT NULL,
     quantity INT NOT NULL,
@@ -415,7 +415,7 @@ CREATE TABLE surcharge_policies (
 3. rooms
 4. equipment_categories
 5. equipments
-6. room_equipment
+6. room_equipments
 7. system_settings
 8. accounts
 9. customers

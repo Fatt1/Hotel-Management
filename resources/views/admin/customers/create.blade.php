@@ -26,10 +26,10 @@
                 {{-- Họ --}}
                 <div class="flex flex-col gap-1">
                     <label class="text-sm font-semibold text-slate-700">Họ <span class="text-red-500">*</span></label>
-                    <input type="text" name="first_name" value="{{ old('first_name') }}"
+                    <input type="text" name="last_name" value="{{ old('last_name') }}"
                         placeholder="Nhập họ khách hàng"
-                        class="w-full rounded-xl border @error('first_name') border-red-400 @else border-slate-200 @enderror bg-slate-50 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 outline-none" />
-                    @error('first_name')
+                        class="w-full rounded-xl border @error('last_name') border-red-400 @else border-slate-200 @enderror bg-slate-50 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 outline-none" />
+                    @error('last_name')
                         <span class="text-red-500 text-xs">{{ $message }}</span>
                     @enderror
                 </div>
@@ -48,10 +48,10 @@
                 {{-- Tên --}}
                 <div class="flex flex-col gap-1">
                     <label class="text-sm font-semibold text-slate-700">Tên <span class="text-red-500">*</span></label>
-                    <input type="text" name="last_name" value="{{ old('last_name') }}"
+                    <input type="text" name="first_name" value="{{ old('first_name') }}"
                         placeholder="Nhập tên khách hàng"
-                        class="w-full rounded-xl border @error('last_name') border-red-400 @else border-slate-200 @enderror bg-slate-50 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 outline-none" />
-                    @error('last_name')
+                        class="w-full rounded-xl border @error('first_name') border-red-400 @else border-slate-200 @enderror bg-slate-50 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 outline-none" />
+                    @error('first_name')
                         <span class="text-red-500 text-xs">{{ $message }}</span>
                     @enderror
                 </div>

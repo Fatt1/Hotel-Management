@@ -137,24 +137,33 @@
         <!-- Media -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           <div class="p-6 border-b border-slate-100">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-blue-900 text-2xl">image</span>
-              <h3 class="text-lg font-bold text-slate-900">Hình ảnh</h3>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-blue-900 text-2xl">image</span>
+                <h3 class="text-lg font-bold text-slate-900">Media (Hình ảnh)</h3>
+              </div>
+              @if($viewModel->images()->count() > 2)
+                <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">View all photos</a>
+              @endif
             </div>
           </div>
           
           <div class="p-4 space-y-3">
             @if($viewModel->images()->count() > 0)
-              <div class="space-y-2">
-                @foreach($viewModel->images() as $image)
-                  <div class="w-full h-48 bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden">
-                    <img src="{{ $image->image_url ?? asset('images/room-default.png') }}" alt="{{ $viewModel->roomType()->name }}" class="w-full h-full object-cover">
+              @foreach($viewModel->images()->take(2) as $image)
+                <div class="flex items-center gap-4 p-3 border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-all">
+                  <img src="{{ asset('storage/' . $image->image_url) }}" alt="{{ $viewModel->roomType()->name }}" class="w-20 h-16 object-cover rounded">
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-slate-900" title="{{ basename($image->image_url) }}">
+                      {{ Str::limit(basename($image->image_url), 25) }}
+                    </p>
+                    <p class="text-xs text-slate-500">{{ $loop->first ? 'Main View' : 'Detail' }}</p>
                   </div>
-                @endforeach
-              </div>
-              <p class="text-xs text-slate-500 text-center">Tổng {{ $viewModel->images()->count() }} hình ảnh</p>
+                </div>
+              @endforeach
+              <p class="text-xs text-slate-500">Total {{ $viewModel->images()->count() }} images available</p>
             @else
-              <div class="w-full h-48 bg-slate-100 rounded-lg flex items-center justify-center">
+              <div class="w-full h-32 bg-slate-100 rounded-lg flex items-center justify-center">
                 <span class="material-symbols-outlined text-slate-400 text-4xl">image_not_supported</span>
               </div>
               <p class="text-xs text-slate-500 text-center">Chưa có hình ảnh</p>
@@ -189,7 +198,6 @@
             <div class="flex items-center gap-3">
               <span class="material-symbols-outlined text-blue-900 text-2xl">kitchen</span>
               <h3 class="text-lg font-bold text-slate-900">Thiết bị (Room Equipment)</h3>
-              <span class="ml-auto text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">Mock Data</span>
             </div>
           </div>
           
