@@ -22,9 +22,13 @@ class CustomerAdminController extends Controller
         $page_number = $request->input('page', 1);
         $search = $request->input('search', null);
         $country = $request->input('country', null);
-        $customer = $getAllCustomerAction->handle($page_size, $page_number, $search, $country);
+        $sort_by     = $request->input('sort_by', 'id');
+        $sort_dir    = $request->input('sort_dir', 'desc');
+        $customer = $getAllCustomerAction->handle($page_size, $page_number, $search, $country, $sort_by, $sort_dir);
+        $countries = (new CustomerViewModel())->countries();
         return view('admin.customers.index', [
             'customers' => $customer,
+            'countries' => $countries,
         ]);
     }
 
@@ -37,7 +41,7 @@ class CustomerAdminController extends Controller
                 'viewModel' => $viewModel,
             ]);
         } catch (Exception $e) {
-            return redirect()->route('admin.customer.index')->with('error', $e->getMessage());
+            return redirect()->route('admin.customers.index')->with('error', $e->getMessage());
         }
     }
 

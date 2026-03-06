@@ -22,6 +22,10 @@ class RoomTypeAdminController extends Controller
         $roomTypes = $action->executeWithRoomCount();
         return view('admin.room-type.index', compact('roomTypes'));
     }
+    public function getAll(GetRoomTypeListAction $action) {
+        $roomTypes = $action->execute();
+        return response()->json($roomTypes, 200);
+    }
 
     /**
      * Show the form for creating a new resource.
