@@ -22,60 +22,58 @@
   <main class="flex flex-1 flex-col min-w-0">
     @include("layouts.admin.header")
     
-    <!-- Flash Messages -->
-    <div class="px-8 pt-4 max-w-7xl mx-auto w-full">
-      @if($message = session('success'))
-        <div class="flex items-center gap-3 px-4 py-3 bg-green-50 border border-green-200 rounded-lg text-green-800 mb-4">
-          <span class="material-symbols-outlined text-green-600">check_circle</span>
-          <div class="flex-1">
-            <p class="font-semibold text-sm">Thành công</p>
-            <p class="text-sm">{{ $message }}</p>
-          </div>
-          <button onclick="this.parentElement.style.display='none'" class="text-green-600 hover:text-green-800 text-xl">
-            <span class="material-symbols-outlined text-lg">close</span>
-          </button>
-        </div>
-      @endif
-
-      @if($message = session('error'))
-        <div class="flex items-center gap-3 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-800 mb-4">
-          <span class="material-symbols-outlined text-red-600">error</span>
-          <div class="flex-1">
-            <p class="font-semibold text-sm">Lỗi</p>
-            <p class="text-sm">{{ $message }}</p>
-          </div>
-          <button onclick="this.parentElement.style.display='none'" class="text-red-600 hover:text-red-800 text-xl">
-            <span class="material-symbols-outlined text-lg">close</span>
-          </button>
-        </div>
-      @endif
-
-      @if($message = session('warning'))
-        <div class="flex items-center gap-3 px-4 py-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800 mb-4">
-          <span class="material-symbols-outlined text-yellow-600">warning</span>
-          <div class="flex-1">
-            <p class="font-semibold text-sm">Cảnh báo</p>
-            <p class="text-sm">{{ $message }}</p>
-          </div>
-          <button onclick="this.parentElement.style.display='none'" class="text-yellow-600 hover:text-yellow-800 text-xl">
-            <span class="material-symbols-outlined text-lg">close</span>
-          </button>
-        </div>
-      @endif
-
-      @if($message = session('info'))
-        <div class="flex items-center gap-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 mb-4">
-          <span class="material-symbols-outlined text-blue-600">info</span>
-          <div class="flex-1">
-            <p class="font-semibold text-sm">Thông tin</p>
-            <p class="text-sm">{{ $message }}</p>
-          </div>
-          <button onclick="this.parentElement.style.display='none'" class="text-blue-600 hover:text-blue-800 text-xl">
-            <span class="material-symbols-outlined text-lg">close</span>
-          </button>
-        </div>
-      @endif
-    </div>
+    <!-- Flash Messages (SweetAlert2) -->
+    @if(session('success') || session('error') || session('warning') || session('info'))
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        @if($message = session('success'))
+          Swal.fire({
+            icon: 'success',
+            title: 'Thành công',
+            text: '{{ addslashes($message) }}',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            background: '#f0fdf4',
+            color: '#166534',
+            iconColor: '#16a34a',
+          });
+        @elseif($message = session('error'))
+          Swal.fire({
+            icon: 'error',
+            title: 'Lỗi',
+            text: '{{ addslashes($message) }}',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#ef4444',
+          });
+        @elseif($message = session('warning'))
+          Swal.fire({
+            icon: 'warning',
+            title: 'Cảnh báo',
+            text: '{{ addslashes($message) }}',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+          });
+        @elseif($message = session('info'))
+          Swal.fire({
+            icon: 'info',
+            title: 'Thông tin',
+            text: '{{ addslashes($message) }}',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+          });
+        @endif
+      });
+    </script>
+    @endif
     
     @yield("content")
   </main>
@@ -94,6 +92,8 @@
   </div>
 </div>
 
+  <!-- SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <!-- Axios CDN -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   @stack('scripts')
