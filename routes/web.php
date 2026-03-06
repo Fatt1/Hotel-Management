@@ -41,6 +41,7 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     // Booking routes
     Route::get("/bookings", [BookingAdminController::class, "index"])->name("admin.bookings.index");
     Route::get('/bookings/create', [BookingAdminController::class,'create'])->name('admin.bookings.create');
+    Route::post('/bookings', [BookingAdminController::class,'store'])->name('admin.bookings.store');
     // Room Type routes
     Route::get('room-types/all', [RoomTypeAdminController::class, 'getAll'])->name('admin.room-types.all');
     Route::resource('room-types', RoomTypeAdminController::class)->names([

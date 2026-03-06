@@ -14,7 +14,7 @@ class EloquentRoomRepository implements RoomRepository
      */
     public function findById(int $id): ?Room
     {
-        return Room::find($id);
+        return Room::find($id)->with('roomType')->first();
     }
 
     /**

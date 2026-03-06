@@ -1,22 +1,32 @@
 import axios from "axios";
 
 export async function getCustomerByEmail(email) {
-    const response = await axios.get("/admin/customers/email", { params: { email } });
+    const response = await axios.get("/admin/customers/email", {
+        params: { email },
+    });
     return response.data;
 }
 
 export async function getRoomTypes() {
-    try{
-         const response = await axios.get("/admin/room-types/all");
+    try {
+        const response = await axios.get("/admin/room-types/all");
         return response.data;
-    }
-    catch(error) {
+    } catch (error) {
         console.error("Error fetching room types:", error);
         alert("Không thể lấy dữ liệu loại phòng. Vui lòng thử lại.");
         return null;
     }
-   
+}
 
+export async function createBooking(payload) {
+    try {
+        const response = await axios.post("/admin/bookings", payload);
+        return response.data;
+    } catch (error) {
+        console.error("Error creating booking:", error);
+        alert("Không thể tạo đơn đặt phòng. Vui lòng thử lại.");
+        return null;
+    }
 }
 
 export async function getAllRoomsApi(

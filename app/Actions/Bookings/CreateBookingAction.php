@@ -7,34 +7,84 @@ use App\Actions\Customers\GetCustomerByEmailAction;
 use App\Data\BookingData;
 use App\Data\CustomerData;
 use App\Models\Booking;
+use App\Models\BookingDetail;
+use App\Models\Room;
+use Illuminate\Support\Facades\DB;
 
 class CreateBookingAction
 {
     public function __construct(
         private GetCustomerByEmailAction $getCustomerByEmailAction,
-        private AddCustomerAction $createCustomerAction
-    ) {
-        throw new \Exception('Not implemented');
-    }
-    public function handle(BookingData $bookingData)
+        private AddCustomerAction $createCustomerAction,
+    ) {}
+
+    public function execute(BookingData $bookingData): Booking
     {
-        // Kiểm tra khách hàng đã tồn tại chưa thông qua email
-        $customer = $this->getCustomerByEmailAction->handle($bookingData->email);
-        if (!$customer) {
-            // Nếu chưa tồn tại, tạo mới khách hàng
-            $customer = $this->createCustomerAction->handle(new CustomerData($bookingData->first_name, $bookingData->last_name, $bookingData->phone_number, $bookingData->country, $bookingData->email));
-        }
-        // Tinhs toán các khoản phí dịch vụ, phòng, phụ thu, tổng tiền cuối cùng ở đây (nếu cần) trước khi tạo booking
-        $totalServiceAmount = 0; // Tính tổng tiền dịch vụ
-        $totalRoomAmount = 0; // Tính tổng tiền phòng
-        $totalSurchargeAmount = 0;
-        $finalAmount = $totalServiceAmount + $totalRoomAmount + $totalSurchargeAmount; // Tính tổng tiền cuối cùng
-        // Sau khi có thông tin khách hàng, tiếp tục xử lý tạo booking với $customer->id
-        $booking = new Booking([
-            'customer_id' => $customer->id,
-            'booking_date' => $bookingData->booking_date,
-            'checkout_date' => $bookingData->checkout_date,
-            'checkout_time' => $bookingData->checkout_time,
-        ]);
+        return DB::transaction(function () use ($bookingData) {
+            // 1. Lấy hoặc tạo mới khách hàng
+            $customer = $this->getCustomerByEmailAction->handle($bookingData->email)
+                ?? $this->createCustomerAction->handle(new CustomerData(
+                    $bookingData->first_name,
+                    $bookingData->last_name,
+                    $bookingData->phone_number,
+                    $bookingData->country,
+                    $bookingData->email,
+                ));
+
+            // 2. Load tất cả rooms + roomType trong 1 query duy nhất (tránh N+1)
+            $roomIds = collect($bookingData->booking_details)->pluck('room_id')->toArray();
+            $rooms = Room::with('roomType')->whereIn('id', $roomIds)->get()->keyBy('id');
+
+            // 3. Tính totalRoomAmount theo từng detail
+            $totalRoomAmount = 0;
+            foreach ($bookingData->booking_details as $detail) {
+                $detail = (array) $detail;
+                $room = $rooms->get($detail['room_id']);
+                if ($room?->roomType) {
+                    $days = max(
+                        (new \DateTime($detail['checkin_date']))->diff(new \DateTime($detail['checkout_date']))->days,
+                        1
+                    );
+                    $totalRoomAmount += $room->roomType->daily_price * $days;
+                }
+            }
+            
+            // 4. Tạo booking — kiểm tra checkin_date có phải hôm nay không
+            $firstDetail = (array) $bookingData->booking_details[0];
+            $checkinDate = (new \DateTime($firstDetail['checkin_date']))->format('Y-m-d');
+            $today       = (new \DateTime('today'))->format('Y-m-d');
+            $status      = $checkinDate === $today ? 'Đang ở' : 'Chờ xác nhận';
+
+            $booking = Booking::create([
+                'customer_id'          => $customer->id,
+                'booking_date'         => $bookingData->booking_date,
+                'status'               => $status,
+                'total_service_amount' => 0,
+                'total_room_amount'    => $totalRoomAmount,
+                'surcharge_amount'     => 0,
+                'final_amount'         => $totalRoomAmount,
+            ]);
+
+            // 5. Batch insert booking_details (1 query thay vì N query)
+            $detailsToInsert = [];
+            foreach ($bookingData->booking_details as $detail) {
+                $detail = (array) $detail;
+                $room = $rooms->get($detail['room_id']);
+                $detailsToInsert[] = [
+                    'booking_id'       => $booking->id,
+                    'room_id'          => $detail['room_id'],
+                    'checkin_date'     => $detail['checkin_date'],
+                    'checkout_date'    => $detail['checkout_date'],
+                    'checkout_status'  => false,
+                    'hourly_price'     => $room?->roomType->hourly_price ?? 0,
+                    'daily_price'      => $room?->roomType->daily_price ?? 0,
+                    'service_amount'   => 0,
+                    'surcharge_amount' => 0,
+                ];
+            }
+            BookingDetail::insert($detailsToInsert);
+
+            return $booking;
+        });
     }
 }

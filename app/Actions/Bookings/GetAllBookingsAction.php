@@ -30,6 +30,7 @@ class GetAllBookingsAction
         if ($status) {
             $query->where('status', $status);
         }
+        $query = $query->orderBy('booking_date', 'desc');
 
         return $query->paginate($page_size, ['*'], 'page', $page_number);
     }

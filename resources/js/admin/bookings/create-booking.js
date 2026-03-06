@@ -4,7 +4,7 @@ import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import { Vietnamese } from "flatpickr/dist/l10n/vn.js";
 import { formatVND } from "../../util";
-import { getRoomTypes, getAllRoomsApi, getCustomerByEmail } from "../../api";
+import { getRoomTypes, getAllRoomsApi, getCustomerByEmail, createBooking } from "../../api";
 
 // ─── State ─────────────────────────────────────────────────────────────────────────────
 let selectedDates = [];
@@ -99,6 +99,45 @@ async function searchCustomerByEmail(email) {
     }
 }
 
+// ─── Country Picker Helper ──────────────────────────────────────────────────────
+function setCountryPicker(countryValue) {
+    const field  = document.getElementById('nc-country-field');
+    if (!field) return;
+
+    const hidden = field.querySelector('input[type="hidden"]');
+    const nameEl = field.querySelector('.cp-trigger .cp-name');
+    const flagEl = field.querySelector('.cp-trigger .cp-flag');
+
+    if (hidden) hidden.value = countryValue ?? '';
+
+    if (nameEl) {
+        nameEl.textContent = countryValue || 'Chọn quốc gia';
+        nameEl.classList.toggle('text-slate-400', !countryValue);
+        nameEl.classList.toggle('text-slate-700', !!countryValue);
+    }
+
+    // Cập nhật flag + checkmark — tìm item khớp trong dropdown (đã được move ra body)
+    if (countryValue) {
+        const matchingItem = document.querySelector(`.cp-item[data-value="${CSS.escape(countryValue)}"]`);
+        if (matchingItem && flagEl) {
+            const iso = matchingItem.dataset.iso;
+            if (iso) {
+                flagEl.className = `cp-flag fi fi-${iso}`;
+                flagEl.style.cssText = 'width:1.5rem;height:1.125rem;display:inline-block;flex-shrink:0;border-radius:2px';
+                flagEl.textContent = '';
+            }
+            // Cập nhật checkmark
+            matchingItem.closest('ul')?.querySelectorAll('.cp-check')
+                .forEach(el => el.classList.add('invisible'));
+            matchingItem.querySelector('.cp-check')?.classList.remove('invisible');
+        }
+    } else if (flagEl) {
+        flagEl.className = 'cp-flag material-symbols-outlined';
+        flagEl.style.cssText = 'font-size:1.125rem;flex-shrink:0;color:#94a3b8';
+        flagEl.textContent = 'language';
+    }
+}
+
 function renderExistingCustomer(customer) {
     // Card → green
     const card = document.getElementById("customer-info-card");
@@ -124,7 +163,8 @@ function renderExistingCustomer(customer) {
         input.className = readonlyClass;
     });
 
-    // Disable country picker
+    // Set + disable country picker
+    setCountryPicker(customer.country ?? '');
     const trigger = document.querySelector("#nc-country-field .cp-trigger");
     if (trigger) trigger.disabled = true;
 }
@@ -157,7 +197,8 @@ function renderNewCustomerForm(email) {
         input.className = editableClass;
     });
 
-    // Enable country picker
+    // Reset + enable country picker
+    setCountryPicker('');
     const trigger = document.querySelector("#nc-country-field .cp-trigger");
     if (trigger) trigger.disabled = false;
 
@@ -225,7 +266,48 @@ async function validateAndSubmit() {
     if (!validateCustomer()) return;
     if (!validateRooms()) return;
 
-    // TODO: gọi API tạo booking
+    if (selectedDates.length < 2) {
+        Swal.fire({ icon: "warning", title: "Chưa chọn ngày", text: "Vui lòng chọn đủ ngày check-in và check-out." });
+        return;
+    }
+
+    const checkinTime  = document.getElementById("checkin-time").value;
+    const checkoutTime = document.getElementById("checkout-time").value;
+
+    const payload = {
+        email:        customerInputs.email.value,
+        phone_number: customerInputs.phone.value,
+        first_name:   customerInputs.firstName.value,
+        last_name:    customerInputs.lastName.value,
+        country:      customerInputs.country.value,
+        booking_date: toDbDatetime(selectedDates[0], checkinTime),
+        booking_details: selectedRooms.map((room) => ({
+            room_id:       room.id,
+            checkin_date:  toDbDatetime(selectedDates[0], checkinTime),
+            checkout_date: toDbDatetime(selectedDates[1], checkoutTime),
+        })),
+    };
+
+    const btn = document.getElementById("confirm-booking-btn");
+    btn.disabled = true;
+    btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">progress_activity</span> Đang xử lý...`;
+
+    try {
+        const result = await createBooking(payload);
+        await Swal.fire({
+            icon: "success",
+            title: "Đặt phòng thành công!",
+            text: `Mã đặt phòng: #${result.booking_id}`,
+            confirmButtonText: "Xem danh sách đặt phòng",
+        });
+        window.location.href = "/admin/bookings";
+    } catch (error) {
+        const msg = error.response?.data?.message ?? "Có lỗi xảy ra. Vui lòng thử lại.";
+        Swal.fire({ icon: "error", title: "Đặt phòng thất bại", text: msg });
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span class="material-symbols-outlined text-sm">check_circle</span> Xác nhận đặt phòng`;
+    }
 }
 
 
