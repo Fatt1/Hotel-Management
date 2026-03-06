@@ -1,5 +1,10 @@
 import axios from "axios";
 
+export async function getCustomerByEmail(email) {
+    const response = await axios.get("/admin/customers/email", { params: { email } });
+    return response.data;
+}
+
 export async function getRoomTypes() {
     try{
          const response = await axios.get("/admin/room-types/all");

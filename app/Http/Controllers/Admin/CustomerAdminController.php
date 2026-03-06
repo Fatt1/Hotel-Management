@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 
-use App\Http\Controllers\Controller;
-use App\Actions\Customers\GetAllCustomerAction;
-use App\Actions\Customers\GetCustomerByIdAction;
 use App\Actions\Customers\AddCustomerAction;
-use App\Actions\Customers\UpdateCustomerAction;
 use App\Actions\Customers\DeleteCustomerAction;
+use App\Actions\Customers\GetAllCustomerAction;
+use App\Actions\Customers\GetCustomerByEmailAction;
+use App\Actions\Customers\GetCustomerByIdAction;
+use App\Actions\Customers\UpdateCustomerAction;
 use App\Data\CustomerData;
+use App\Http\Controllers\Controller;
 use App\ViewModels\CustomerViewModel;
 use Exception;
 use Illuminate\Http\Request;
@@ -30,6 +31,21 @@ class CustomerAdminController extends Controller
             'customers' => $customer,
             'countries' => $countries,
         ]);
+    }
+
+    public function getByEmail(Request $request, GetCustomerByEmailAction $getCustomerByEmail)
+    {
+        $email = $request->input('email');
+        try {
+            $customer = $getCustomerByEmail->handle($email);
+            if ($customer) {
+                return response()->json($customer, 200);
+            } else {
+                return response()->json(['message' => 'Khách hàng không tồn tại'], 404);
+            }
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
     }
 
     public function show(int $id, GetCustomerByIdAction $getCustomerByIdAction)

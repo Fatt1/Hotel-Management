@@ -128,14 +128,10 @@
         </div>
 
         {{-- Pagination --}}
-        <div class="p-5 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-xs font-medium text-slate-500">
-                Hiển thị {{ $customers->count() }} trên {{ $customers->total() }} khách hàng
-            </span>
-            <div>
+            <div class="pt-5">
                 {{ $customers->withQueryString()->links('vendor.pagination.custom') }}
             </div>
-        </div>
+ 
 
     </div>
 </div>

@@ -15,16 +15,7 @@
       </button>
     </div>
 
-    @if(session('success'))
-      <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-800 rounded-xl text-sm font-medium">
-        {{ session('success') }}
-      </div>
-    @endif
-    @if(session('error'))
-      <div class="mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-800 rounded-xl text-sm font-medium">
-        {{ session('error') }}
-      </div>
-    @endif
+  
 
     <!-- Search & Filter -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6 flex items-center gap-4">
@@ -121,41 +112,9 @@
         </table>
       </div>
 
-      <!-- Table Footer with Pagination -->
-      <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-        <p class="text-xs text-slate-500 font-medium">
-          Hiển thị {{ $services->count() }} trên {{ $services->total() }} dịch vụ
-        </p>
-        <div class="flex items-center gap-2">
-          @if ($services->onFirstPage())
-            <button class="p-2 text-slate-400 rounded transition-all disabled:opacity-50 cursor-not-allowed" disabled>
-              <span class="material-symbols-outlined">chevron_left</span>
-            </button>
-          @else
-            <a href="{{ $services->previousPageUrl() }}" class="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition-all">
-              <span class="material-symbols-outlined">chevron_left</span>
-            </a>
-          @endif
-
-          @foreach ($services->getUrlRange(1, $services->lastPage()) as $page => $url)
-            @if ($page == $services->currentPage())
-              <button class="px-3 py-1 bg-blue-900 text-white rounded text-sm font-bold">{{ $page }}</button>
-            @else
-              <a href="{{ $url }}" class="text-slate-600 text-sm font-bold hover:bg-slate-100 px-3 py-1 rounded">{{ $page }}</a>
-            @endif
-          @endforeach
-
-          @if ($services->hasMorePages())
-            <a href="{{ $services->nextPageUrl() }}" class="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition-all">
-              <span class="material-symbols-outlined">chevron_right</span>
-            </a>
-          @else
-            <button class="p-2 text-slate-400 rounded transition-all disabled:opacity-50 cursor-not-allowed" disabled>
-              <span class="material-symbols-outlined">chevron_right</span>
-            </button>
-          @endif
-        </div>
-      </div>
+     <div class="pt-5">
+         {{ $services->withQueryString()->links('vendor.pagination.custom')}}  
+     </div>
     </div>
   </div>
 </div>

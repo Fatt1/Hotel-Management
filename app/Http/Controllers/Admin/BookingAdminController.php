@@ -22,6 +22,7 @@ class BookingAdminController extends Controller
     }
     public function create()
     {
-        return view("admin.bookings.create");
+        $countries = (new \App\ViewModels\CustomerViewModel())->countries();
+        return view("admin.bookings.create", compact('countries'));
     }
 }

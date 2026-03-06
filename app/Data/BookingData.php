@@ -3,18 +3,19 @@
 namespace App\Data;
 
 use DateTime;
-use Ramsey\Uuid\Type\Decimal;
 use Spatie\LaravelData\Data;
 
 class BookingData extends Data
 {
     public function __construct(
-        public int $customer_id,
+        public string $email,
+        public string $phone_number,
+        public string $first_name,
+        public string $last_name,
+        public string $country,
         public DateTime $booking_date,
-        public Decimal $total_service_amount,
-        public Decimal $total_room_amount,
-        public Decimal $surcharge_amount,
-        public Decimal $final_amount,
+        public DateTime $checkout_date,
+        public DateTime $checkout_time,
         public array $booking_details,
     ) {}
 }
