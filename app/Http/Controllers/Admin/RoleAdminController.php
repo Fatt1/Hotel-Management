@@ -58,8 +58,7 @@ class RoleAdminController extends Controller
 
     public function store(RoleData $roleData, AddRoleAction $addRoleAction){
         $role = $addRoleAction->handle($roleData);
-        return redirect()->route('admin.roles.index')->with('success','Vai trò đã được tạo thành công.');
-        
+        return response()->json(['message' => 'Vai trò đã được tạo thành công.'], 201);
     }
     public function editPermission(int $id, GetRoleByIdAction $getRoleByIdAction)
     {

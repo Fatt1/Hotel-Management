@@ -8,8 +8,8 @@ use Spatie\LaravelData\Support\Validation\ValidationContext;
 class CustomerData extends Data
 {
     public function __construct(
-        public string $first_name,
         public string $last_name,
+        public string $first_name,
         public string $phone_number,
         public string $country,
         public string $email,
@@ -19,8 +19,8 @@ class CustomerData extends Data
     public static function messages(...$args): array
     {
         return [
-            'first_name.required' => 'Vui lòng nhập tên',
             'last_name.required' => 'Vui lòng nhập họ',
+            'first_name.required' => 'Vui lòng nhập tên',
             'phone_number.required' => 'Vui lòng nhập số điện thoại',
             'country.required' => 'Vui lòng nhập quốc gia',
             'email.required' => 'Vui lòng nhập email',
@@ -33,8 +33,8 @@ class CustomerData extends Data
         $customerId = $context->payload['id'] ?? null;
         $isUpdate = $customerId !== null;
         return [
-            'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
             'phone_number' => 'required|string|max:20',
             'country' => 'required|string|max:255',
             'email' => [

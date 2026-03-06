@@ -4,6 +4,7 @@ import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import { Vietnamese } from "flatpickr/dist/l10n/vn.js";
 import { formatVND } from "../../util";
+import { getRoomTypes, getAllRoomsApi } from "../../api";
 
 
 function formatDisplay(date) {
@@ -96,83 +97,82 @@ async function handleAddRoomClick() {
         document.getElementById("check_in").value,
         document.getElementById("check_out").value
     )).available_rooms;
-    let roomListContainer = '';
+   await renderRoomList(rooms);
+}
+
+async function renderRoomList(rooms) {
+     let roomListContainer = '';
     rooms.forEach((room) => {
         const roomHtml = getRoomHtml(false, room);
         roomListContainer += roomHtml;
     });
-     openModal(getModelHtmlRoom(roomListContainer));
+    const modalContent = await getModelHtmlRoom(roomListContainer);
+     openModal(modalContent);
     document.querySelectorAll(".close-modal-btn").forEach((btn) => {
         btn.addEventListener("click", closeModal);
     });
+    document.getElementById("room-type-filter").addEventListener("change", handleRoomTypeChange);
 }
 
-function getModelHtmlRoom(content) {
+async function getModelHtmlRoom(content) {
+    const roomTypes = await getRoomTypes();
     return `
-    <div class="p-8 pb-6 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
-    <div class="flex items-center gap-3">
-        <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
-            <span class="material-symbols-outlined !text-2xl">add_home_work</span>
+   <div class="w-full max-w-3xl">
+        <div class="p-8 pb-6 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 ">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined !text-2xl">add_home_work</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Chọn phòng trống</h2>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Hệ thống quản lý Urban Luxe
+                </p>
+            </div>
         </div>
-        <div>
-            <h2 class="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Chọn phòng trống</h2>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Hệ thống quản lý Urban Luxe
-            </p>
-        </div>
-    </div>
-    <button class="close-modal-btn p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
-        <span class="material-symbols-outlined text-slate-400">close</span>
-    </button>
-</div>
-<div
-    class="px-8 py-6 bg-slate-50/50 dark:bg-slate-800/30 flex flex-wrap gap-4 border-b border-slate-100 dark:border-slate-800">
-    <div class="flex-1 min-w-[200px]">
-        <label class="form-label">Lọc theo loại phòng</label>
-        <select class="form-input">
-            <option>Tất cả loại phòng</option>
-            <option>Urban Suite King</option>
-            <option>Urban Deluxe Twin</option>
-            <option>Urban Standard Single</option>
-        </select>
-    </div>
-    <div class="flex-1 min-w-[200px]">
-        <label class="form-label">Lọc theo tầng</label>
-        <select class="form-input">
-            <option>Tất cả tầng</option>
-            <option>Tầng 1</option>
-            <option>Tầng 2</option>
-            <option>Tầng 3</option>
-            <option>Tầng 4</option>
-            <option>Tầng 5</option>
-        </select>
-    </div>
-    <div class="flex items-end">
-        <button
-            class="h-12 px-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center gap-2 text-xs font-bold uppercase tracking-wider hover:bg-slate-50 transition-colors">
-            <span class="material-symbols-outlined">filter_list</span>
-            Lọc ngay
+        <button class="close-modal-btn p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+            <span class="material-symbols-outlined text-slate-400">close</span>
         </button>
     </div>
-</div>
-<div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        ${content} 
+    <div
+        class="px-8 py-6 bg-slate-50/50 dark:bg-slate-800/30 flex flex-wrap gap-4 border-b border-slate-100 dark:border-slate-800">
+        <div class="">
+            <select id="room-type-filter" class="block w-55 px-3 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 text-slate-600 dark:text-slate-300">
+                <option value="">Tất cả loại phòng</option>
+                ${roomTypes?.map((rt) => `<option value="${rt.id}">${rt.name}</option>`).join("")}
+            </select>
+        </div>
+        <div class="">
+            <select id="floor-filter" class="block w-44 px-3 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 text-slate-600 dark:text-slate-300">
+                <option>Tất cả tầng</option>
+                <option>Tầng 1</option>
+                <option>Tầng 2</option>
+                <option>Tầng 3</option>
+                <option>Tầng 4</option>
+                <option>Tầng 5</option>
+            </select>
+        </div>
+        
     </div>
-</div>
-<div class="p-8 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Đã chọn: <span
-            class="text-primary font-black">0 phòng</span></p>
-    <div class="flex items-center gap-4">
-        <button
-            class="close-modal-btn px-8 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-all">Đóng</button>
-        <button
-            class="px-8 py-3.5 bg-primary text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center gap-2">
-            <span class="material-symbols-outlined">check_circle</span>
-            Xác nhận thêm
-        </button>
+    <div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${content} 
+        </div>
     </div>
-</div>
-
+    <div class="p-8 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Đã chọn: <span
+                class="text-primary font-black">0 phòng</span></p>
+        <div class="flex items-center gap-4">
+            <button
+                class="close-modal-btn px-8 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-all">Đóng</button>
+            <button
+                class="px-8 py-3.5 bg-primary text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined">check_circle</span>
+                Xác nhận thêm
+            </button>
+        </div>
+    </div>
+    
+   </div>
     `;
 }
 
@@ -200,24 +200,17 @@ function getRoomHtml(isSelected, room) {
         </label>`;
 }
 
-async function getAllRoomsApi(
-    checkinDate,
-    checkoutDate,
-    roomTypeId = null,
-    floorId = null,
-) {
-    // Gọi API để lấy danh sách phòng trống dựa trên ngày check-in, check-out, loại phòng và tầng
-    try {
-        const repsonse = await axios.get("/admin/rooms/available", {
-            params: {
-                checkin_date: checkinDate,
-                checkout_date: checkoutDate,
-                room_type_id: roomTypeId,
-                floor_id: floorId,
-            },
-        });
-        return repsonse.data;
-    } catch (error) {
-        console.error("Lỗi khi lấy danh sách phòng trống:", error);
-    }
+
+
+async function handleRoomTypeChange() {
+        const roomTypeId = document.getElementById("room-type-filter").value;
+        console.log("Selected room type ID:", roomTypeId);
+        const floorId = null;
+        const rooms = await getAllRoomsApi(
+            document.getElementById("check_in").value,
+            document.getElementById("check_out").value,
+            roomTypeId || null,
+            floorId || null
+        );
+        await renderRoomList(rooms.available_rooms);
 }

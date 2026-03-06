@@ -88,8 +88,8 @@
                             <td class="table-cell font-bold text-primary">
                                 CUS-{{ str_pad($customer->id + 1000, 4, '0', STR_PAD_LEFT) }}
                             </td>
-                            <td class="table-cell">{{ $customer->first_name }}</td>
-                            <td class="table-cell font-semibold text-slate-900">{{ $customer->last_name }}</td>
+                            <td class="table-cell">{{ $customer->last_name }}</td>
+                            <td class="table-cell font-semibold text-slate-900">{{ $customer->first_name }}</td>
                             <td class="table-cell">{{ $customer->phone_number }}</td>
                             <td class="table-cell">{{ $customer->country }}</td>
                             <td class="table-cell">{{ $customer->email }}</td>

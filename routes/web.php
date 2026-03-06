@@ -42,6 +42,7 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::get("/bookings", [BookingAdminController::class, "index"])->name("admin.bookings.index");
     Route::get('/bookings/create', [BookingAdminController::class,'create'])->name('admin.bookings.create');
     // Room Type routes
+    Route::get('room-types/all', [RoomTypeAdminController::class, 'getAll'])->name('admin.room-types.all');
     Route::resource('room-types', RoomTypeAdminController::class)->names([
         'index' => 'admin.room-types.index',
         'create' => 'admin.room-types.create',
@@ -128,7 +129,12 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
 // =========================================================
 // Client Routes
 // =========================================================
+use App\Http\Controllers\Client\AuthController;
+
 Route::name('client.')->group(function () {
+    // Đăng nhập Client
+    Route::get('/login', [AuthController::class, 'index'])->name('login');
+
     // Danh sách loại phòng
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
 
