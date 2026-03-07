@@ -4,24 +4,17 @@ declare(strict_types=1);
 
 namespace App\Actions\Customers;
 
-use App\Abstractions\Repositories\CustomerRepository;
+use App\Models\Customer;
 
 class DeleteCustomerAction
 {
-    public function __construct(
-        private CustomerRepository $customerRepository
-    ) {
-    }
     public function handle(int $id): void
     {
-        $customer = $this->customerRepository->findById($id);
-        if (!$customer) {
-            throw new \Exception('Khách hàng không tồn tại');
-        }
+        $customer = Customer::findOrFail($id);
 
-        if($customer->bookings()->exists()){
+        if ($customer->bookings()->exists()) {
             throw new \Exception('Không thể xóa khách hàng có đặt phòng');
         }
-        $this->customerRepository->delete($customer);
+        $customer->delete();
     }
 }

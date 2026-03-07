@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Actions\RoomTypes;
 
-use App\Abstractions\Repositories\RoomTypeRepository;
 use App\Data\RoomTypeData;
 use App\Models\RoomType;
 use App\Models\RoomTypeImage;
@@ -14,22 +13,8 @@ use Illuminate\Support\Facades\Storage;
 
 class CreateRoomTypeAction
 {
-    public function __construct(
-        private RoomTypeRepository $roomTypeRepository
-    ) {}
-
-    /**
-     * Tạo loại phòng mới
-     * 
-     * @param RoomTypeData $data
-     * @param UploadedFile[] $images
-     * @param array $amenityIds
-     * @param array $equipmentData ['ids' => [], 'quantities' => []]
-     * @return RoomType
-     */
     public function execute(RoomTypeData $data, array $images = [], array $amenityIds = [], array $equipmentData = []): RoomType
     {
-        // Kiểm tra mã code đã tồn tại
         if (RoomType::where('code', $data->code)->exists()) {
             throw new Exception("Mã loại phòng đã tồn tại");
         }
@@ -48,7 +33,7 @@ class CreateRoomTypeAction
         $roomType->hourly_price = $data->hourly_price;
         $roomType->daily_price = $data->daily_price;
 
-        $this->roomTypeRepository->save($roomType);
+        $roomType->save();
 
         // Xử lý upload và lưu hình ảnh
         $this->saveImages($roomType, $images);

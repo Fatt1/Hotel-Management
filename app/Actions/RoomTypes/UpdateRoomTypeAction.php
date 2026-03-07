@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Actions\RoomTypes;
 
-use App\Abstractions\Repositories\RoomTypeRepository;
 use App\Data\RoomTypeData;
 use App\Models\RoomType;
 use App\Models\RoomTypeImage;
@@ -14,28 +13,9 @@ use Illuminate\Support\Facades\Storage;
 
 class UpdateRoomTypeAction
 {
-    public function __construct(
-        private RoomTypeRepository $roomTypeRepository
-    ) {}
-
-    /**
-     * Cập nhật loại phòng
-     * 
-     * @param int $id
-     * @param RoomTypeData $data
-     * @param UploadedFile[] $images
-     * @param array $amenityIds
-     * @param array $equipmentData ['ids' => [], 'quantities' => []]
-     * @param array $deleteImageIds - IDs của ảnh cần xóa
-     * @return RoomType
-     */
     public function execute(int $id, RoomTypeData $data, array $images = [], array $amenityIds = [], array $equipmentData = [], array $deleteImageIds = []): RoomType
     {
-        $roomType = $this->roomTypeRepository->findById($id);
-        
-        if (!$roomType) {
-            throw new Exception("Loại phòng không tồn tại");
-        }
+        $roomType = RoomType::findOrFail($id);
 
         // Kiểm tra mã code đã tồn tại (bỏ qua record hiện tại)
         $existingCode = RoomType::where('code', $data->code)
@@ -59,7 +39,7 @@ class UpdateRoomTypeAction
         $roomType->hourly_price = $data->hourly_price;
         $roomType->daily_price = $data->daily_price;
 
-        $this->roomTypeRepository->save($roomType);
+        $roomType->save();
 
         // Xóa các ảnh được chọn
         if (!empty($deleteImageIds)) {
