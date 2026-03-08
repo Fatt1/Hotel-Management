@@ -100,7 +100,7 @@ class BookingSeeder extends Seeder
             'final_amount'         => 500000.00,
         ]);
 
-        DB::table('bookings')->where('id', $booking3->id)->update(['status' => 'Chờ xác nhận']);
+        DB::table('bookings')->where('id', $booking3->id)->update(['status' => 'Đã đặt']);
 
         BookingDetail::create([
             'room_id'          => $room201->id,

@@ -29,6 +29,16 @@ export async function createBooking(payload) {
     }
 }
 
+export async function updateBooking(bookingId, payload) {
+    try {
+        const response = await axios.put(`/admin/bookings/${bookingId}`, payload);
+        return response.data;
+    } catch (error) {
+        console.error("Error updating booking:", error);
+        throw error;
+    }
+}
+
 export async function getAllRoomsApi(
     checkinDate,
     checkoutDate,
@@ -48,5 +58,15 @@ export async function getAllRoomsApi(
         return repsonse.data;
     } catch (error) {
         console.error("Lỗi khi lấy danh sách phòng trống:", error);
+    }
+}
+
+export async function getAllServicesApi() {
+    try {
+        const response = await axios.get("/admin/services/all");
+        return response.data;
+    } catch (error) {
+        console.error("Lỗi khi lấy danh sách dịch vụ:", error);
+        return null;
     }
 }

@@ -1,9 +1,9 @@
 @extends('layouts.admin')
-@section('title', 'Tạo booking mới')
+@section('title', 'Cập nhật booking')
 @section('content')
     <div class="flex flex-col xl:flex-row gap-6">
         <div class="flex-1 space-y-6">
-            {{-- Thông tin khách hàng --}}
+            {{-- Thông tin khách hàng (READ-ONLY) --}}
             <div
                 class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-6">
                 <div class="flex items-center mb-4">
@@ -12,81 +12,60 @@
                     </h2>
                 </div>
                 <div class="grid grid-cols-1 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Email khách
-                            hàng</label>
-                        <div class="flex gap-2">
-                            <input type="email" id="customer-email-input" placeholder="Nhập email khách hàng"
-                                class="flex-1 px-3 py-2 text-sm border border-border-light dark:border-border-dark rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary" />
-                            <button type="button" id="search-customer-btn"
-                                class="flex items-center gap-1 px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-blue-800 transition-colors">
-                                <span id="search-customer-icon" class="material-symbols-outlined text-base">search</span>
-                                Tìm
-                            </button>
-                        </div>
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Khách hàng mới sẽ được tự động tạo tài
-                            khoản.</p>
-                    </div>
-
-                    {{-- Customer info section (shown after search) --}}
-                    <div id="customer-info-section" class="hidden">
-                        <div id="customer-info-card" class="rounded-xl border border-amber-200 bg-amber-50 p-4">
-                            <div id="customer-status-header" class="flex items-center justify-between gap-2 text-amber-700 mb-3">
+                    {{-- Customer info section (always shown, read-only) --}}
+                    <div id="customer-info-section">
+                        <div id="customer-info-card" class="rounded-xl border border-blue-200 bg-blue-50 p-4">
+                            <div id="customer-status-header" class="flex items-center justify-between gap-2 text-blue-700 mb-3">
                                 <div class="flex items-center gap-2">
-                                    <span id="customer-status-icon" class="material-symbols-outlined text-base">person_add</span>
-                                    <span id="customer-status-text" class="text-xs font-bold uppercase tracking-wider">Khách hàng chưa tồn tại — Nhập thông tin để tạo mới</span>
+                                    <span class="material-symbols-outlined text-base">person</span>
+                                    <span class="text-xs font-bold uppercase tracking-wider">Thông tin khách hàng</span>
                                 </div>
-                                <a id="customer-edit-link" href="#" target="_blank"
-                                    class="hidden flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-primary bg-white border border-primary/30 rounded-lg hover:bg-primary/5 transition-colors">
-                                    <span class="material-symbols-outlined text-sm">edit</span>
-                                    Chỉnh sửa
-                                </a>
                             </div>
                            
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {{-- Họ  --}}
                                 <div class="flex flex-col gap-1">
                                     <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">Họ</label>
-                                    <input id="nc-first-name" name="customer_first_name" placeholder="Nhập họ"
-                                        type="text"
-                                        class="w-full px-3 py-2 text-sm border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                                    <span id="nc-first-name-error" class="hidden text-xs text-red-500"></span>
+                                    <input id="nc-first-name" name="customer_first_name" 
+                                        value="{{ $booking->customer->first_name }}"
+                                        type="text" readonly
+                                        class="w-full px-3 py-2 text-sm border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed" />
                                 </div>
                                 {{-- Tên  --}}
                                 <div class="flex flex-col gap-1">
                                     <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">Tên</label>
-                                    <input id="nc-last-name" name="customer_last_name" placeholder="Nhập tên" type="text"
-                                        class="w-full px-3 py-2 text-sm border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                                    <span id="nc-last-name-error" class="hidden text-xs text-red-500"></span>
+                                    <input id="nc-last-name" name="customer_last_name" 
+                                        value="{{ $booking->customer->last_name }}"
+                                        type="text" readonly
+                                        class="w-full px-3 py-2 text-sm border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed" />
                                 </div>
                                 {{-- Email  --}}
                                 <div class="flex flex-col gap-1">
                                     <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">Email</label>
-                                    <input id="nc-email" name="customer_email" placeholder="Email" type="email"
-                                        class="w-full px-3 py-2 text-sm border rounded-lg bg-white text-gray-500" />
-                                    <span id="nc-email-error" class="hidden text-xs text-red-500"></span>
+                                    <input id="nc-email" name="customer_email" 
+                                        value="{{ $booking->customer->email }}"
+                                        type="email" readonly
+                                        class="w-full px-3 py-2 text-sm border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed" />
                                 </div>
                                 {{-- Số điện thoại  --}}
                                 <div class="flex flex-col gap-1">
                                     <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">Số điện
                                         thoại</label>
-                                    <input id="nc-phone" name="customer_phone" placeholder="VD: 0901234567" type="text"
-                                        class="w-full px-3 py-2 text-sm border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                                    <span id="nc-phone-error" class="hidden text-xs text-red-500"></span>
+                                    <input id="nc-phone" name="customer_phone" 
+                                        value="{{ $booking->customer->phone_number }}"
+                                        type="text" readonly
+                                        class="w-full px-3 py-2 text-sm border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed" />
                                 </div>
                                 {{-- Quốc gia  --}}
-                                <div id="nc-country-field" class="flex flex-col gap-1 md:col-span-2">
+                                <div class="flex flex-col gap-1 md:col-span-2">
                                     <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">Quốc gia</label>
-                                    @include('admin.customers._country_picker', [
-                                        'inputName' => 'customer_country',
-                                        'selectedValue' => '',
-                                        'pickerCountries' => $countries,
-                                    ])
-                                    <span id="nc-country-error" class="hidden text-xs text-red-500"></span>
+                                    <input type="text" 
+                                        value="{{ $booking->customer->country }}"
+                                        readonly
+                                        class="w-full px-3 py-2 text-sm border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed" />
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -110,8 +89,7 @@
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Nhận phòng</p>
                             <div class="flex items-center gap-2">
                                 <p id="checkin-display"
-                                    class="text-sm font-semibold text-gray-900 dark:text-white cursor-pointer"
-                                    id="checkin-date-trigger">--</p>
+                                    class="text-sm font-semibold text-gray-900 dark:text-white cursor-pointer">--</p>
                                 <span class="text-gray-300">|</span>
                                 <input type="time" id="checkin-time" value="14:00"
                                     class="text-sm font-semibold text-primary bg-transparent outline-none border-none cursor-pointer w-[72px] [&::-webkit-calendar-picker-indicator]:hidden" />
@@ -207,25 +185,25 @@
                     </div>
                 </div>
                 <div class="space-y-3">
-                    <button type="button" id="btn-checkin"
-                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-lg shadow-lg shadow-emerald-500/30 transition-all transform active:scale-95 flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-sm">door_front</span>
-                        Nhận phòng
-                    </button>
-                    <button type="button" id="btn-reserve"
+                    <button type="button" id="btn-update"
                         class="w-full bg-primary hover:bg-blue-800 text-white font-medium py-3 rounded-lg shadow-lg shadow-blue-500/30 transition-all transform active:scale-95 flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-sm">bookmark_add</span>
-                        Đặt phòng
+                        <span class="material-symbols-outlined text-sm">save</span>
+                        Cập nhật
                     </button>
-                    <a  href="{{ route('admin.bookings.index') }}"
-                        class="block text-center w-full bg-white dark:bg-transparent border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium py-3 rounded-lg transition-colors">
+                    <a href="{{ route('admin.bookings.index') }}"
+                        class="w-full bg-white dark:bg-transparent border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium py-3 rounded-lg transition-colors flex items-center justify-center">
                         Hủy bỏ
                     </a>
                 </div>
             </div>
         </div>
     </div>
+
+    {{-- Pass booking data to JavaScript --}}
+    <script>
+        window.bookingData = @json($bookingData);
+    </script>
 @endsection
 @push('scripts')
-    @vite(['resources/js/admin/bookings/create-booking.js'])
+    @vite(['resources/js/admin/bookings/update-booking.js'])
 @endpush

@@ -18,7 +18,7 @@
       <span>Tổng quan</span>
     </a>
     <div class="sidebar-group-label">VẬN HÀNH</div>
-    <a class="{{ request()->routeIs("admin.room-diagrams.index") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.room-diagrams.index') }}">
+    <a class="{{ request()->routeIs("admin.layout-rooms.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.layout-rooms.index') }}">
       <span class="material-symbols-outlined">grid_view</span>
       <span>Sơ đồ phòng</span>
     </a>

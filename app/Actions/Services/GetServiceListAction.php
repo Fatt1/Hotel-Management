@@ -6,6 +6,7 @@ namespace App\Actions\Services;
 
 use App\Models\Service;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 class GetServiceListAction
 {
@@ -13,6 +14,11 @@ class GetServiceListAction
      * Lấy danh sách dịch vụ với phân trang
      * Query Action: Dùng Eloquent trực tiếp theo CQRS rule
      */
+    public function execute(): Collection
+    {
+        return Service::query()->with('group')->orderBy('id', 'asc')->get();
+    }
+
     public function executePaginated(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
         $query = Service::query()->with('group');

@@ -32,7 +32,7 @@
                     <select
                         class="block w-full sm:w-48 px-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 transition-all">
                         <option value="">Tất cả trạng thái</option>
-                        <option value="pending">Chờ xác nhận</option>
+                        <option value="pending">Đã đặt</option>
                         <option value="confirmed">Đã xác nhận</option>
                         <option value="checkin">Đã nhận phòng</option>
                         <option value="checkout">Đã trả phòng</option>
@@ -60,7 +60,7 @@
                         @foreach ($bookings as $booking)
                             @php
                                 $status_classes = [
-                                    'Chờ xác nhận' => 'badge-pending-booking',
+                                    'Đã đặt' => 'badge-pending-booking',
                                     'Đang ở' => 'badge-confirmed-booking',
                                     'Hoàn tất' => 'badge-completed-booking',
                                     'Hủy' => 'badge-cancelled-booking',
@@ -89,14 +89,18 @@
                             <td class="table-cell text-right">
                                 <div
                                     class="flex items-center justify-end gap-1 ">
-                                    <button class="action-btn text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                    <a href="{{ route('admin.bookings.edit', $booking->id) }}" class="action-btn text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                                         title="Xem chi tiết">
                                         <span class="material-symbols-outlined">visibility</span>
-                                    </button>
-                                    <button class="action-btn text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20"
-                                        title="Chỉnh sửa">
-                                        <span class="material-symbols-outlined">edit</span>
-                                    </button>
+                                    </a>
+                                    <form action="{{ route('admin.bookings.cancel', $booking->id) }}" method="POST" class="cancel-booking-form">
+                                        @csrf
+                                        @method('POST')
+                                        <button type="submit" class="action-btn text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                            title="Hủy đặt phòng">
+                                            <span class="material-symbols-outlined">delete</span>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -114,4 +118,26 @@
             </div>
         </div>
     </div>
+<script>
+document.querySelectorAll('.cancel-booking-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        Swal.fire({
+            title: 'Xác nhận hủy đặt phòng',
+            text: 'Bạn có chắc chắn muốn hủy đặt phòng này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Hủy đặt phòng',
+            cancelButtonText: 'Không'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+});
+</script>
 @endsection
