@@ -87,3 +87,20 @@
     </a>
   </nav>
 </aside>
+
+<script>
+  // Auto scroll to active sidebar item on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const activeItem = document.querySelector('.sidebar-item-active');
+    if (activeItem) {
+      // Delay slightly to ensure layout is complete
+      setTimeout(function() {
+        activeItem.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+      }, 100);
+    }
+  });
+</script>

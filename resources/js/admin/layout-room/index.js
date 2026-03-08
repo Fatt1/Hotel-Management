@@ -48,13 +48,13 @@ function showRoomMenu(event, element) {
     document.getElementById('menu-checkin').style.display = 'flex';
     document.getElementById('menu-details').style.display = 'flex';
     document.getElementById('menu-checkin').href = `/admin/bookings/${bookingId}/checkin`;
-    document.getElementById('menu-details').href = `/admin/bookings/${bookingId}`;
+    document.getElementById('menu-details').href = `/admin/bookings/${bookingId}/edit`;
   } else if (roomStatus === 'occupied' || roomStatus === 'late_checkout') {
     // Đang ở / Chưa đi: Checkout và Chi tiết
     document.getElementById('menu-checkout').style.display = 'flex';
     document.getElementById('menu-details').style.display = 'flex';
     document.getElementById('menu-checkout').href = `/admin/bookings/${bookingId}/checkout`;
-    document.getElementById('menu-details').href = `/admin/bookings/${bookingId}`;
+    document.getElementById('menu-details').href = `/admin/bookings/${bookingId}/edit`;
   } else if (roomStatus === 'available') {
     // Trống: Đặt phòng
     document.getElementById('menu-book').style.display = 'flex';
