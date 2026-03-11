@@ -58,6 +58,10 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::get('bookings/{id}/checkin', [BookingAdminController::class, 'checkinConfirm'])->name('admin.bookings.checkin');
     Route::post('bookings/{id}/checkin', [BookingAdminController::class, 'checkin'])->name('admin.bookings.checkin.confirm');
     Route::post('bookings/{id}/cancel', [BookingAdminController::class, 'cancel'])->name('admin.bookings.cancel');
+    Route::get("bookings/{id}/checkout", [BookingAdminController::class, "checkoutConfirm"])->name('admin.bookings.checkout');
+    Route::post("bookings/{id}/checkout", [BookingAdminController::class, "checkout"])->name('admin.bookings.checkout.confirm');
+    Route::post('bookings/calculate-payment', [BookingAdminController::class, 'calculatePayment'])->name('admin.bookings.calculate-payment');
+    Route::post('bookings/{id}/record-payment', [BookingAdminController::class, 'recordPayment'])->name('admin.bookings.record-payment');
     Route::get('bookings/{id}', [BookingAdminController::class, 'show'])->name('admin.bookings.show');
     // Room Type routes
     Route::get('room-types/all', [RoomTypeAdminController::class, 'getAll'])->name('admin.room-types.all');

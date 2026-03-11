@@ -4,6 +4,7 @@
  */
 import { formatVND } from '../../../util';
 import { state } from './state';
+import { updateRemaining } from './payment-input';
 
 export function renderPayment() {
     const paymentEl = document.getElementById('paymentDetails');
@@ -13,6 +14,7 @@ export function renderPayment() {
     if (state.selectedRooms.length === 0) {
         paymentEl.innerHTML = `<p class="text-sm text-gray-400 dark:text-gray-500 text-center py-4">Chưa có phòng nào được chọn</p>`;
         totalEl.textContent = '0 đ';
+        updateRemaining(0);
         return;
     }
 
@@ -70,6 +72,7 @@ export function renderPayment() {
     const grandTotal = totalRoomAmount + totalServiceAmount;
     paymentEl.innerHTML = rows.join(separator) + separator + summaryRows.join('');
     totalEl.textContent = `${formatVND(grandTotal)} đ`;
+    updateRemaining(grandTotal);
 }
 
 function getDaysBetween(checkin, checkout) {

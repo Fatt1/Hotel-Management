@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\Bookings\CalculateCheckoutPaymentAction;
 use App\Actions\Bookings\CancelBookingAction;
 use App\Actions\Bookings\CheckinBookingAction;
+use App\Actions\Bookings\CheckoutBookingAction;
 use App\Actions\Bookings\CreateBookingAction;
 use App\Actions\Bookings\GetAllBookingsAction;
 use App\Actions\Bookings\GetBookingByIdAction;
 use App\Actions\Bookings\UpdateBookingAction;
 use App\Data\BookingData;
 use App\Http\Controllers\Controller;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 
 class BookingAdminController extends Controller
@@ -55,6 +58,12 @@ class BookingAdminController extends Controller
         return view("admin.bookings.show", compact('booking'));
     }
 
+    public function checkoutConfirm($id, GetBookingByIdAction $getBookingByIdAction)
+    {
+        $booking = $getBookingByIdAction->execute($id);
+        return view("admin.bookings.checkout", compact('booking'));
+    }
+
     public function checkinConfirm($id, GetBookingByIdAction $getBookingByIdAction)
     {
         $booking = $getBookingByIdAction->execute($id);
@@ -71,6 +80,18 @@ class BookingAdminController extends Controller
         }
     }
 
+    public function checkout($id, CheckoutBookingAction $checkoutBookingAction, Request $request)
+    {
+        try {
+            $paymentAmount = (float) ($request->input('payment_amount', 0) ?: 0);
+            $paymentMethod = $request->input('payment_method', 'cash');
+            $checkoutBookingAction->execute($id, $paymentAmount, $paymentMethod);
+            return redirect()->route('admin.layout-rooms.index')->with('success', 'Check-out thành công!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Check-out thất bại: ' . $e->getMessage());
+        }
+    }
+
     public function cancel($id, CancelBookingAction $cancelBookingAction)
     {
         try {
@@ -84,54 +105,7 @@ class BookingAdminController extends Controller
     public function edit($id, GetBookingByIdAction $getBookingByIdAction)
     {
         $booking = $getBookingByIdAction->execute($id);
-        
-        // Prepare booking data for JavaScript
-        $bookingData = [
-            'id' => $booking->id,
-            'customer' => [
-                'first_name' => $booking->customer->first_name,
-                'last_name' => $booking->customer->last_name,
-                'email' => $booking->customer->email,
-                'phone_number' => $booking->customer->phone_number,
-                'country' => $booking->customer->country,
-            ],
-            'booking_date' => $booking->booking_date->format('Y-m-d H:i:s'),
-            'status' => $booking->status,
-            'booking_details' => $booking->bookingDetails->map(function($detail) {
-                return [
-                    'room' => [
-                        'id' => $detail->room->id,
-                        'name' => $detail->room->name,
-                        'status' => $detail->room->status,
-                        'room_type' => [
-                            'id' => $detail->room->roomType->id,
-                            'name' => $detail->room->roomType->name,
-                            'code' => $detail->room->roomType->code,
-                            'daily_price' => $detail->daily_price,
-                            'hourly_price' => $detail->hourly_price,
-                        ],
-                        'floor' => [
-                            'id' => $detail->room->floor->id,
-                            'name' => $detail->room->floor->name,
-                        ],
-                    ],
-                    'checkin_date' => $detail->checkin_date->format('Y-m-d H:i:s'),
-                    'checkout_date' => $detail->checkout_date->format('Y-m-d H:i:s'),
-                    'services' => $detail->serviceUsages->map(function($usage) {
-                        return [
-                            'id' => $usage->service->id,
-                            'name' => $usage->service->name,
-                            'unit_price' => $usage->unit_price,
-                            'quantity' => $usage->quantity,
-                            'unit' => $usage->service->unit,
-                            'group' => $usage->service->serviceGroup->name ?? '',
-                        ];
-                    }),
-                ];
-            })->toArray(),
-        ];
-        
-        return view('admin.bookings.edit', compact('booking', 'bookingData'));
+        return view('admin.bookings.edit', compact('booking'));
     }
 
     public function update($id, BookingData $bookingData, UpdateBookingAction $updateBookingAction)
@@ -145,6 +119,66 @@ class BookingAdminController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Cập nhật booking thất bại: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Tính tiền checkout: trả về chi tiết từng phòng, phụ thu và tổng cần thanh toán.
+     * POST /admin/bookings/calculate-payment
+     * Body: { booking_id: int, room_ids: int[] }
+     */
+    public function calculatePayment(Request $request, CalculateCheckoutPaymentAction $action)
+    {
+        $request->validate([
+            'booking_id' => 'required|integer|exists:bookings,id',
+            'room_ids'   => 'required|array|min:1',
+            'room_ids.*' => 'integer|exists:rooms,id',
+        ]);
+
+        try {
+            $result = $action->execute([
+                'booking_id' => $request->integer('booking_id'),
+                'room_ids'   => $request->input('room_ids'),
+            ]);
+
+            return response()->json($result, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Tính tiền thất bại: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Ghi nhận thanh toán / hoàn tiền (AJAX, không checkout).
+     * POST /admin/bookings/{id}/record-payment
+     */
+    public function recordPayment(Request $request, int $id)
+    {
+        $request->validate([
+            'amount'         => 'required|numeric|min:0.01',
+            'payment_method' => 'required|string|in:cash,bank_transfer,card',
+            'payment_type'   => 'required|string|in:payment,refund',
+        ]);
+
+        try {
+            $amount = (float) $request->input('amount');
+            if ($request->input('payment_type') === 'refund') {
+                $amount = -$amount;
+            }
+
+            Payment::create([
+                'booking_id'     => $id,
+                'amount'         => $amount,
+                'payment_method' => $request->input('payment_method'),
+                'staff_id'       => auth('staff')->id(),
+            ]);
+
+            return response()->json(['success' => true], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Ghi nhận thất bại: ' . $e->getMessage()
             ], 500);
         }
     }

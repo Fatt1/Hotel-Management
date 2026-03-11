@@ -8,6 +8,7 @@ use App\Data\BookingData;
 use App\Data\CustomerData;
 use App\Models\Booking;
 use App\Models\BookingDetail;
+use App\Models\Payment;
 use App\Models\Room;
 use App\Models\Service;
 use App\Models\ServiceUsage;
@@ -138,6 +139,16 @@ class CreateBookingAction
                         ServiceUsage::insert($serviceUsagesToInsert);
                     }
                 }
+            }
+
+            // 6. Create payment record if provided
+            if (!empty($bookingData->payment) && ($bookingData->payment['amount'] ?? 0) > 0) {
+                Payment::create([
+                    'booking_id'     => $booking->id,
+                    'amount'         => $bookingData->payment['amount'],
+                    'payment_method' => $bookingData->payment['method'] ?? 'cash',
+                    'staff_id'       => auth('staff')->id(),
+                ]);
             }
 
             return $booking;

@@ -5,6 +5,7 @@ namespace App\Actions\Bookings;
 use App\Data\BookingData;
 use App\Models\Booking;
 use App\Models\BookingDetail;
+use App\Models\Payment;
 use App\Models\Room;
 use App\Models\Service;
 use App\Models\ServiceUsage;
@@ -123,6 +124,7 @@ class UpdateBookingAction
                 }
             }
 
+           
             return $booking->fresh(['customer', 'bookingDetails.room', 'bookingDetails.serviceUsages']);
         });
     }

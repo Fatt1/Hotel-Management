@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ActionType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -66,19 +67,32 @@ class Staff extends Authenticatable
         return "{$this->first_name} {$this->last_name}";
     }
 
-     public function canAction(string $function, string $action_name):bool
+    public function canAction(string $function, string $action_name): bool
     {
         $role = $this->role;
-        if(!$role)
+        if (!$role)
             return false;
+
         $action_bit = ActionType::fromName($action_name);
-        // Nếu không tìm thấy action trong enum
-        if(!$action_bit)
+        if (!$action_bit)
             return false;
-        // Lưu ý: Nên Cache đoạn này lại để không query DB liên tục
-        $role_claim = $role->claims()->where('claim_name', $function)->first();  
-        if(!$role_claim)
+
+        $cacheKey = "role_claims_{$role->id}";
+        $claims = Cache::get($cacheKey);
+
+        if ($claims === null) {
+            $claims = $role->claims()
+                ->get()
+                ->pluck('claim_value', 'claim_name')
+                ->map(fn ($val) => (int) $val)
+                ->all();
+
+            Cache::forever($cacheKey, $claims);
+        }
+
+        if (!isset($claims[$function]))
             return false;
-        return ($role_claim->claim_value & $action_bit) === $action_bit;
+
+        return ($claims[$function] & $action_bit) === $action_bit;
     }
 }

@@ -4,39 +4,29 @@ namespace App\Actions\LayoutRooms;
 
 use App\Enums\RoomLayoutStatus;
 use App\Enums\RoomStatus;
-use App\Models\Floor;
 use App\Models\Room;
+use App\ViewModels\LayoutRoomIndexViewModel;
 use App\ViewModels\RoomLayoutViewModel;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
 
 class GetAllLayoutRoomsAction
 {
-    /**
-     * Lấy tất cả phòng với trạng thái layout trong ngày được chọn
-     * 
-     * @param string|null $filterDate - Ngày cần xem (Y-m-d), mặc định là hôm nay
-     * @param string|null $statusFilter - Lọc theo trạng thái: available, reserved, arriving, occupied, late_checkout, dirty
-     * @param string $groupBy - Group theo: type, floor, room
-     * @return Collection<string, Collection<RoomLayoutViewModel>>
-     */
     public function execute(
         ?string $filterDate = null,
-        ?string $statusFilter = null,
+        ?string $filterStatus = null,
         string $groupBy = 'type'
-    ): Collection {
+    ): LayoutRoomIndexViewModel {
         $date = $filterDate ? Carbon::parse($filterDate) : Carbon::today();
         $dateStart = $date->copy()->startOfDay();
         $dateEnd = $date->copy()->endOfDay();
         $now = Carbon::now();
+        $dateStr = $date->format('Y-m-d');
 
-        // Load tất cả phòng với room type, floor và booking details trong ngày
         $rooms = Room::with([
             'roomType:id,name,code',
             'floor:id,name',
             'bookingDetails' => function ($query) use ($dateStart, $dateEnd) {
                 $query->where(function ($q) use ($dateStart, $dateEnd) {
-                    // Booking overlaps với ngày được chọn
                     $q->where('checkin_date', '<=', $dateEnd)
                       ->where('checkout_date', '>=', $dateStart);
                 })
@@ -45,38 +35,17 @@ class GetAllLayoutRoomsAction
             }
         ])->orderBy('name')->get();
 
-        $roomLayouts = [];
+        $allRooms = collect();
         foreach ($rooms as $room) {
             $viewModel = $this->determineRoomStatus($room, $now, $dateStart, $dateEnd);
-            
-            // Thêm thông tin floor cho grouping
             $viewModel->floorName = $room->floor->name ?? 'N/A';
             $viewModel->floorId = $room->floor->id ?? 0;
-            
-            $roomLayouts[] = $viewModel;
+            $allRooms->push($viewModel);
         }
 
-        $collection = collect($roomLayouts);
-
-        // Lọc theo trạng thái nếu có
-        if ($statusFilter && $statusFilter !== 'all') {
-            $collection = $collection->filter(function ($room) use ($statusFilter) {
-                return $room->status->value === $statusFilter;
-            });
-        }
-
-        // Group theo yêu cầu
-        return match ($groupBy) {
-            'floor' => $collection->groupBy('floorName'),
-            'room' => $collection->groupBy(fn($r) => 'Tất cả phòng'),
-            default => $collection->groupBy('roomTypeCode'),
-        };
+        return new LayoutRoomIndexViewModel($allRooms, $dateStr, $filterStatus, $groupBy);
     }
 
-    /**
-     * Xác định trạng thái phòng
-     * @param \App\Models\Room|object $room
-     */
     private function determineRoomStatus(
         $room,
         Carbon $now,
@@ -144,40 +113,6 @@ class GetAllLayoutRoomsAction
         return $viewModel;
     }
 
-    /**
-     * Lấy số lượng phòng theo từng trạng thái
-     */
-    public function getStatusCounts(?string $filterDate = null): array
-    {
-        $rooms = $this->execute($filterDate, null, 'room')->flatten();
-        
-        $counts = [
-            'available' => 0,
-            'reserved' => 0,
-            'arriving' => 0,
-            'occupied' => 0,
-            'late_checkout' => 0,
-            'dirty' => 0,
-        ];
-
-        foreach ($rooms as $room) {
-            $counts[$room->status->value]++;
-        }
-
-        return $counts;
-    }
-
-    /**
-     * Lấy danh sách tầng
-     */
-    public function getAllFloors(): Collection
-    {
-        return Floor::orderBy('name')->get(['id', 'name']);
-    }
-
-    /**
-     * Xử lý trường hợp phòng có nhiều booking trong cùng ngày
-     */
     private function handleMultipleBookings(
         RoomLayoutViewModel $viewModel,
         $bookingDetails,

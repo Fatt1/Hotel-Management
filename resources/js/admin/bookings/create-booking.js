@@ -17,6 +17,7 @@ import { initCustomerSearch, validateCustomer, getCustomerSubmitData }     from 
 import { openRoomModal }                                                   from './modules/room-modal';
 import { renderRoomList }                                                  from './modules/room-list';
 import { renderPayment }                                                   from './modules/payment';
+import { initPaymentInput, getPaymentData }                                from './modules/payment-input';
 import { createBooking }                                                   from '../../api';
 
 // ─── Bootstrap ───────────────────────────────────────────────────────────────
@@ -24,6 +25,7 @@ import { createBooking }                                                   from 
 window.addEventListener('DOMContentLoaded', () => {
     initCustomerSearch();
     initDatePicker({ onChange: refresh });
+    initPaymentInput();
     document.getElementById('add-room-btn').addEventListener('click', handleAddRoomClick);
     document.getElementById('btn-checkin').addEventListener('click', () => validateAndSubmit('Đang ở'));
     document.getElementById('btn-reserve').addEventListener('click', () => validateAndSubmit('Đã đặt'));
@@ -76,6 +78,7 @@ async function validateAndSubmit(status) {
 
             })),
         })),
+        payment: getPaymentData(),
     };
 
     const isCheckin = status === 'Đang ở';

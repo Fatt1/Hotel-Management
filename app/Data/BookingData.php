@@ -18,6 +18,7 @@ class BookingData extends Data
         #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d H:i:s')]
         public DateTime $booking_date,
         public array $booking_details,
-        public string $status
+        public string $status,
+        public ?array $payment = null,
     ) {}
 }

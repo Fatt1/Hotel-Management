@@ -7,6 +7,7 @@ namespace App\Actions\Roles;
 use App\Data\RoleClaimData;
 use App\Models\Role;
 use App\Models\RoleClaim;
+use Illuminate\Support\Facades\Cache;
 
 class UpdateRoleClaimAction
 {
@@ -32,5 +33,14 @@ class UpdateRoleClaimAction
             $roleClaim->claim_value = $claimData->claim_value;
             $roleClaim->save();
         }
+
+        // Refresh cache sau khi cập nhật
+        $cachedClaims = RoleClaim::where('role_id', $roleId)
+            ->get()
+            ->pluck('claim_value', 'claim_name')
+            ->map(fn ($val) => (int) $val)
+            ->all();
+
+        Cache::forever("role_claims_{$roleId}", $cachedClaims);
     }
 }

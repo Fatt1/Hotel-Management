@@ -17,7 +17,7 @@
       
       <!-- Date Filter -->
       <div class="flex items-center gap-3">
-        <input type="date" id="date-filter" value="{{ $viewModel->filterDate }}" 
+        <input min="{{ now()->format('Y-m-d') }}" type="date" id="date-filter" value="{{ $viewModel->filterDate }}" 
           class="px-4 py-2.5 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
         <button onclick="applyDateFilter()"
           class="bg-blue-900 hover:bg-blue-800 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-900/20">

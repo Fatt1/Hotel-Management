@@ -16,9 +16,11 @@ let _servicesCache = null;
  * @param {number} roomId
  * @param {{ onConfirm?: () => void }} options
  */
+
 export async function openServiceModal(roomId, { onConfirm } = {}) {
-    if (!_servicesCache) {
-        _servicesCache = await getAllServicesApi();
+    if (_servicesCache === null) {
+        const result = await getAllServicesApi();
+        if (result?.length) _servicesCache = result;
     }
     if (!_servicesCache?.length) return;
 

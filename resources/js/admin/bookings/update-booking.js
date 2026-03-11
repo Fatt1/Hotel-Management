@@ -1,16 +1,10 @@
-/**
- * Update Booking — main entry point.
- *
- * Similar to create-booking.js but:
- * - Customer fields are read-only
- * - Pre-loads existing booking data
- * - Single "Update" button instead of "Check-in" and "Reserve"
- */
+
 import { state }                                                           from './modules/state';
 import { initDatePicker, toDbDatetime }                                    from './modules/date-picker';
 import { openRoomModal }                                                   from './modules/room-modal';
 import { renderRoomList }                                                  from './modules/room-list';
 import { renderPayment }                                                   from './modules/payment';
+import { initPaymentInput }                                                from './modules/payment-input';
 import { updateBooking }                                                   from '../../api';
 
 // ─── Bootstrap ───────────────────────────────────────────────────────────────
@@ -18,56 +12,53 @@ import { updateBooking }                                                   from 
 window.addEventListener('DOMContentLoaded', () => {
     loadExistingBookingData();
     initDatePicker({ onChange: refresh });
+    const alreadyPaid = (window.bookingData?.payments ?? []).reduce((sum, p) => sum + parseFloat(p.amount ?? 0), 0);
+    initPaymentInput(alreadyPaid);
     document.getElementById('add-room-btn').addEventListener('click', handleAddRoomClick);
     document.getElementById('btn-update').addEventListener('click', validateAndSubmit);
-    
-    // Initial render
     refresh();
 });
 
 // ─── Load Existing Data ──────────────────────────────────────────────────────
 
 function loadExistingBookingData() {
-    const bookingData = window.bookingData;
-    if (!bookingData) return;
+    const booking = window.bookingData;
+    if (!booking) return;
 
-    // Set customer (read-only, already filled in HTML)
-    state.currentCustomer = bookingData.customer;
+    state.currentCustomer = booking.customer;
 
-    // Set selected rooms
-    state.selectedRooms = bookingData.booking_details.map(detail => detail.room);
-    
-    // Set services for each room
+    // Rooms — from booking_details[].room (Eloquent relationship key)
+    state.selectedRooms = booking.booking_details.map(detail => detail.room);
+
+    // Services — from booking_details[].service_usages[].service (Eloquent)
     state.roomServices = {};
-    bookingData.booking_details.forEach(detail => {
+    booking.booking_details.forEach(detail => {
         const roomId = detail.room.id;
         state.roomServices[roomId] = {};
-        
-        detail.services.forEach(service => {
-            state.roomServices[roomId][service.id] = {
-                id: service.id,
-                name: service.name,
-                unit_price: service.unit_price,
-                unit: service.unit,
-                group: service.group,
-                quantity: service.quantity,
+
+        (detail.service_usages ?? []).forEach(usage => {
+            const svc = usage.service;
+            state.roomServices[roomId][svc.id] = {
+                id:         svc.id,
+                name:       svc.name,
+                unit_price: parseFloat(usage.unit_price),
+                unit:       svc.unit,
+                group:      svc.group?.name ?? '',
+                quantity:   usage.quantity,
             };
         });
     });
 
-    // Set dates (will be picked up by date-picker module)
-    const firstDetail = bookingData.booking_details[0];
+    // Dates
+    const firstDetail = booking.booking_details[0];
     if (firstDetail) {
-        const checkinDate = new Date(firstDetail.checkin_date);
+        const checkinDate  = new Date(firstDetail.checkin_date);
         const checkoutDate = new Date(firstDetail.checkout_date);
-        
+
         state.selectedDates = [checkinDate, checkoutDate];
-        
-        // Set time inputs
-        document.getElementById('checkin-time').value = 
-            checkinDate.toTimeString().substring(0, 5);
-        document.getElementById('checkout-time').value = 
-            checkoutDate.toTimeString().substring(0, 5);
+
+        document.getElementById('checkin-time').value  = checkinDate.toTimeString().substring(0, 5);
+        document.getElementById('checkout-time').value = checkoutDate.toTimeString().substring(0, 5);
     }
 }
 
@@ -89,23 +80,14 @@ async function handleAddRoomClick() {
 // ─── Submit ───────────────────────────────────────────────────────────────────
 
 async function validateAndSubmit() {
-    const bookingData = window.bookingData;
-    
+    const booking = window.bookingData;
+
     if (state.selectedRooms.length === 0) {
-        Swal.fire({ 
-            icon: 'warning', 
-            title: 'Chưa chọn phòng', 
-            text: 'Vui lòng chọn ít nhất 1 phòng trước khi cập nhật.' 
-        });
+        Swal.fire({ icon: 'warning', title: 'Chưa chọn phòng', text: 'Vui lòng chọn ít nhất 1 phòng trước khi cập nhật.' });
         return;
     }
-    
     if (state.selectedDates.length < 2) {
-        Swal.fire({ 
-            icon: 'warning', 
-            title: 'Chưa chọn ngày', 
-            text: 'Vui lòng chọn đủ ngày check-in và check-out.' 
-        });
+        Swal.fire({ icon: 'warning', title: 'Chưa chọn ngày', text: 'Vui lòng chọn đủ ngày check-in và check-out.' });
         return;
     }
 
@@ -114,18 +96,13 @@ async function validateAndSubmit() {
     const [ciDate, coDate] = state.selectedDates;
 
     const payload = {
-        // Customer data (unchanged)
-        first_name: bookingData.customer.first_name,
-        last_name: bookingData.customer.last_name,
-        email: bookingData.customer.email,
-        phone_number: bookingData.customer.phone_number,
-        country: bookingData.customer.country,
-        
-        // Booking data
+        first_name:   booking.customer.first_name,
+        last_name:    booking.customer.last_name,
+        email:        booking.customer.email,
+        phone_number: booking.customer.phone_number,
+        country:      booking.customer.country,
         booking_date: toDbDatetime(ciDate, checkinTime),
-        status: bookingData.status, // Keep current status
-        
-        // Booking details
+        status:       booking.status,
         booking_details: state.selectedRooms.map(room => ({
             room_id:       room.id,
             checkin_date:  toDbDatetime(ciDate, checkinTime),
@@ -137,14 +114,14 @@ async function validateAndSubmit() {
         })),
     };
 
-    const btn = document.getElementById('btn-update');
+    const btn         = document.getElementById('btn-update');
     const originalHtml = btn.innerHTML;
-    
+
     btn.disabled = true;
     btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">progress_activity</span> Đang xử lý...`;
 
     try {
-        const result = await updateBooking(bookingData.id, payload);
+        const result = await updateBooking(booking.id, payload);
         await Swal.fire({
             icon: 'success',
             title: 'Cập nhật thành công!',
@@ -154,13 +131,10 @@ async function validateAndSubmit() {
         window.location.href = '/admin/bookings';
     } catch (error) {
         const msg = error.response?.data?.message ?? 'Có lỗi xảy ra. Vui lòng thử lại.';
-        Swal.fire({ 
-            icon: 'error', 
-            title: 'Cập nhật thất bại', 
-            text: msg 
-        });
+        Swal.fire({ icon: 'error', title: 'Cập nhật thất bại', text: msg });
     } finally {
         btn.disabled = false;
         btn.innerHTML = originalHtml;
     }
 }
+

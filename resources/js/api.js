@@ -70,3 +70,30 @@ export async function getAllServicesApi() {
         return null;
     }
 }
+
+export async function calculateCheckoutPayment(bookingId, roomIds) {
+    try {
+        const response = await axios.post("/admin/bookings/calculate-payment", {
+            booking_id: bookingId,
+            room_ids: roomIds,
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Lỗi khi tính tiền checkout:", error);
+        throw error;
+    }
+}
+
+export async function recordPayment(bookingId, { amount, paymentMethod, paymentType }) {
+    try {
+        const response = await axios.post(`/admin/bookings/${bookingId}/record-payment`, {
+            amount,
+            payment_method: paymentMethod,
+            payment_type: paymentType,
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Lỗi khi ghi nhận thanh toán:", error);
+        throw error;
+    }
+}

@@ -185,6 +185,38 @@
                     </div>
                 </div>
                 <div class="space-y-3">
+                    {{-- Lịch sử thanh toán --}}
+                    @if($booking->payments->isNotEmpty())
+                        @php
+                            $methodLabels = ['cash' => 'Tiền mặt', 'bank_transfer' => 'Chuyển khoản', 'card' => 'Thẻ tín dụng'];
+                        @endphp
+                        <div class="border border-border-light dark:border-border-dark rounded-xl p-4 space-y-2">
+                            <span class="text-xs font-bold uppercase text-gray-500 dark:text-gray-400">Lịch sử thanh toán</span>
+                            @foreach($booking->payments as $payment)
+                                <div class="flex items-center justify-between gap-2">
+                                    <div>
+                                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                            {{ $methodLabels[$payment->payment_method] ?? $payment->payment_method }}
+                                        </span>
+                                        @if($payment->staff)
+                                            <span class="text-[10px] text-gray-400 block">{{ $payment->staff->first_name }} {{ $payment->staff->last_name }}</span>
+                                        @endif
+                                    </div>
+                                    <span class="text-sm font-bold text-emerald-600">{{ number_format($payment->amount, 0, ',', '.') }} đ</span>
+                                </div>
+                            @endforeach
+                            <div class="pt-1 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                                <span class="text-xs text-gray-500">Đã thanh toán</span>
+                                <span class="text-sm font-bold text-emerald-600">{{ number_format($booking->payments->sum('amount'), 0, ',', '.') }} đ</span>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="flex items-center justify-between px-1">
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Còn lại</span>
+                        <span id="payment-remaining" class="text-sm font-bold text-rose-500">0 đ</span>
+                    </div>
+
                     <button type="button" id="btn-update"
                         class="w-full bg-primary hover:bg-blue-800 text-white font-medium py-3 rounded-lg shadow-lg shadow-blue-500/30 transition-all transform active:scale-95 flex items-center justify-center gap-2">
                         <span class="material-symbols-outlined text-sm">save</span>
@@ -201,7 +233,7 @@
 
     {{-- Pass booking data to JavaScript --}}
     <script>
-        window.bookingData = @json($bookingData);
+        window.bookingData = @json($booking);
     </script>
 @endsection
 @push('scripts')
