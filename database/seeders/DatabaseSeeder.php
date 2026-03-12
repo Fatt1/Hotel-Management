@@ -68,6 +68,7 @@ class DatabaseSeeder extends Seeder
             EquipmentSeeder::class,
             AmenitySeeder::class,
             SurchargePolicySeeder::class,
+            SystemSettingSeeder::class,
         ]);
     }
 }

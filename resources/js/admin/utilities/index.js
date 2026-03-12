@@ -2,6 +2,17 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 document.addEventListener("DOMContentLoaded", function () {
+    // Flash success (add/update)
+    const flashSuccess = document.getElementById("flash-success");
+    if (flashSuccess) {
+        Swal.fire({
+            icon: "success",
+            title: "Thành công",
+            text: flashSuccess.dataset.message,
+            confirmButtonColor: "#1e3a8a",
+        });
+    }
+
     // Delete btn
     const deleteButtons = document.querySelectorAll(".delete-utility-btn");
     deleteButtons.forEach((button) => {

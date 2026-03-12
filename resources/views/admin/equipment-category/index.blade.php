@@ -18,16 +18,16 @@
 
     <!-- Search Filter -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6 flex items-center gap-4">
-      <div class="relative flex-1">
+      <form action="{{ route('admin.equipment-categories.index') }}" method="GET" class="relative flex-1">
         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
         <input 
           type="text" 
-          id="searchInput" 
+          name="search"
+          value="{{ request('search') }}"
           placeholder="Tìm theo tên nhóm..." 
           class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-900/20 outline-none"
-          onkeyup="filterTable()"
         />
-      </div>
+      </form>
     </div>
 
     <!-- Table Container -->
@@ -74,37 +74,9 @@
 
       <!-- Table Footer with Pagination -->
       <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-        <p class="text-xs text-slate-500 font-medium">
-          Hiển thị {{ $equipmentCategories->count() }} / {{ $equipmentCategories->total() }} nhóm thiết bị
-        </p>
-        <div class="flex items-center gap-2">
-          @if ($equipmentCategories->onFirstPage())
-            <button class="p-2 text-slate-400 rounded transition-all disabled:opacity-50 cursor-not-allowed" disabled>
-              <span class="material-symbols-outlined">chevron_left</span>
-            </button>
-          @else
-            <a href="{{ $equipmentCategories->previousPageUrl() }}" class="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition-all pagination-link">
-              <span class="material-symbols-outlined">chevron_left</span>
-            </a>
-          @endif
-
-          @foreach ($equipmentCategories->getUrlRange(1, $equipmentCategories->lastPage()) as $page => $url)
-            @if ($page == $equipmentCategories->currentPage())
-              <button class="px-3 py-1 bg-blue-900 text-white rounded text-sm font-bold">{{ $page }}</button>
-            @else
-              <a href="{{ $url }}" class="text-slate-600 text-sm font-bold hover:bg-slate-100 px-3 py-1 rounded pagination-link">{{ $page }}</a>
-            @endif
-          @endforeach
-
-          @if ($equipmentCategories->hasMorePages())
-            <a href="{{ $equipmentCategories->nextPageUrl() }}" class="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition-all pagination-link">
-              <span class="material-symbols-outlined">chevron_right</span>
-            </a>
-          @else
-            <button class="p-2 text-slate-400 rounded transition-all disabled:opacity-50 cursor-not-allowed" disabled>
-              <span class="material-symbols-outlined">chevron_right</span>
-            </button>
-          @endif
+        <span class="text-xs font-medium text-slate-500">Hiển thị {{ $equipmentCategories->lastItem() ?? 0 }} trên {{ $equipmentCategories->total() }} nhóm thiết bị</span>
+        <div class="mt-5">
+          {{ $equipmentCategories->withQueryString()->links('vendor.pagination.custom') }}
         </div>
       </div>
     </div>
@@ -112,36 +84,6 @@
 </div>
 
 <script>
-  // Search Filter
-  function filterTable() {
-    const input = document.getElementById('searchInput');
-    const filter = input.value.toLowerCase();
-    const table = document.getElementById('tableBody');
-    const rows = table.getElementsByTagName('tr');
-
-    for (let i = 0; i < rows.length; i++) {
-      const cells = rows[i].getElementsByTagName('td');
-      let match = false;
-      
-      for (let j = 0; j < cells.length; j++) {
-        if (cells[j].textContent.toLowerCase().indexOf(filter) > -1) {
-          match = true;
-          break;
-        }
-      }
-      
-      rows[i].style.display = match ? '' : 'none';
-    }
-  }
-
-  // Placeholder functions - actual logic handled by JS file
-  function openCreateModal() {
-    // Logic in resources/js/admin/equipment-categories/index.js
-  }
-
-  function openEditModal(id, name) {
-    // Logic in resources/js/admin/equipment-categories/index.js
-  }
 
   function openDeleteModal(url, categoryName) {
     // Logic in resources/js/admin/equipment-categories/index.js
