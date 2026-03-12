@@ -6,9 +6,12 @@ use App\Models\Utility;
 
 class GetUtilityListAction
 {
-    public function executePaginated(int $perPage = 10)
+    public function executePaginated(int $perPage = 5, ?string $search = null)
     {
-        return Utility::paginate($perPage);
+        return Utility::query()
+            ->when($search, fn($q) => $q->where('name', 'like', '%' . $search . '%'))
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
     public function getAll()

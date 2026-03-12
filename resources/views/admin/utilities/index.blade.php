@@ -25,16 +25,16 @@
 
     <!-- Search & Filter -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6 flex items-center gap-4">
-      <div class="relative flex-1">
+      <form action="{{ route('admin.utilities.index') }}" method="GET" class="relative flex-1">
         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
         <input 
           type="text" 
-          id="searchInput" 
+          name="search"
+          value="{{ request('search') }}"
           placeholder="Tìm theo tên tiện ích..." 
           class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-900/20 outline-none"
-          onkeyup="filterTable()"
         />
-      </div>
+      </form>
     </div>
 
     <!-- Table Container -->
@@ -91,66 +91,15 @@
 
       <!-- Table Footer with Pagination -->
       <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-        <p class="text-xs text-slate-500 font-medium">
-          Hiển thị {{ $utilities->count() }} / {{ $utilities->total() }} tiện ích
-        </p>
-        <div class="flex items-center gap-2">
-          @if ($utilities->onFirstPage())
-            <button class="p-2 text-slate-400 rounded transition-all disabled:opacity-50 cursor-not-allowed" disabled>
-              <span class="material-symbols-outlined">chevron_left</span>
-            </button>
-          @else
-            <a href="{{ $utilities->previousPageUrl() }}" class="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition-all">
-              <span class="material-symbols-outlined">chevron_left</span>
-            </a>
-          @endif
-
-          @foreach ($utilities->getUrlRange(1, $utilities->lastPage()) as $page => $url)
-            @if ($page == $utilities->currentPage())
-              <button class="px-3 py-1 bg-blue-900 text-white rounded text-sm font-bold">{{ $page }}</button>
-            @else
-              <a href="{{ $url }}" class="text-slate-600 text-sm font-bold hover:bg-slate-100 px-3 py-1 rounded">{{ $page }}</a>
-            @endif
-          @endforeach
-
-          @if ($utilities->hasMorePages())
-            <a href="{{ $utilities->nextPageUrl() }}" class="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition-all">
-              <span class="material-symbols-outlined">chevron_right</span>
-            </a>
-          @else
-            <button class="p-2 text-slate-400 rounded transition-all disabled:opacity-50 cursor-not-allowed" disabled>
-              <span class="material-symbols-outlined">chevron_right</span>
-            </button>
-          @endif
+        <span class="text-xs font-medium text-slate-500">Hiển thị {{ $utilities->lastItem() }} trên {{ $utilities->total() }} tiện ích</span>
+        <div class="mt-5">
+          {{ $utilities->withQueryString()->links('vendor.pagination.custom') }}
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<script>
-  // Search Filter
-  function filterTable() {
-    const input = document.getElementById('searchInput');
-    const filter = input.value.toLowerCase();
-    const table = document.getElementById('tableBody');
-    const rows = table.getElementsByTagName('tr');
-
-    for (let i = 0; i < rows.length; i++) {
-      const cells = rows[i].getElementsByTagName('td');
-      let match = false;
-      
-      for (let j = 0; j < cells.length; j++) {
-        if (cells[j].textContent.toLowerCase().indexOf(filter) > -1) {
-          match = true;
-          break;
-        }
-      }
-      
-      rows[i].style.display = match ? '' : 'none';
-    }
-  }
-</script>
 
 @push('scripts')
   @vite(['resources/js/admin/utilities/index.js'])
