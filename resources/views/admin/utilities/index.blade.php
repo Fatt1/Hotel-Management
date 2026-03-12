@@ -101,6 +101,10 @@
 </div>
 
 
+@if(session('success'))
+  <div id="flash-success" data-message="{{ session('success') }}" class="hidden"></div>
+@endif
+
 @push('scripts')
   @vite(['resources/js/admin/utilities/index.js'])
 @endpush

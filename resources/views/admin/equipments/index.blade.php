@@ -24,24 +24,28 @@
     </div>
 
     <!-- Search & Filter -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6 flex items-center gap-4">
+    <form action="{{ route('admin.equipments.index') }}" method="GET"
+          class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6 flex items-center gap-4">
       <div class="relative flex-1">
         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-        <input 
-          type="text" 
-          id="searchInput" 
-          placeholder="Tìm theo tên thiết bị..." 
+        <input
+          type="text"
+          name="search"
+          value="{{ request('search') }}"
+          placeholder="Tìm theo tên thiết bị..."
           class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-900/20 outline-none"
-          onkeyup="filterTable()"
         />
       </div>
-      <select class="px-4 py-2 border border-slate-200 rounded-lg text-sm bg-white">
-        <option>Loại được sắp xếp (Tất cả)</option>
-        <option>Thiết bị điện tử</option>
-        <option>Nội thất phòng</option>
-        <option>Tiện ích khách hàng</option>
+      <select name="category_id" onchange="this.form.submit()"
+              class="px-4 py-2 border border-slate-200 rounded-lg text-sm bg-white">
+        <option value="">Tất cả phân loại</option>
+        @foreach($categories as $cat)
+          <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
+            {{ $cat->name }}
+          </option>
+        @endforeach
       </select>
-    </div>
+    </form>
 
     <!-- Table Container -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
@@ -97,66 +101,15 @@
 
       <!-- Table Footer with Pagination -->
       <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-        <p class="text-xs text-slate-500 font-medium">
-          Hiển thị {{ $equipments->count() }} / {{ $equipments->total() }} thiết bị
-        </p>
-        <div class="flex items-center gap-2">
-          @if ($equipments->onFirstPage())
-            <button class="p-2 text-slate-400 rounded transition-all disabled:opacity-50 cursor-not-allowed" disabled>
-              <span class="material-symbols-outlined">chevron_left</span>
-            </button>
-          @else
-            <a href="{{ $equipments->previousPageUrl() }}" class="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition-all">
-              <span class="material-symbols-outlined">chevron_left</span>
-            </a>
-          @endif
-
-          @foreach ($equipments->getUrlRange(1, $equipments->lastPage()) as $page => $url)
-            @if ($page == $equipments->currentPage())
-              <button class="px-3 py-1 bg-blue-900 text-white rounded text-sm font-bold">{{ $page }}</button>
-            @else
-              <a href="{{ $url }}" class="text-slate-600 text-sm font-bold hover:bg-slate-100 px-3 py-1 rounded">{{ $page }}</a>
-            @endif
-          @endforeach
-
-          @if ($equipments->hasMorePages())
-            <a href="{{ $equipments->nextPageUrl() }}" class="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition-all">
-              <span class="material-symbols-outlined">chevron_right</span>
-            </a>
-          @else
-            <button class="p-2 text-slate-400 rounded transition-all disabled:opacity-50 cursor-not-allowed" disabled>
-              <span class="material-symbols-outlined">chevron_right</span>
-            </button>
-          @endif
+        <span class="text-xs font-medium text-slate-500">Hiển thị {{ $equipments->lastItem() ?? 0 }} trên {{ $equipments->total() }} thiết bị</span>
+        <div class="mt-5">
+          {{ $equipments->withQueryString()->links('vendor.pagination.custom') }}
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<script>
-  // Search Filter
-  function filterTable() {
-    const input = document.getElementById('searchInput');
-    const filter = input.value.toLowerCase();
-    const table = document.getElementById('tableBody');
-    const rows = table.getElementsByTagName('tr');
-
-    for (let i = 0; i < rows.length; i++) {
-      const cells = rows[i].getElementsByTagName('td');
-      let match = false;
-      
-      for (let j = 0; j < cells.length; j++) {
-        if (cells[j].textContent.toLowerCase().indexOf(filter) > -1) {
-          match = true;
-          break;
-        }
-      }
-      
-      rows[i].style.display = match ? '' : 'none';
-    }
-  }
-</script>
 
 @push('scripts')
   @vite(['resources/js/admin/equipments/index.js'])
