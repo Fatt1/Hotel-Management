@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\RoomTypeStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -35,7 +34,6 @@ class RoomType extends Model
         'height' => 'decimal:2',
         'hourly_price' => 'decimal:2',
         'daily_price' => 'decimal:2',
-        'is_active' => RoomTypeStatus::class,
     ];
 
     public function rooms(): HasMany
@@ -45,7 +43,7 @@ class RoomType extends Model
 
     public function equipments(): BelongsToMany
     {
-        return $this->belongsToMany(Equipment::class, 'room_equipments')
+        return $this->belongsToMany(Equipment::class, 'room_equipment')
             ->withPivot('quantity');
     }
 

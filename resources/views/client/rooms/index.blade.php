@@ -29,19 +29,6 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.45; cursor: p
   ];
   $defaultFallback = ['https://picsum.photos/seed/hotel-room-a/800/560','https://picsum.photos/seed/hotel-room-b/800/560'];
 
-  $badgeMap = [
-    'STD' => [['cls'=>'bg-green-50 text-green-600 border border-green-200',  'icon'=>'fa-tag',   'text'=>'Giá tốt nhất']],
-    'DLX' => [
-      ['cls'=>'bg-orange-50 text-orange-500 border border-orange-200', 'icon'=>'fa-fire',  'text'=>'Được đề xuất'],
-      ['cls'=>'bg-purple-50 text-purple-500 border border-purple-200', 'icon'=>'fa-heart', 'text'=>'Lựa chọn của cặp đôi'],
-    ],
-    'FAM' => [['cls'=>'bg-blue-50 text-blue-500 border border-blue-200', 'icon'=>'fa-users', 'text'=>'Phổ biến']],
-    'PRE' => [
-      ['cls'=>'bg-amber-50 text-amber-600 border border-amber-200',  'icon'=>'fa-crown', 'text'=>'Lựa chọn sang trọng'],
-      ['cls'=>'bg-pink-50 text-pink-500 border border-pink-200',     'icon'=>'fa-gem',   'text'=>'Bộ sưu tập sang trọng'],
-      ['cls'=>'bg-yellow-50 text-yellow-600 border border-yellow-200','icon'=>'fa-star',  'text'=>'Top Rated'],
-    ],
-  ];
 @endphp
 
 {{-- ============================================================
@@ -214,7 +201,6 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.45; cursor: p
             $areaSqm = number_format($area, 0, ',', '.') . ' m²';
             $areaFt  = number_format($area * 10.7639, 0, ',', '.') . ' ft²';
 
-            $badges    = $badgeMap[$rt->code] ?? [];
             $showAms   = $rt->amenities->take(6);
             $moreCount = max(0, $rt->amenities->count() - 6);
             $avail     = $rt->available_count ?? 0;
@@ -298,14 +284,6 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.45; cursor: p
             <div class="pt-0.5">
               <div class="text-xl font-bold text-gray-900">{!! $priceFmt !!}</div>
               <div class="text-xs text-gray-400 mb-2.5">mỗi đêm</div>
-              <div class="flex flex-col gap-1.5">
-                @foreach($badges as $b)
-                  <span class="inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-sm {{ $b['cls'] }} w-fit">
-                    <i class="fas {{ $b['icon'] }} text-[9px]"></i>
-                    {{ $b['text'] }}
-                  </span>
-                @endforeach
-              </div>
               @if($rt->description)
                 <p class="text-[11px] text-gray-400 mt-2 leading-relaxed" style="max-width: 180px;">
                   {{ \Illuminate\Support\Str::limit($rt->description, 80) }}

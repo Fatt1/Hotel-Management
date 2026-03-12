@@ -57,7 +57,7 @@
       {{-- CTA Buttons --}}
       <div style="display: flex; align-items: center; gap: 1rem;">
         <a href="{{ route('client.login') }}" style="font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #9a9080; text-decoration: none;" onmouseover="this.style.color='#e8e0d0'" onmouseout="this.style.color='#9a9080'">Đăng Nhập</a>
-        <a href="#" style="font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; background-color: #d4af37; color: #0a0a0a; padding: 0.5rem 1.25rem; text-decoration: none;" onmouseover="this.style.backgroundColor='#c9a227'" onmouseout="this.style.backgroundColor='#d4af37'">Đặt Phòng</a>
+        <a href="{{ route('client.rooms.index') }}" style="font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; background-color: #d4af37; color: #0a0a0a; padding: 0.5rem 1.25rem; text-decoration: none;" onmouseover="this.style.backgroundColor='#c9a227'" onmouseout="this.style.backgroundColor='#d4af37'">Đặt Phòng</a>
       </div>
     </div>
   </nav>
