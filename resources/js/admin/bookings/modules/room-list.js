@@ -7,9 +7,9 @@ import { state } from './state';
 import { openServiceModal } from './service-modal';
 
 /**
- * @param {{ onRemoveRoom?: () => void, onServicesUpdated?: () => void }} callbacks
+ * @param {{ onRemoveRoom?: () => void, onServicesUpdated?: () => void, bookingId?: number }} callbacks
  */
-export function renderRoomList({ onRemoveRoom, onServicesUpdated } = {}) {
+export function renderRoomList({ onRemoveRoom, onServicesUpdated, bookingId } = {}) {
     const container = document.getElementById('selectedRoomsList');
     if (!container) return;
 
@@ -29,9 +29,14 @@ export function renderRoomList({ onRemoveRoom, onServicesUpdated } = {}) {
     container.querySelectorAll('[data-remove-room-id]').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = parseInt(btn.dataset.removeRoomId);
-            state.selectedRooms = state.selectedRooms.filter(r => r.id !== id);
-            delete state.roomServices[id];
-            onRemoveRoom?.();
+            if (onRemoveRoom) {
+                onRemoveRoom(id);
+            } else {
+                // Fallback: just remove from state
+                state.selectedRooms = state.selectedRooms.filter(r => r.id !== id);
+                delete state.roomServices[id];
+                renderRoomList({ onRemoveRoom, onServicesUpdated, bookingId });
+            }
         });
     });
 
@@ -40,8 +45,9 @@ export function renderRoomList({ onRemoveRoom, onServicesUpdated } = {}) {
         btn.addEventListener('click', () => {
             const roomId = parseInt(btn.dataset.addServiceRoom);
             openServiceModal(roomId, {
+                bookingId: bookingId,
                 onConfirm: () => {
-                    renderRoomList({ onRemoveRoom, onServicesUpdated });
+                    renderRoomList({ onRemoveRoom, onServicesUpdated, bookingId });
                     onServicesUpdated?.();
                 },
             });

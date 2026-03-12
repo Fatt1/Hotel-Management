@@ -5,7 +5,6 @@ namespace App\Actions\Bookings;
 use App\Data\BookingData;
 use App\Models\Booking;
 use App\Models\BookingDetail;
-use App\Models\Payment;
 use App\Models\Room;
 use App\Models\Service;
 use App\Models\ServiceUsage;
@@ -13,6 +12,10 @@ use Illuminate\Support\Facades\DB;
 
 class UpdateBookingAction
 {
+    public function __construct()
+    {
+        
+    }
     public function execute(int $bookingId, BookingData $bookingData): Booking
     {
         return DB::transaction(function () use ($bookingId, $bookingData) {
@@ -66,8 +69,13 @@ class UpdateBookingAction
             }
             
             // 5. Cập nhật booking
+            // Lấy checkin/checkout từ booking_detail đầu tiên làm "master" dates
+            $firstDetail = (array) $bookingData->booking_details[0];
+            
             $booking->update([
                 'booking_date'         => $bookingData->booking_date,
+                'checkin_date'         => $firstDetail['checkin_date'] ?? null,
+                'checkout_date'        => $firstDetail['checkout_date'] ?? null,
                 'status'               => $bookingData->status,
                 'total_service_amount' => $totalServiceAmount,
                 'total_room_amount'    => $totalRoomAmount,

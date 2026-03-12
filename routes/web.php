@@ -64,6 +64,12 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::post("bookings/{id}/checkout", [BookingAdminController::class, "checkout"])->name('admin.bookings.checkout.confirm');
     Route::post('bookings/calculate-payment', [BookingAdminController::class, 'calculatePayment'])->name('admin.bookings.calculate-payment');
     Route::post('bookings/{id}/record-payment', [BookingAdminController::class, 'recordPayment'])->name('admin.bookings.record-payment');
+    // Room and service management in booking
+    Route::post('bookings/{id}/rooms', [BookingAdminController::class, 'addRoom'])->name('admin.bookings.add-room');
+    Route::delete('bookings/{id}/rooms/{roomId}', [BookingAdminController::class, 'removeRoom'])->name('admin.bookings.remove-room');
+    Route::put('bookings/{id}/rooms/{roomId}/dates', [BookingAdminController::class, 'updateRoomDates'])->name('admin.bookings.update-room-dates');
+    Route::post('bookings/{id}/rooms/{roomId}/services', [BookingAdminController::class, 'addOrUpdateService'])->name('admin.bookings.add-service');
+    Route::delete('bookings/{id}/rooms/{roomId}/services/{serviceId}', [BookingAdminController::class, 'removeService'])->name('admin.bookings.remove-service');
     Route::get('bookings/{id}', [BookingAdminController::class, 'show'])->name('admin.bookings.show');
     // Room Type routes
     Route::get('room-types/all', [RoomTypeAdminController::class, 'getAll'])->name('admin.room-types.all');

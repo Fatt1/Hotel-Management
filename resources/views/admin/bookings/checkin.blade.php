@@ -111,7 +111,7 @@
                 <form action="{{ route('admin.bookings.cancel', $booking->id) }}" method="POST" class="inline" 
                     onsubmit="return confirm('Bạn có chắc chắn muốn hủy đặt lịch này?')">
                     @csrf
-                    @method('DELETE')
+                    @method('POST')
                     <button type="submit" 
                         class="px-6 py-3 rounded-xl font-bold text-red-600 hover:bg-red-50 border-2 border-red-200 transition-all">
                         Hủy đặt lịch

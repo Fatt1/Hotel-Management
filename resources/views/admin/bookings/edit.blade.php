@@ -1,6 +1,22 @@
 @extends('layouts.admin')
 @section('title', 'Cập nhật booking')
 @section('content')
+    @php
+        $isCompleted = $booking->status === 'Hoàn tất';
+        $isOccupied = $booking->status === 'Đang ở';
+    @endphp
+    
+    @if($isCompleted)
+        <div class="mb-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-yellow-600 dark:text-yellow-400">warning</span>
+                <p class="text-sm text-yellow-700 dark:text-yellow-300">
+                    Booking này đã hoàn tất. Không thể chỉnh sửa.
+                </p>
+            </div>
+        </div>
+    @endif
+
     <div class="flex flex-col xl:flex-row gap-6">
         <div class="flex-1 space-y-6">
             {{-- Thông tin khách hàng (READ-ONLY) --}}
@@ -72,15 +88,18 @@
 
             {{-- Thời gian lưu trú --}}
             <div
-                class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-6">
+                class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-6 {{ $isCompleted ? 'opacity-60' : '' }}">
                 <div class="flex items-center mb-4">
                     <span class="material-symbols-outlined text-primary dark:text-blue-400 mr-2">date_range</span>
                     <h2 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Thời gian lưu trú
                     </h2>
+                    @if($isCompleted)
+                        <span class="ml-2 text-xs text-gray-500">(Không thể chỉnh sửa)</span>
+                    @endif
                 </div>
                 {{-- Date Range Picker --}}
                 <div id="date-range-bar"
-                    class="flex items-center gap-2 p-1 border border-border-light dark:border-border-dark rounded-xl bg-white dark:bg-gray-800 shadow-sm">
+                    class="flex items-center gap-2 p-1 border border-border-light dark:border-border-dark rounded-xl bg-white dark:bg-gray-800 shadow-sm {{ $isCompleted ? 'pointer-events-none' : '' }}">
                     {{-- Check-in display --}}
                     <div
                         class="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
@@ -141,23 +160,125 @@
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center">
                         <span class="material-symbols-outlined text-primary dark:text-blue-400 mr-2">meeting_room</span>
-                        <h2 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Chọn phòng
+                        <h2 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Danh sách phòng
                         </h2>
                     </div>
-                    <button type="button" id="add-room-btn"
-                        class="flex items-center text-xs font-medium text-primary dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors">
-                        <span class="material-symbols-outlined text-sm mr-1">add</span>
-                        Thêm phòng
-                    </button>
+                    @if(!$isCompleted)
+                        <button type="button" id="add-room-btn"
+                            class="flex items-center text-xs font-medium text-primary dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors">
+                            <span class="material-symbols-outlined text-sm mr-1">add</span>
+                            Thêm phòng
+                        </button>
+                    @endif
                 </div>
 
-                {{-- Danh sách phòng đã chọn --}}
-                <div id="selectedRoomsList" class="space-y-3">
-                    <div
-                        class="flex flex-col items-center justify-center py-8 text-gray-400 dark:text-gray-600 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg">
-                        <span class="material-symbols-outlined text-3xl mb-2">bed</span>
-                        <p class="text-sm">Chưa có phòng nào được chọn</p>
-                    </div>
+                {{-- Danh sách phòng --}}
+                <div class="space-y-3">
+                    @forelse($booking->bookingDetails as $detail)
+                        @php
+                            $room = $detail->room;
+                            $isCheckedOut = $detail->checkout_status;
+                            $canEdit = !$isCompleted && !$isCheckedOut;
+                            $checkinDate = \Carbon\Carbon::parse($detail->checkin_date);
+                            $checkoutDate = \Carbon\Carbon::parse($detail->checkout_date);
+                            $days = (int) max($checkinDate->diffInDays($checkoutDate), 1);
+                     
+                            $roomCost = $days * $detail->daily_price;
+                        @endphp
+                        
+                        <div class="p-4 bg-white dark:bg-gray-800 border border-border-light dark:border-border-dark rounded-xl space-y-3 {{ $isCheckedOut ? 'opacity-60' : '' }}">
+                            
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary shrink-0">
+                                        <span class="material-symbols-outlined text-lg">bed</span>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <p class="text-sm font-bold text-gray-900 dark:text-white uppercase">{{ $room->name }}</p>
+                                            @if($isCheckedOut)
+                                                <span class="px-2 py-0.5 bg-green-100 text-green-600 text-[10px] font-black uppercase rounded">Đã checkout</span>
+                                            @endif
+                                        </div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $room->roomType->name }} · {{ $days }} ngày</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 shrink-0">
+                                    <div class="text-right">
+                                        <p class="text-sm font-bold text-primary">{{ number_format($roomCost, 0, ',', '.') }} đ</p>
+                                        <p class="text-[10px] text-gray-400">{{ number_format($detail->daily_price, 0, ',', '.') }} đ/ngày</p>
+                                    </div>
+                                    @if($canEdit)
+                                        <button type="button" onclick="removeRoom({{ $booking->id }}, {{ $room->id }})"
+                                            class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors shrink-0">
+                                            <span class="material-symbols-outlined text-base">delete</span>
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
+
+                            {{-- Thời gian phòng này --}}
+                            <div class="border-t border-gray-100 dark:border-gray-700 pt-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                                        - Thời gian lưu trú
+                                    </span>
+                                    @if($canEdit)
+                                        <button type="button" onclick="openEditDateModal({{ $booking->id }}, {{ $room->id }}, '{{ $detail->checkin_date }}', '{{ $detail->checkout_date }}', '{{ $booking->status }}')"
+                                            class="text-[11px] font-semibold text-primary hover:text-blue-800 dark:hover:text-blue-400 transition-colors">
+                                            <span class="material-symbols-outlined text-sm">edit</span>
+                                        </button>
+                                    @endif
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <div>
+                                        <span class="text-gray-500 dark:text-gray-400">Check-in:</span>
+                                        <span class="text-gray-900 dark:text-white font-medium">{{ $checkinDate->format('d/m/Y H:i') }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-500 dark:text-gray-400">Check-out:</span>
+                                        <span class="text-gray-900 dark:text-white font-medium">{{ $checkoutDate->format('d/m/Y H:i') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Dịch vụ --}}
+                            <div class="border-t border-gray-100 dark:border-gray-700 pt-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                                        - Dịch vụ đã dùng
+                                    </span>
+                                    @if($canEdit)
+                                        <button type="button" onclick="openServiceModalForRoom({{ $room->id }})"
+                                            class="flex items-center gap-0.5 text-[11px] font-semibold text-primary hover:text-blue-800 dark:hover:text-blue-400 transition-colors">
+                                            <span class="material-symbols-outlined text-sm">add</span>
+                                            Thêm dịch vụ
+                                        </button>
+                                    @endif
+                                </div>
+                                <div class="space-y-0.5">
+                                    @forelse($detail->serviceUsages as $usage)
+                                        <div class="flex items-center justify-between py-0.5">
+                                            <span class="text-xs text-gray-600 dark:text-gray-400">
+                                                {{ $usage->service->name }}
+                                                <span class="text-gray-400 dark:text-gray-500">×{{ $usage->quantity }}</span>
+                                            </span>
+                                            <span class="text-xs font-medium text-gray-700 dark:text-gray-300 shrink-0 ml-4">
+                                                {{ number_format($usage->unit_price * $usage->quantity, 0, ',', '.') }} đ
+                                            </span>
+                                        </div>
+                                    @empty
+                                        <p class="text-xs text-gray-400 dark:text-gray-500 italic">Chưa có dịch vụ nào</p>
+                                    @endforelse
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="flex flex-col items-center justify-center py-8 text-gray-400 dark:text-gray-600 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg">
+                            <span class="material-symbols-outlined text-3xl mb-2">bed</span>
+                            <p class="text-sm">Chưa có phòng nào</p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -170,18 +291,75 @@
                     class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-6 pb-4 border-b border-gray-100 dark:border-gray-700">
                     Chi tiết thanh toán
                 </h2>
-                <div id="paymentDetails" class="space-y-4 mb-6">
-                    <p class="text-sm text-gray-400 dark:text-gray-500 text-center py-4">Chưa có phòng nào được chọn</p>
+                <div class="space-y-4 mb-6">
+                    @php
+                        $totalRoomAmount = 0;
+                        $totalServiceAmount = 0;
+                        $totalSurchargeAmount = 0;
+                    @endphp
+                    
+                    @foreach($booking->bookingDetails as $detail)
+                        @php
+                            // Lấy dữ liệu trực tiếp từ DB
+                            $checkinDate = \Carbon\Carbon::parse($detail->checkin_date);
+                            $checkoutDate = \Carbon\Carbon::parse($detail->checkout_date);
+                            $days = (int) max($checkinDate->diffInDays($checkoutDate), 1);
+                            $roomAmount = $days * $detail->daily_price;
+                            $serviceAmount = $detail->service_amount ?? 0;
+                            $surchargeAmount = $detail->surcharge_amount ?? 0;
+                            
+                            $totalRoomAmount += $roomAmount;
+                            $totalServiceAmount += $serviceAmount;
+                            $totalSurchargeAmount += $surchargeAmount;
+                        @endphp
+                        
+                        <div class="border-b border-gray-100 dark:border-gray-700 pb-3">
+                            <p class="font-bold text-sm text-gray-900 dark:text-white mb-2">{{ $detail->room->name }}</p>
+                            <div class="space-y-1 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600 dark:text-gray-400">Phòng</span>
+                                    <span class="text-gray-900 dark:text-white">{{ number_format($roomAmount, 0, ',', '.') }} đ</span>
+                                </div>
+                                @if($serviceAmount > 0)
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Dịch vụ</span>
+                                        <span class="text-gray-900 dark:text-white">{{ number_format($serviceAmount, 0, ',', '.') }} đ</span>
+                                    </div>
+                                @endif
+                                @if($detail->checkout_status && $surchargeAmount > 0)
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Phụ thu</span>
+                                        <span class="text-gray-900 dark:text-white">{{ number_format($surchargeAmount, 0, ',', '.') }} đ</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
                 <div
                     class="bg-gray-50 dark:bg-gray-800/50 -mx-6 px-6 py-4 border-t border-gray-100 dark:border-gray-700 mb-6">
-                    <div class="flex flex-col gap-1">
-                        <span class="text-xs font-bold uppercase text-gray-500 dark:text-gray-400">Tổng cộng</span>
-                        <div class="flex items-baseline justify-between">
-                            <span id="totalAmount" class="text-2xl font-bold text-gray-900 dark:text-white">0 đ</span>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600 dark:text-gray-400">Tổng tiền phòng</span>
+                            <span class="font-semibold text-gray-900 dark:text-white">{{ number_format($totalRoomAmount, 0, ',', '.') }} đ</span>
                         </div>
-                        <span class="text-[10px] text-gray-400 dark:text-gray-500 text-right italic">Đã bao gồm thuế &amp;
-                            phí</span>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-gray-600 dark:text-gray-400">Tổng tiền dịch vụ</span>
+                            <span class="font-semibold text-gray-900 dark:text-white">{{ number_format($totalServiceAmount, 0, ',', '.') }} đ</span>
+                        </div>
+                        @if($totalSurchargeAmount > 0)
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-gray-600 dark:text-gray-400">Tổng phụ thu</span>
+                                <span class="font-semibold text-orange-600 dark:text-orange-400">{{ number_format($totalSurchargeAmount, 0, ',', '.') }} đ</span>
+                            </div>
+                        @endif
+                        <div class="pt-3 border-t border-gray-200 dark:border-gray-600">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase text-gray-500 dark:text-gray-400">Tổng cộng</span>
+                                <span class="text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($totalRoomAmount + $totalServiceAmount + $totalSurchargeAmount, 0, ',', '.') }} đ</span>
+                            </div>
+                            <span class="text-[10px] text-gray-400 dark:text-gray-500 text-right block mt-1 italic">Đã bao gồm thuế &amp; phí</span>
+                        </div>
                     </div>
                 </div>
                 <div class="space-y-3">
@@ -189,6 +367,7 @@
                     @if($booking->payments->isNotEmpty())
                         @php
                             $methodLabels = ['cash' => 'Tiền mặt', 'bank_transfer' => 'Chuyển khoản', 'card' => 'Thẻ tín dụng'];
+                            $totalPaid = $booking->payments->sum('amount');
                         @endphp
                         <div class="border border-border-light dark:border-border-dark rounded-xl p-4 space-y-2">
                             <span class="text-xs font-bold uppercase text-gray-500 dark:text-gray-400">Lịch sử thanh toán</span>
@@ -207,24 +386,32 @@
                             @endforeach
                             <div class="pt-1 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
                                 <span class="text-xs text-gray-500">Đã thanh toán</span>
-                                <span class="text-sm font-bold text-emerald-600">{{ number_format($booking->payments->sum('amount'), 0, ',', '.') }} đ</span>
+                                <span class="text-sm font-bold text-emerald-600">{{ number_format($totalPaid, 0, ',', '.') }} đ</span>
                             </div>
                         </div>
+                    @else
+                        @php
+                            $totalPaid = 0;
+                        @endphp
                     @endif
 
                     <div class="flex items-center justify-between px-1">
                         <span class="text-xs text-gray-500 dark:text-gray-400">Còn lại</span>
-                        <span id="payment-remaining" class="text-sm font-bold text-rose-500">0 đ</span>
+                        <span class="text-sm font-bold text-rose-500">{{ number_format(($totalRoomAmount + $totalServiceAmount + $totalSurchargeAmount) - $totalPaid, 0, ',', '.') }} đ</span>
                     </div>
 
-                    <button type="button" id="btn-update"
-                        class="w-full bg-primary hover:bg-blue-800 text-white font-medium py-3 rounded-lg shadow-lg shadow-blue-500/30 transition-all transform active:scale-95 flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-sm">save</span>
-                        Cập nhật
-                    </button>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                        <div class="flex items-start gap-2">
+                            <span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-sm">info</span>
+                            <p class="text-xs text-blue-700 dark:text-blue-300">
+                                Thay đổi sẽ được lưu tự động khi thêm/xóa phòng hoặc dịch vụ.
+                            </p>
+                        </div>
+                    </div>
+
                     <a href="{{ route('admin.bookings.index') }}"
                         class="w-full bg-white dark:bg-transparent border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium py-3 rounded-lg transition-colors flex items-center justify-center">
-                        Hủy bỏ
+                        Quay lại danh sách
                     </a>
                 </div>
             </div>
@@ -234,6 +421,108 @@
     {{-- Pass booking data to JavaScript --}}
     <script>
         window.bookingData = @json($booking);
+        window.isCompleted = {{ $isCompleted ? 'true' : 'false' }};
+        
+        // Remove room function
+        async function removeRoom(bookingId, roomId) {
+            const result = await Swal.fire({
+                title: 'Xác nhận xóa phòng?',
+                text: 'Bạn có chắc muốn xóa phòng này khỏi booking?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+                await axios.delete(`/admin/bookings/${bookingId}/rooms/${roomId}`);
+                window.location.reload();
+            } catch (error) {
+                const msg = error.response?.data?.message ?? 'Có lỗi xảy ra khi xóa phòng.';
+                Swal.fire({ icon: 'error', title: 'Thất bại', text: msg });
+            }
+        }
+        
+        // Open service modal
+        function openServiceModalForRoom(roomId) {
+            // This will be handled by the existing service modal logic
+            const event = new CustomEvent('open-service-modal', { detail: { roomId } });
+            document.dispatchEvent(event);
+        }
+        
+        // Helper function to format date for datetime-local input (keeps local timezone)
+        function formatDateTimeLocal(dateString) {
+            const date = new Date(dateString);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+        
+        // Edit date modal
+        async function openEditDateModal(bookingId, roomId, checkinDate, checkoutDate, bookingStatus) {
+            const isOccupied = bookingStatus === 'Đang ở';
+            
+            const { value: formValues } = await Swal.fire({
+                title: 'Cập nhật thời gian',
+                html: `
+                    <div class="space-y-4 text-left">
+                        ${isOccupied ? '<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3"><p class="text-xs text-yellow-700">Booking đang ở - chỉ có thể cập nhật ngày checkout</p></div>' : ''}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Check-in</label>
+                            <input type="datetime-local" id="swal-checkin" 
+                                value="${formatDateTimeLocal(checkinDate)}"
+                                ${isOccupied ? 'disabled' : ''}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg ${isOccupied ? 'bg-gray-100 cursor-not-allowed' : ''}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Check-out</label>
+                            <input type="datetime-local" id="swal-checkout" 
+                                value="${formatDateTimeLocal(checkoutDate)}"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        </div>
+                    </div>
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Cập nhật',
+                cancelButtonText: 'Hủy',
+                preConfirm: () => {
+                    const checkin = document.getElementById('swal-checkin').value;
+                    const checkout = document.getElementById('swal-checkout').value;
+                    
+                    if (!checkin || !checkout) {
+                        Swal.showValidationMessage('Vui lòng nhập đầy đủ thông tin');
+                        return false;
+                    }
+                    
+                    if (new Date(checkout) <= new Date(checkin)) {
+                        Swal.showValidationMessage('Ngày checkout phải sau ngày checkin');
+                        return false;
+                    }
+                    
+                    return { checkin, checkout };
+                }
+            });
+
+            if (formValues) {
+                try {
+                    await axios.put(`/admin/bookings/${bookingId}/rooms/${roomId}/dates`, {
+                        checkin_date: formValues.checkin,
+                        checkout_date: formValues.checkout
+                    });
+                    
+                    window.location.reload();
+                } catch (error) {
+                    const msg = error.response?.data?.message ?? 'Có lỗi xảy ra khi cập nhật ngày.';
+                    Swal.fire({ icon: 'error', title: 'Thất bại', text: msg });
+                }
+            }
+        }
     </script>
 @endsection
 @push('scripts')

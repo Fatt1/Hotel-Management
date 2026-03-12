@@ -6,7 +6,7 @@
  */
 import { openModal, closeModal } from '../../../app';
 import { formatVND } from '../../../util';
-import { getAllServicesApi } from '../../../api';
+import { getAllServicesApi, addOrUpdateServiceInBooking, removeServiceFromBooking } from '../../../api';
 import { state } from './state';
 
 // Cache services list after first API call
@@ -14,10 +14,10 @@ let _servicesCache = null;
 
 /**
  * @param {number} roomId
- * @param {{ onConfirm?: () => void }} options
+ * @param {{ onConfirm?: () => void, bookingId?: number }} options
  */
 
-export async function openServiceModal(roomId, { onConfirm } = {}) {
+export async function openServiceModal(roomId, { onConfirm, bookingId } = {}) {
     if (_servicesCache === null) {
         const result = await getAllServicesApi();
         if (result?.length) _servicesCache = result;
@@ -26,6 +26,7 @@ export async function openServiceModal(roomId, { onConfirm } = {}) {
 
     // Work on a draft copy — only committed to state on confirm
     const draft = JSON.parse(JSON.stringify(state.roomServices[roomId] ?? {}));
+    const originalDraft = JSON.parse(JSON.stringify(state.roomServices[roomId] ?? {}));
 
     openModal(buildModalHtml(_servicesCache, draft));
     attachQtyListeners(_servicesCache, draft);
@@ -43,12 +44,53 @@ export async function openServiceModal(roomId, { onConfirm } = {}) {
     );
 
     // Confirm — persist draft (only non-zero qty) back to state
-    document.getElementById('confirm-services-btn').addEventListener('click', () => {
+    document.getElementById('confirm-services-btn').addEventListener('click', async () => {
+        const btn = document.getElementById('confirm-services-btn');
+        const originalHtml = btn.innerHTML;
+        
+        // Filter non-zero quantities
         state.roomServices[roomId] = Object.fromEntries(
             Object.entries(draft).filter(([, svc]) => svc.quantity > 0)
         );
-        closeModal();
-        onConfirm?.();
+
+        // If in edit mode (bookingId provided), call APIs to update services
+        if (bookingId) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">progress_activity</span> Đang lưu...`;
+            
+            try {
+                // Find changes: added, updated, removed
+                const currentServices = Object.entries(draft).filter(([, svc]) => svc.quantity > 0);
+                const originalServices = Object.entries(originalDraft);
+                
+                // Add/Update services
+                for (const [serviceId, svc] of currentServices) {
+                    const original = originalDraft[serviceId];
+                    if (!original || original.quantity !== svc.quantity) {
+                        await addOrUpdateServiceInBooking(bookingId, roomId, parseInt(serviceId), svc.quantity);
+                    }
+                }
+                
+                // Remove services (quantity changed to 0)
+                for (const [serviceId, svc] of originalServices) {
+                    if (!draft[serviceId] || draft[serviceId].quantity === 0) {
+                        await removeServiceFromBooking(bookingId, roomId, parseInt(serviceId));
+                    }
+                }
+                
+                closeModal();
+                onConfirm?.();
+            } catch (error) {
+                const msg = error.response?.data?.message ?? 'Có lỗi xảy ra khi cập nhật dịch vụ.';
+                Swal.fire({ icon: 'error', title: 'Thất bại', text: msg });
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        } else {
+            // Create mode: just update state
+            closeModal();
+            onConfirm?.();
+        }
     });
 }
 
