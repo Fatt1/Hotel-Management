@@ -102,7 +102,7 @@
     </a>
     @endcan
     @can('settings.view')
-    <a class="sidebar-item" href="#">
+    <a class="{{ request()->routeIs('admin.general-config.*') ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.general-config.index') }}">
       <span class="material-symbols-outlined">settings</span>
       <span>Cấu hình chung</span>
     </a>

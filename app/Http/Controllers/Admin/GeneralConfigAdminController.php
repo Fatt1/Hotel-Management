@@ -25,8 +25,8 @@ class GeneralConfigAdminController extends Controller
     public function updateGeneral(Request $request, UpdateSystemSettingsAction $action)
     {
         $request->validate([
-            'checkin_time' => ['required', 'date_format:H:i'],
-            'checkout_time' => ['required', 'date_format:H:i'],
+            'checkin_time' => ['required', 'date_format:H:i,H:i:s'],
+            'checkout_time' => ['required', 'date_format:H:i,H:i:s'],
             'rounding_time' => ['required', 'integer', 'min:1','max:59'],
         ],[
             'checkin_time.required' => 'Vui lòng nhập thời gian check-in',
