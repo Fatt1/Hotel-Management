@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\UtilityAdminController;
 use App\Http\Controllers\Admin\RoomTypeAdminController;
 use App\Http\Controllers\Admin\ServiceGroupAdminController;
 use App\Http\Controllers\Admin\ServiceAdminController;
+use App\Http\Controllers\Admin\GeneralConfigAdminController;
 use App\Http\Controllers\Client\AmenityController;
 use App\Http\Controllers\Client\BookingCheckoutController;
 use App\Http\Controllers\Client\DiningController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\Client\GalleryController;
 use App\Http\Controllers\Client\RoomController;
 use App\Http\Controllers\RoomAdminController;
 use Illuminate\Support\Facades\Route;
+
 
 use App\Http\Controllers\Client\HomeController;
 
@@ -151,6 +153,11 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
         'update'  => 'admin.services.update',
         'destroy' => 'admin.services.destroy',
     ]);
+    
+    // General Config routes
+    Route::get('general-config', [GeneralConfigAdminController::class, 'index'])->name('admin.general-config.index');
+    Route::post('general-config/general', [GeneralConfigAdminController::class, 'updateGeneral'])->name('admin.general-config.update-general');
+    Route::post('general-config/surcharge', [GeneralConfigAdminController::class, 'updateSurcharge'])->name('admin.general-config.update-surcharge');
     
     Route::post("/logout", [AuthAdminController::class, "logout"])->name('admin.logout');
 
