@@ -120,6 +120,7 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     ]);
 
     // Utility routes
+    Route::get('utilities/icons/search', [UtilityAdminController::class, 'searchIcons'])->name('admin.utilities.icons.search');
     Route::resource('utilities', UtilityAdminController::class)->names([
         'index'   => 'admin.utilities.index',
         'create'  => 'admin.utilities.create',

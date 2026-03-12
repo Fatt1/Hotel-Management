@@ -11,15 +11,17 @@ use App\Http\Controllers\Controller;
 use App\Models\Utility;
 use App\ViewModels\UtilityViewModel;
 use Exception;
-use GuzzleHttp\Promise\Create;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use PDO;
 
 class UtilityAdminController extends Controller
 {
-    public function index(GetUtilityListAction $action)
+    public function index(Request $request, GetUtilityListAction $action)
     {
         try {
-            $utilities = $action->executePaginated(perPage: 10);
+            $utilities = $action->executePaginated(perPage: 10, search: $request->input('search'));
 
             return view('admin.utilities.index', compact('utilities'));
         } catch (Exception $e) {
@@ -57,6 +59,28 @@ class UtilityAdminController extends Controller
         } catch (Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
+    }
+
+    public function searchIcons(Request $request)
+    {
+        $search = strtolower(trim($request->input('search', '')));
+
+        $allIcons = Cache::remember('material_symbols_icons', 86400, function () {
+            $response = Http::timeout(10)->get('https://fonts.google.com/metadata/icons?incomplete=1&key=material_symbols');
+            if ($response->failed()) {
+                return [];
+            }
+            // Response body starts with ")]}'\n" — strip it before decode
+            $body = preg_replace('/^\)\]\}\'[^\n]*\n/', '', $response->body());
+            $data = json_decode($body, true);
+            return collect($data['icons'] ?? [])->pluck('name')->toArray();
+        });
+
+        $filtered = $search
+            ? array_values(array_filter($allIcons, fn($icon) => str_contains($icon, $search)))
+            : array_slice($allIcons, 0, 48);
+
+        return response()->json(array_slice($filtered, 0, 48));
     }
 
     public function destroy(Utility $utility, DeleteUtilityAction $action)

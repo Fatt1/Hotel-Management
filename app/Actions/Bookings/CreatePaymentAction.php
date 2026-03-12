@@ -1,4 +1,5 @@
 <?php
+namespace App\Actions\Bookings; 
 
 use App\Models\Payment;
 
