@@ -78,9 +78,14 @@ class CreateBookingAction
             }
             
             // 4. Tạo booking với tổng tiền đã tính
+            // Lấy checkin/checkout từ booking_detail đầu tiên làm "master" dates cho booking
+            $firstDetail = (array) $bookingData->booking_details[0];
+            
             $booking = Booking::create([
                 'customer_id'          => $customer->id,
                 'booking_date'         => $bookingData->booking_date,
+                'checkin_date'         => $firstDetail['checkin_date'] ?? null,
+                'checkout_date'        => $firstDetail['checkout_date'] ?? null,
                 'status'               => $bookingData->status,
                 'total_service_amount' => $totalServiceAmount,
                 'total_room_amount'    => $totalRoomAmount,

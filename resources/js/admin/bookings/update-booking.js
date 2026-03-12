@@ -2,21 +2,36 @@
 import { state }                                                           from './modules/state';
 import { initDatePicker, toDbDatetime }                                    from './modules/date-picker';
 import { openRoomModal }                                                   from './modules/room-modal';
-import { renderRoomList }                                                  from './modules/room-list';
-import { renderPayment }                                                   from './modules/payment';
-import { initPaymentInput }                                                from './modules/payment-input';
-import { updateBooking }                                                   from '../../api';
+import { openServiceModal }                                                from './modules/service-modal';
+import { 
+    addRoomToBooking, 
+    removeRoomFromBooking
+} from '../../api';
 
 // ─── Bootstrap ───────────────────────────────────────────────────────────────
 
 window.addEventListener('DOMContentLoaded', () => {
     loadExistingBookingData();
-    initDatePicker({ onChange: refresh });
-    const alreadyPaid = (window.bookingData?.payments ?? []).reduce((sum, p) => sum + parseFloat(p.amount ?? 0), 0);
-    initPaymentInput(alreadyPaid);
-    document.getElementById('add-room-btn').addEventListener('click', handleAddRoomClick);
-    document.getElementById('btn-update').addEventListener('click', validateAndSubmit);
-    refresh();
+    
+    // Only init date picker and add room button if not completed
+    if (!window.isCompleted) {
+        initDatePicker({ onChange: handleDateChange });
+        
+        const addRoomBtn = document.getElementById('add-room-btn');
+        if (addRoomBtn) {
+            addRoomBtn.addEventListener('click', handleAddRoomClick);
+        }
+    }
+    
+    // Listen for service modal events
+    document.addEventListener('open-service-modal', (e) => {
+        const { roomId } = e.detail;
+        const booking = window.bookingData;
+        openServiceModal(roomId, {
+            bookingId: booking?.id,
+            onConfirm: handleServicesUpdated
+        });
+    });
 });
 
 // ─── Load Existing Data ──────────────────────────────────────────────────────
@@ -27,10 +42,10 @@ function loadExistingBookingData() {
 
     state.currentCustomer = booking.customer;
 
-    // Rooms — from booking_details[].room (Eloquent relationship key)
+    // Rooms — from booking_details[].room
     state.selectedRooms = booking.booking_details.map(detail => detail.room);
 
-    // Services — from booking_details[].service_usages[].service (Eloquent)
+    // Services — from booking_details[].service_usages[]
     state.roomServices = {};
     booking.booking_details.forEach(detail => {
         const roomId = detail.room.id;
@@ -49,9 +64,19 @@ function loadExistingBookingData() {
         });
     });
 
-    // Dates
-    const firstDetail = booking.booking_details[0];
-    if (firstDetail) {
+    // Dates — use booking.checkin_date and booking.checkout_date (master dates)
+    // Fallback to first detail if not available
+    if (booking.checkin_date && booking.checkout_date) {
+        const checkinDate  = new Date(booking.checkin_date);
+        const checkoutDate = new Date(booking.checkout_date);
+
+        state.selectedDates = [checkinDate, checkoutDate];
+
+        document.getElementById('checkin-time').value  = checkinDate.toTimeString().substring(0, 5);
+        document.getElementById('checkout-time').value = checkoutDate.toTimeString().substring(0, 5);
+    } else if (booking.booking_details.length > 0) {
+        // Fallback to first detail
+        const firstDetail = booking.booking_details[0];
         const checkinDate  = new Date(firstDetail.checkin_date);
         const checkoutDate = new Date(firstDetail.checkout_date);
 
@@ -62,79 +87,63 @@ function loadExistingBookingData() {
     }
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Handlers ────────────────────────────────────────────────────────────────
 
-function refresh() {
-    renderRoomList({ onRemoveRoom: refresh, onServicesUpdated: refresh });
-    renderPayment();
+async function handleDateChange() {
+    // When dates change in edit mode, just update the hidden inputs
+    // The dates will be used when adding new rooms
 }
 
 async function handleAddRoomClick() {
-    await openRoomModal(
-        document.getElementById('check_in').value,
-        document.getElementById('check_out').value,
-        { onConfirm: refresh }
-    );
+    const checkinDatetime = document.getElementById('check_in').value;
+    const checkoutDatetime = document.getElementById('check_out').value;
+    
+    if (!checkinDatetime || !checkoutDatetime) {
+        Swal.fire({ 
+            icon: 'warning', 
+            title: 'Chưa chọn ngày', 
+            text: 'Vui lòng chọn ngày check-in và check-out trước khi thêm phòng.' 
+        });
+        return;
+    }
+
+    await openRoomModal(checkinDatetime, checkoutDatetime, { 
+        onConfirm: async () => {
+            await addRoomsToBooking();
+        }
+    });
 }
 
-// ─── Submit ───────────────────────────────────────────────────────────────────
-
-async function validateAndSubmit() {
+async function addRoomsToBooking() {
     const booking = window.bookingData;
-
-    if (state.selectedRooms.length === 0) {
-        Swal.fire({ icon: 'warning', title: 'Chưa chọn phòng', text: 'Vui lòng chọn ít nhất 1 phòng trước khi cập nhật.' });
+    const checkinDatetime = document.getElementById('check_in').value;
+    const checkoutDatetime = document.getElementById('check_out').value;
+    
+    // Find newly selected rooms (not yet in booking)
+    const existingRoomIds = booking.booking_details.map(d => d.room.id);
+    const newRooms = state.selectedRooms.filter(r => !existingRoomIds.includes(r.id));
+    
+    if (newRooms.length === 0) {
         return;
     }
-    if (state.selectedDates.length < 2) {
-        Swal.fire({ icon: 'warning', title: 'Chưa chọn ngày', text: 'Vui lòng chọn đủ ngày check-in và check-out.' });
-        return;
-    }
-
-    const checkinTime  = document.getElementById('checkin-time').value;
-    const checkoutTime = document.getElementById('checkout-time').value;
-    const [ciDate, coDate] = state.selectedDates;
-
-    const payload = {
-        first_name:   booking.customer.first_name,
-        last_name:    booking.customer.last_name,
-        email:        booking.customer.email,
-        phone_number: booking.customer.phone_number,
-        country:      booking.customer.country,
-        booking_date: toDbDatetime(ciDate, checkinTime),
-        status:       booking.status,
-        booking_details: state.selectedRooms.map(room => ({
-            room_id:       room.id,
-            checkin_date:  toDbDatetime(ciDate, checkinTime),
-            checkout_date: toDbDatetime(coDate, checkoutTime),
-            services: Object.values(state.roomServices[room.id] ?? {}).map(s => ({
-                service_id: s.id,
-                quantity:   s.quantity,
-            })),
-        })),
-    };
-
-    const btn         = document.getElementById('btn-update');
-    const originalHtml = btn.innerHTML;
-
-    btn.disabled = true;
-    btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">progress_activity</span> Đang xử lý...`;
 
     try {
-        const result = await updateBooking(booking.id, payload);
-        await Swal.fire({
-            icon: 'success',
-            title: 'Cập nhật thành công!',
-            text: `Booking #${result.booking_id} đã được cập nhật.`,
-            confirmButtonText: 'Xem danh sách đặt phòng',
-        });
-        window.location.href = '/admin/bookings';
+        // Add each new room via API
+        for (const room of newRooms) {
+            await addRoomToBooking(booking.id, room.id, checkinDatetime, checkoutDatetime);
+        }
+        
+        // Reload page to get fresh data
+        window.location.reload();
     } catch (error) {
-        const msg = error.response?.data?.message ?? 'Có lỗi xảy ra. Vui lòng thử lại.';
-        Swal.fire({ icon: 'error', title: 'Cập nhật thất bại', text: msg });
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = originalHtml;
+        const msg = error.response?.data?.message ?? 'Có lỗi xảy ra khi thêm phòng.';
+        Swal.fire({ icon: 'error', title: 'Thất bại', text: msg });
     }
+}
+
+async function handleServicesUpdated() {
+    // Services have been updated via service modal
+    // Reload page to get fresh data
+    window.location.reload();
 }
 

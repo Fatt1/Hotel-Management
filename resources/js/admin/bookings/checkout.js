@@ -1,5 +1,5 @@
-﻿import { calculateCheckoutPayment, recordPayment } from "../../api";
-
+﻿import { calculateCheckoutPayment, recordPayment, checkout } from "../../api";
+import Swal from "sweetalert2";
 let _amountManuallyEdited = false;
 let _lastGrandTotal = 0;
 let _serverRemaining = 0;
@@ -17,6 +17,11 @@ function fmt(amount) {
 function getCheckedRoomIds() {
     return Array.from(document.querySelectorAll(".room-checkbox:checked"))
         .map(cb => parseInt(cb.dataset.roomId));
+}
+
+function getCheckedBookingDetailIds() {
+    return Array.from(document.querySelectorAll(".room-checkbox:checked"))
+        .map(cb => parseInt(cb.dataset.bookingDetailId));
 }
 
 function showLoading(show) {
@@ -95,11 +100,10 @@ function renderInvoice(data) {
     document.getElementById("invoice-surcharges-list").innerHTML = surchargeRooms.length
         ? surchargeRooms.map(r => {
             const labels = [];
-            if (r.early_checkin) labels.push(`CI sớm ${r.early_checkin.hours_early}h`);
-            if (r.late_checkout) labels.push(`CO muộn ${r.late_checkout.hours_late}h`);
+            if (r.early_checkin) labels.push(`CI sớm ${formatHours(r.early_checkin.hours_early)}`);
+            if (r.late_checkout) labels.push(`CO muộn ${formatHours(r.late_checkout.hours_late)}`);
             return `<div class="flex justify-between text-red-600 font-medium">
                         <span class="flex items-center gap-1">
-                            <span class="material-symbols-outlined text-[14px]">alarm_off</span>
                             ${labels.join(" + ")} (${r.room_name})
                         </span>
                         <span class="whitespace-nowrap ml-2">${fmt(r.surcharge_amount)}</span>
@@ -113,6 +117,12 @@ function renderInvoice(data) {
     _lastGrandTotal = data.sum_total;
     _serverRemaining = data.remaining;
     renderRemaining();
+}
+
+function formatHours(hours){
+    const h = Math.floor(hours);
+    const m = Math.round((hours - h) * 60);
+    return `${h} giờ ${m > 0 ? " " + m + " phút" : ""}`;
 }
 
 // ===== Còn lại =====
@@ -194,6 +204,42 @@ document.addEventListener("DOMContentLoaded", function () {
     onRoomToggle();
 });
 
+function handleCheckoutClick() {
+        const bookingDetailIds = getCheckedBookingDetailIds();
+        if (bookingDetailIds.length === 0) {
+            alert("Vui lòng chọn ít nhất một phòng để checkout.");
+            return;
+        }
+        Swal.fire({
+            title: "Xác nhận checkout",
+            text: "Bạn có chắc chắn muốn checkout các phòng đã chọn không?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Có, checkout",
+            cancelButtonText: "Hủy",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await checkout(BOOKING_ID, bookingDetailIds);
+                    Swal.fire("Thành công", "Checkout thành công!", "success").then(() => {
+                        window.location.href = `/admin/bookings`; // Chuyển về trang chi tiết booking sau khi checkout
+                    });
+                } catch (err) {
+                    Swal.fire("Lỗi", err.response?.data?.message ?? err.message, "error");
+                    };
+                }
+            }
+        );
+    }
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    // ... (các phần khởi tạo khác)
+    document.getElementById("checkout-btn").addEventListener("click", (e) => {
+        e.preventDefault();
+        handleCheckoutClick();
+    });
+})
 // Expose để inline event handlers trong blade vẫn hoạt động
 window.onRoomToggle = onRoomToggle;
 window.toggleSelectAll = toggleSelectAll;
