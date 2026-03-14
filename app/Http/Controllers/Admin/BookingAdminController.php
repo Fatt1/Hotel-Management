@@ -14,7 +14,6 @@ use App\Actions\Bookings\GetBookingByIdAction;
 use App\Actions\Bookings\RecordPaymentAction;
 use App\Actions\Bookings\RemoveRoomFromBookingAction;
 use App\Actions\Bookings\RemoveServiceAction;
-use App\Actions\Bookings\UpdateBookingAction;
 use App\Actions\Bookings\UpdateRoomDatesAction;
 use App\Data\BookingData;
 use App\Http\Controllers\Controller;
@@ -110,20 +109,7 @@ class BookingAdminController extends Controller
         return view('admin.bookings.edit', compact('booking'));
     }
 
-    public function update($id, BookingData $bookingData, UpdateBookingAction $updateBookingAction)
-    {
-        try {
-            $booking = $updateBookingAction->execute($id, $bookingData);
-            return response()->json([
-                'message' => 'Cập nhật booking thành công',
-                'booking_id' => $booking->id
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Cập nhật booking thất bại: ' . $e->getMessage()
-            ], 500);
-        }
-    }
+
 
     /**
      * Tính tiền checkout: trả về chi tiết từng phòng, phụ thu và tổng cần thanh toán.

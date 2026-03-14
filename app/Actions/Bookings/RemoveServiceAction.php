@@ -37,7 +37,14 @@ class RemoveServiceAction
             ServiceUsage::where('booking_detail_id', $bookingDetail->id)
                 ->where('service_id', $serviceId)
                 ->delete();
-
+            
+            $totalServiceAmount = 0;
+            foreach($bookingDetail->serviceUsages as $usage) {
+                    $totalServiceAmount += $usage->quantity * $usage->unit_price;
+            }
+            $bookingDetail->update([
+                'service_amount' => $totalServiceAmount,
+            ]);
             $this->recalculateBookingAmountsAction->execute($booking->id);
         });
     }

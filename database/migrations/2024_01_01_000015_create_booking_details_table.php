@@ -20,6 +20,7 @@ return new class extends Migration
             $table->boolean('checkout_status')->default(false);
             $table->decimal('hourly_price', 10, 2);
             $table->decimal('daily_price', 10, 2);
+            $table->decimal('room_amount', 12, 2)->default(0);
             $table->decimal('service_amount', 12, 2)->default(0);
             $table->decimal('surcharge_amount', 12, 2)->default(0);
         });

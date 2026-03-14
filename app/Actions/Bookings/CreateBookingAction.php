@@ -55,6 +55,7 @@ class CreateBookingAction
             foreach ($bookingData->booking_details as $detail) {
                 $detail = (array) $detail;
                 $room = $rooms->get($detail['room_id']);
+                 
                 
                 // Tính tiền phòng
                 if ($room?->roomType) {
@@ -84,8 +85,6 @@ class CreateBookingAction
             $booking = Booking::create([
                 'customer_id'          => $customer->id,
                 'booking_date'         => $bookingData->booking_date,
-                'checkin_date'         => $firstDetail['checkin_date'] ?? null,
-                'checkout_date'        => $firstDetail['checkout_date'] ?? null,
                 'status'               => $bookingData->status,
                 'total_service_amount' => $totalServiceAmount,
                 'total_room_amount'    => $totalRoomAmount,
@@ -97,7 +96,16 @@ class CreateBookingAction
             foreach ($bookingData->booking_details as $detail) {
                 $detail = (array) $detail;
                 $room = $rooms->get($detail['room_id']);
+                $roomAmount = 0;
+                if($room?->roomType) {
+                    $days = max(
+                        (new \DateTime($detail['checkin_date']))->diff(new \DateTime($detail['checkout_date']))->days,
+                        1
+                    );
+                    $roomAmount = $room->roomType->daily_price * $days;
+                }
                 
+
                 // Tính service_amount cho detail này (LẤY GIÁ TỪ DB)
                 $serviceAmount = 0;
                 if (isset($detail['services']) && is_array($detail['services'])) {
@@ -120,6 +128,7 @@ class CreateBookingAction
                     'hourly_price'     => $room?->roomType->hourly_price ?? 0,
                     'daily_price'      => $room?->roomType->daily_price ?? 0,
                     'service_amount'   => $serviceAmount,
+                    'room_amount'      => $roomAmount,
                     'surcharge_amount' => 0,
                 ]);
                 

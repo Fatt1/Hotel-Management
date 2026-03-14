@@ -1,9 +1,7 @@
 <?php
 
 namespace App\Actions\Bookings;
-
 use App\Models\Booking;
-use Carbon\Carbon;
 
 class RecalculateBookingAmountsAction
 {
@@ -17,35 +15,16 @@ class RecalculateBookingAmountsAction
      */
     public function execute(int $bookingId): void
     {
-        $booking = Booking::with('bookingDetails.serviceUsages')->findOrFail($bookingId);
+        $booking = Booking::with('bookingDetails')->findOrFail($bookingId);
         
         $totalRoomAmount = 0;
         $totalServiceAmount = 0;
         $totalSurchargeAmount = 0;
-
+       
         foreach ($booking->bookingDetails as $detail) {
-            // Calculate room amount for this detail
-            $checkinDate = Carbon::parse($detail->checkin_date);
-            $checkoutDate = Carbon::parse($detail->checkout_date);
-            $days = (int) max($checkinDate->diffInDays($checkoutDate), 1);
-            $roomAmount = $days * $detail->daily_price;
-            
-            // Calculate service amount for this detail
-            $serviceAmount = 0;
-            foreach ($detail->serviceUsages as $serviceUsage) {
-                $serviceAmount += $serviceUsage->quantity * $serviceUsage->unit_price;
-            }
-            
-            // Update booking detail amounts
-            $detail->update([
-                'service_amount' => $serviceAmount,
-                // surcharge_amount is updated separately during checkout
-            ]);
-            
-            // Accumulate totals
-            $totalRoomAmount += $roomAmount;
-            $totalServiceAmount += $serviceAmount;
-            $totalSurchargeAmount += $detail->surcharge_amount ?? 0;
+            $totalRoomAmount += $detail->room_amount;
+            $totalServiceAmount += $detail->service_amount;
+            $totalSurchargeAmount += $detail->surcharge_amount;
         }
 
         // Update booking totals

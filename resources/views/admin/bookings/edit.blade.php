@@ -4,6 +4,12 @@
     @php
         $isCompleted = $booking->status === 'Hoàn tất';
         $isOccupied = $booking->status === 'Đang ở';
+        function formatDuration(float $hour) {
+                                $h = floor($hour);
+                                $m = round(($hour - $h) * 60);
+                                $d = floor($h / 24);
+                                return ($d > 0 ? $d . ' ngày' : '') . ($h > 0 ? ' ' . $h . ' giờ' : '') . ($m > 0 ? ' ' . $m . ' phút' : '');
+                            }
     @endphp
     
     @if($isCompleted)
@@ -181,9 +187,11 @@
                             $canEdit = !$isCompleted && !$isCheckedOut;
                             $checkinDate = \Carbon\Carbon::parse($detail->checkin_date);
                             $checkoutDate = \Carbon\Carbon::parse($detail->checkout_date);
-                            $days = (int) max($checkinDate->diffInDays($checkoutDate), 1);
-                     
-                            $roomCost = $days * $detail->daily_price;
+                            
+                            $hours = $checkinDate->diffInHours($checkoutDate);
+                            $roomCost = $detail->room_amount;
+
+                            
                         @endphp
                         
                         <div class="p-4 bg-white dark:bg-gray-800 border border-border-light dark:border-border-dark rounded-xl space-y-3 {{ $isCheckedOut ? 'opacity-60' : '' }}">
@@ -200,13 +208,14 @@
                                                 <span class="px-2 py-0.5 bg-green-100 text-green-600 text-[10px] font-black uppercase rounded">Đã checkout</span>
                                             @endif
                                         </div>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $room->roomType->name }} · {{ $days }} ngày</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $room->roomType->name }} · {{ formatDuration($hours) }}</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3 shrink-0">
                                     <div class="text-right">
                                         <p class="text-sm font-bold text-primary">{{ number_format($roomCost, 0, ',', '.') }} đ</p>
                                         <p class="text-[10px] text-gray-400">{{ number_format($detail->daily_price, 0, ',', '.') }} đ/ngày</p>
+                                        <p class="text-[10px] text-gray-400">{{ number_format($detail->hourly_price, 0, ',', '.') }} đ/giờ</p>
                                     </div>
                                     @if($canEdit)
                                         <button type="button" onclick="removeRoom({{ $booking->id }}, {{ $room->id }})"
@@ -304,7 +313,7 @@
                             $checkinDate = \Carbon\Carbon::parse($detail->checkin_date);
                             $checkoutDate = \Carbon\Carbon::parse($detail->checkout_date);
                             $days = (int) max($checkinDate->diffInDays($checkoutDate), 1);
-                            $roomAmount = $days * $detail->daily_price;
+                            $roomAmount = $detail->room_amount;
                             $serviceAmount = $detail->service_amount ?? 0;
                             $surchargeAmount = $detail->surcharge_amount ?? 0;
                             

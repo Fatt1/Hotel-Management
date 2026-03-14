@@ -22,8 +22,8 @@ class AddOrUpdateServiceAction
             $booking = Booking::findOrFail($bookingId);
             
             // Check if booking is completed
-            if ($booking->status === 'Hoàn thất') {
-                throw new \Exception('Không thể thêm dịch vụ vào booking đã hoàn thất');
+            if ($booking->status === 'Hoàn tất') {
+                throw new \Exception('Không thể thêm dịch vụ vào booking đã hoàn tất');
             }
             
             $bookingDetail = BookingDetail::where('booking_id', $bookingId)
@@ -48,6 +48,14 @@ class AddOrUpdateServiceAction
                     'unit_price' => $service->unit_price,
                 ]
             );
+            $totalServiceAmount = 0;
+            foreach($bookingDetail->serviceUsages as $usage) {
+                    $totalServiceAmount += $usage->quantity * $usage->unit_price;
+            }
+            $bookingDetail->update([
+                'service_amount' => $totalServiceAmount,
+            ]);
+
 
             $this->recalculateBookingAmountsAction->execute($booking->id);
             return $serviceUsage->load('service');

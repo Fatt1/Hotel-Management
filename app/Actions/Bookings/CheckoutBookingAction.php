@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\BookingDetail;
 use App\Models\SurchargePolicy;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class CheckoutBookingAction
@@ -28,77 +29,17 @@ class CheckoutBookingAction
         $now = Carbon::now();
         $surchargePolicies = SurchargePolicy::all();
         
-        // Lấy ngưỡng chuyển từ giờ sang ngày (hour_mark lớn nhất của CHECKOUT_LATE)
-        $switchToDailyThreshold = $surchargePolicies
-            ->filter(fn ($p) => $p->policy_type === PolicyType::CHECKOUT_LATE->value)
-            ->sortByDesc('hour_mark')
-            ->first();
-        
         // Cập nhật checkout_status và surcharge_amount cho từng phòng
         foreach($bookingDetails as $detail) {
-          
-            $checkinDate = Carbon::parse($detail->checkin_date);
-            $checkoutDate = Carbon::parse($detail->checkout_date);
-            
-            // ─── 1. Tính tổng số giờ đã ở (từ checkin đến hiện tại) ───────
-            $totalHoursStayed = $checkinDate->diffInMinutes($now) / 60.0;
-            
-            // ─── 2. Quyết định tính theo giờ hay ngày ──────────────────────
-            // Nếu số giờ <= ngưỡng → tính giờ, nếu > ngưỡng → tính ngày
-            $chargeByHour = false;
-            if ($switchToDailyThreshold && $totalHoursStayed <= (float) $switchToDailyThreshold->hour_mark) {
-                $chargeByHour = true;
-            }
-            
-        
-            
-            // ─── 4. Kiểm tra checkin sớm ───────────────────────────────────
-            $earlyCheckinSurcharge = 0;
-            $standardCheckin = $checkinDate->copy()->setTime(self::STANDARD_CHECKIN_HOUR, 0, 0);
-            
-            if ($checkinDate->lt($standardCheckin)) {
-                // Fix: Đảo ngược thứ tự để được số dương
-                $hoursEarly = $checkinDate->diffInMinutes($standardCheckin) / 60.0;
-                
-                // Tìm policy phù hợp (hour_mark <= hoursEarly), lấy cao nhất
-                $policy = $surchargePolicies
-                    ->filter(fn ($p) => $p->policy_type === PolicyType::CHECKIN_EARLY->value
-                                     && (float) $p->hour_mark <= $hoursEarly)
-                    ->sortByDesc('hour_mark')
-                    ->first();
-                
-                if ($policy) {
-                    $earlyCheckinSurcharge = (float) $policy->price;
-                }
-            }
-            
-            // ─── 5. Kiểm tra checkout muộn ─────────────────────────────────
-            $lateCheckoutSurcharge = 0;
-            $standardCheckout = $checkoutDate->copy()->setTime(self::STANDARD_CHECKOUT_HOUR, 0, 0);
-            
-            if ($now->gt($standardCheckout)) {
-               
-                $hoursLate = $standardCheckout->diffInMinutes($now) / 60.0;
-                
-                // Tìm policy phù hợp (hour_mark <= hoursLate), lấy cao nhất
-                $policy = $surchargePolicies
-                    ->filter(fn ($p) => $p->policy_type === PolicyType::CHECKOUT_LATE->value
-                                     && (float) $p->hour_mark <= $hoursLate)
-                    ->sortByDesc('hour_mark')
-                    ->first();
-                
-                if ($policy) {
-                    $lateCheckoutSurcharge = (float) $policy->price;
-                }
-            }
-            
-            // ─── 6. Tổng phụ thu ────────────────────────────────────────────
-            $totalSurcharge = $earlyCheckinSurcharge + $lateCheckoutSurcharge;
+            $roomAmount = $this->calculateRoomAmount($detail, $now, $surchargePolicies);
+
+            $totalSurcharge = $this->calculateSurchargeAmount($detail, $now, $surchargePolicies);
             
             // ─── 7. Cập nhật vào database ──────────────────────────────────
             $detail->update([
                 'checkout_status' => true,
                 'checkout_date' => $now,
+                'room_amount' => $roomAmount,
                 'surcharge_amount' => $totalSurcharge,
             ]);
         }
@@ -114,9 +55,85 @@ class CheckoutBookingAction
                 'status' => 'Hoàn tất',
             ]);
         }
-        
-            // Recalculate all amounts (including surcharges that were just set)
-            $this->recalculateBookingAmountsAction->execute($bookingId);
+            // Tính lại tổng tiền phòng và dịch vụ sau khi checkout (phụ thu có thể ảnh hưởng đến tổng tiền phòng)
+            $this->recalculateBookingAmountsAction->execute($bookingId); 
         });
+    }
+
+    private function calculateSurchargeAmount($detail, Carbon $now, Collection $surchargePolicies): float
+    {
+        $checkinDate = Carbon::parse($detail->checkin_date);
+        $checkoutDate = Carbon::parse($detail->checkout_date);
+        
+        $standardCheckin = $checkinDate->copy()->setTime(self::STANDARD_CHECKIN_HOUR, 0, 0);
+        $standardCheckout = $checkoutDate->copy()->setTime(self::STANDARD_CHECKOUT_HOUR, 0, 0);
+
+        $checkinEarlyHours =  $checkinDate->diffInMinutes($standardCheckin) / 60.0;
+        $checkoutLateHours = $checkoutDate->diffInMinutes($standardCheckout) / 60.0;
+
+        $earlyCheckinSurcharge = 0;
+        $lateCheckoutSurcharge = 0;
+        
+        
+        // Tính phụ thu check-in sớm
+        $checkinEarlyPolicy = $surchargePolicies
+            ->filter(fn ($p) => $p->policy_type === PolicyType::CHECKIN_EARLY->value && (float) $p->hour_mark <= $checkinEarlyHours)
+            ->sortByDesc('hour_mark')
+            ->first();
+
+        // Tính phụ thu check-out muộn
+        $checkoutLatePolicy = $surchargePolicies
+            ->filter(fn ($p) => $p->policy_type === PolicyType::CHECKOUT_LATE->value && (float) $p->hour_mark <= $checkoutLateHours)
+            ->sortByDesc('hour_mark')
+            ->first();
+        
+        if($checkinEarlyPolicy) {
+            $earlyCheckinSurcharge = (float) $checkinEarlyPolicy->price;
+        }
+        if($checkoutLatePolicy) {
+            $lateCheckoutSurcharge = (float) $checkoutLatePolicy->price;
+        }
+        return $earlyCheckinSurcharge + $lateCheckoutSurcharge;
+
+
+    }  
+     
+
+    private function calculateRoomAmount($detail, Carbon $now, Collection $surchargePolicies): float
+    {
+        $checkinDate = Carbon::parse($detail->checkin_date);
+        $checkoutDate = Carbon::parse($detail->checkout_date);
+        
+        // Tính tổng số giờ đã ở (từ checkin đến hiện tại)
+        $totalHoursStayed = $checkinDate->diffInMinutes($now) / 60.0;
+        $totalDaysStayed = (int) $checkinDate->diffInDays($now);
+        
+        // Lấy ngưỡng chuyển từ giờ sang ngày (hour_mark lớn nhất của CHECKOUT_LATE)
+        $switchToDailyThreshold = $surchargePolicies
+            ->filter(fn ($p) => $p->policy_type === PolicyType::CHECKOUT_LATE->value)
+            ->sortByDesc('hour_mark')
+            ->first();
+        
+        // Quyết định tính theo giờ hay ngày
+        if ($switchToDailyThreshold && $totalHoursStayed <= (float) $switchToDailyThreshold->hour_mark) {
+            // Tính theo giờ
+            return $this->calculateHourlySurcharge($detail, $totalHoursStayed);
+        } else {
+            // Tính theo ngày
+            return $this->calculateDailySurcharge($detail, $totalDaysStayed);
+        }
+    }
+
+
+
+    private function calculateHourlySurcharge(BookingDetail $detail, float $totalHoursStayed):float {
+        if($totalHoursStayed < 1) {
+            $totalHoursStayed = 1; // Tối thiểu tính 1h nếu khách ở chưa đến 1h
+        }
+        return $detail->hourly_price * $totalHoursStayed;
+    }
+            
+    private function calculateDailySurcharge(BookingDetail $detail, int $totalDaysStayed):float {
+        return $detail->daily_price * $totalDaysStayed;
     }
 }

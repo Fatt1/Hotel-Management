@@ -5,6 +5,7 @@ namespace App\Actions\Bookings;
 use App\Models\Booking;
 use App\Models\BookingDetail;
 use App\Models\Room;
+use DateTime;
 use Illuminate\Support\Facades\DB;
 
 class AddRoomToBookingAction
@@ -23,13 +24,15 @@ class AddRoomToBookingAction
             }
             
             $room = Room::with('roomType')->findOrFail($data['room_id']);
-
+            $days = max((new DateTime($data['checkin_date']))->diff(new DateTime($data['checkout_date']))->days, 1);
+            $roomAmount = $room->roomType->daily_price * $days;
             // Create booking detail
             $bookingDetail = BookingDetail::create([
                 'booking_id'    => $bookingId,
                 'room_id'       => $room->id,
                 'checkin_date'  => $data['checkin_date'],
                 'checkout_date' => $data['checkout_date'],
+                'room_amount'   => $roomAmount,
                 'hourly_price'  => $room->roomType->hourly_price,
                 'daily_price'   => $room->roomType->daily_price,
             ]);
