@@ -155,9 +155,7 @@
 
                             $checkoutDate = $detail->checkout_date ?? now();
 
-                            $nights = max(1, (int) $checkoutDate->diffInDays($checkinDate));
-
-                            $roomCharge = (float) $detail->daily_price * $nights;
+                            $roomCharge = $detail->room_amount;
 
                             $isEarlyCI = $checkinDate->hour < 14;
 
@@ -228,8 +226,7 @@
 
                                                 </div>
 
-                                                <div class="text-[11px] text-blue-400 font-semibold">{{ $nights }}
-                                                    đêm</div>
+                                     
 
                                             </div>
 

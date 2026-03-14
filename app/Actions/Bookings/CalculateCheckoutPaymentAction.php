@@ -126,15 +126,19 @@ class CalculateCheckoutPaymentAction
             // Số giờ ≤ ngưỡng → tính theo giá giờ
             $chargeByHour = true;
             $hoursStayed = round($totalHoursStayed, 2);
-            // Tối thiểu tính 1 giờ nếu khách ở chưa đến 1 giờ
-            if($totalHoursStayed < 1) {
-                $totalHoursStayed = 1; // Tối thiểu tính 1 giờ
+
+            $chargedHours = (int) floor($hoursStayed);
+            $fraction = $hoursStayed - $chargedHours;
+            if( $fraction > 0.25) {
+                $chargedHours++;
             }
-            $amount = (float) $detail->hourly_price * $totalHoursStayed;
+            // Tối thiểu tính 1 giờ nếu khách ở chưa đến 1 giờ
+            if($chargedHours < 1) {
+                $chargedHours = 1; // Tối thiểu tính 1 giờ
+            }
+            $amount = (float) $detail->hourly_price * $chargedHours;
         } else {
-            // Số giờ > ngưỡng (hoặc không có policy) → tính theo giá ngày
-            $days = max((int) $checkinDate->diffInDays($checkoutDate), 1);
-            $amount = (float) $detail->daily_price * $days;
+            $amount = $detail->room_amount;
         }
 
         return [

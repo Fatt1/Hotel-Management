@@ -127,10 +127,16 @@ class CheckoutBookingAction
 
 
     private function calculateHourlySurcharge(BookingDetail $detail, float $totalHoursStayed):float {
-        if($totalHoursStayed < 1) {
-            $totalHoursStayed = 1; // Tối thiểu tính 1h nếu khách ở chưa đến 1h
-        }
-        return $detail->hourly_price * $totalHoursStayed;
+        $chargedHours = (int) floor($totalHoursStayed);
+            $fraction = $totalHoursStayed - $chargedHours;
+            if( $fraction > 0.25) {
+                $chargedHours++;
+            }
+            // Tối thiểu tính 1 giờ nếu khách ở chưa đến 1 giờ
+            if($chargedHours < 1) {
+                $chargedHours = 1; // Tối thiểu tính 1 giờ
+            }
+        return $detail->hourly_price * $chargedHours;
     }
             
     private function calculateDailySurcharge(BookingDetail $detail, int $totalDaysStayed):float {
