@@ -1,4 +1,30 @@
-@if ($paginator->hasPages())
+@php
+    $pageSizeOptions = [10, 25, 50, 100];
+    $currentPageSize = (int) request()->query('page_size', $paginator->perPage());
+    if (!in_array($currentPageSize, $pageSizeOptions, true)) {
+        $currentPageSize = 10;
+    }
+
+    $query = request()->query();
+    unset($query['page']);
+@endphp
+
+<div class="flex items-center justify-between gap-3 flex-wrap">
+    <div class="flex items-center gap-2">
+        <label for="page-size-select" class="text-xs text-slate-500">Số dòng/trang</label>
+        <select id="page-size-select"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-primary/20"
+            onchange="window.location.href = this.value">
+            @foreach ($pageSizeOptions as $size)
+                @php
+                    $pageSizeUrl = request()->url() . '?' . http_build_query(array_merge($query, ['page_size' => $size]));
+                @endphp
+                <option value="{{ $pageSizeUrl }}" @selected($currentPageSize === $size)>{{ $size }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    @if ($paginator->hasPages())
     <div class="flex items-center gap-2">
         @if ($paginator->onFirstPage())
             <span
@@ -44,4 +70,5 @@
             </span>
         @endif
     </div>
-@endif
+    @endif
+</div>

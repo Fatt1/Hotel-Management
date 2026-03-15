@@ -1,6 +1,9 @@
 @extends('layouts.admin')
 @section('title', 'Quản lý đặt lịch')
 @section('content')
+@php
+    $status = ["Đã đặt", "Đang ở", "Hoàn tất", "Hủy"];
+@endphp
     <div class="p-8 space-y-6">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
@@ -20,28 +23,29 @@
             class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <div
                 class="p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col xl:flex-row gap-4 justify-between items-center">
-                <div class="relative w-full xl:w-96">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-                        <span class="material-symbols-outlined !text-lg">search</span>
-                    </span>
-                    <input
-                        class="block w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 transition-all"
-                        placeholder="Tìm theo Tên khách / Mã đặt phòng..." type="text" />
-                </div>
-                <div class="flex flex-wrap items-center gap-3 w-full xl:w-auto">
-                    <select
-                        class="block w-full sm:w-48 px-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 transition-all">
-                        <option value="">Tất cả trạng thái</option>
-                        <option value="pending">Đã đặt</option>
-                        <option value="confirmed">Đã xác nhận</option>
-                        <option value="checkin">Đã nhận phòng</option>
-                        <option value="checkout">Đã trả phòng</option>
-                        <option value="cancelled">Đã hủy</option>
-                    </select>
-                    <button class="p-2 text-slate-500 hover:text-primary transition-colors">
-                        <span class="material-symbols-outlined">filter_alt</span>
-                    </button>
-                </div>
+                <form action="{{ route('admin.bookings.index') }}" method="GET"
+                    class="w-full flex flex-col xl:flex-row gap-4 justify-between items-center">
+                    <div class="relative w-full xl:w-96">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                            <span class="material-symbols-outlined !text-lg">search</span>
+                        </span>
+                        <input name="search" value="{{ request('search') }}"
+                            class="block w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 transition-all"
+                            placeholder="Tìm theo Tên khách / Mã đặt phòng..." type="text" />
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+                        <select name="status" onchange="this.form.submit()"
+                            class="block w-full sm:w-48 px-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 transition-all">
+                            <option value="">Tất cả trạng thái</option>
+                            @foreach ($status as $st)
+                                <option value="{{ $st }}" @selected(request('status') === $st)>{{ $st }}</option>
+                            @endforeach
+                        </select>
+                        <button type="submit" class="p-2 text-slate-500 hover:text-primary transition-colors" title="Lọc">
+                            <span class="material-symbols-outlined">filter_alt</span>
+                        </button>
+                    </div>
+                </form>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full">

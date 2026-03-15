@@ -14,9 +14,14 @@ class GetAllBookingsAction
         ]);
 
         if ($search) {
-            $query->where('first_name', 'like', "%$search%")
-                ->orWhere('last_name', 'like', "%$search%")
-                ->orWhere('id', 'like', "%$search%");
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('customer', function ($q2) use ($q, $search) {
+                   $q2->where('first_name', 'like', "%$search%")
+                      ->orWhere('last_name', 'like', "%$search%")
+                      ->orWhere('email', 'like', "%$search%");
+
+                });
+            });
         }
 
         if ($from_date) {
