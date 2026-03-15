@@ -25,6 +25,11 @@ class GetRoomTypeListAction
             });
         }
 
+        // Filter theo trạng thái
+        if (isset($filters['status']) && $filters['status'] !== '') {
+            $query->where('is_active', $filters['status']);
+        }
+
         // Filter theo giá (từ -> đến)
         if (!empty($filters['min_price'])) {
             $query->where('hourly_price', '>=', $filters['min_price']);
@@ -63,6 +68,7 @@ class GetRoomTypeListAction
                 'daily_price' => $roomType->daily_price,
                 'total_rooms' => $roomType->rooms()->count(),
                 'available_rooms' => $roomType->rooms()->where('status', 'available')->count(),
+                'status' => $roomType->is_active?->value ?? 0,
             ];
         });
     }

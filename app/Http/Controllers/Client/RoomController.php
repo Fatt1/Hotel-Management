@@ -38,10 +38,12 @@ class RoomController extends Controller
         $checkOut = $checkOutDate->format('Y-m-d');
         $nights   = max(1, (int) $checkInDate->diffInDays($checkOutDate));
 
-        // --- Room IDs bị trùng lịch (overlap conflict) ---
-        $bookedRoomIds = BookingDetail::where('checkin_date', '<', $checkOut)
-            ->where('checkout_date', '>', $checkIn)
-            ->pluck('room_id')
+        // --- Room IDs bị trùng lịch (chỉ tính booking đang active: 'Đã đặt', 'Đang ở') ---
+        $bookedRoomIds = BookingDetail::join('bookings', 'booking_details.booking_id', '=', 'bookings.id')
+            ->whereIn('bookings.status', ['Đã đặt', 'Đang ở'])
+            ->where('booking_details.checkin_date', '<', $checkOut)
+            ->where('booking_details.checkout_date', '>', $checkIn)
+            ->pluck('booking_details.room_id')
             ->toArray();
 
         // --- Load room types, lọc theo sức chứa ---

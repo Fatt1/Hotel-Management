@@ -5,28 +5,20 @@ declare(strict_types=1);
 namespace App\Actions\Roles;
 
 use App\Models\Role;
-use App\Abstractions\Repositories\RoleRepository;
 use App\Data\RoleData;
 
 class UpdateRoleAction
 {
-    public function __construct(
-        private RoleRepository $roleRepository
-    ) {
-    }
-
     public function handle(int $id, RoleData $roleData): Role
     {
-        $role = $this->roleRepository->findById($id);
-        if (!$role) {
-            throw new \Exception('Role not found');
-        }
+        $role = Role::findOrFail($id);
+
         if ($role->name === 'Admin') {
             throw new \Exception('Không thể sửa vai trò Admin');
         }
 
         $role->name = $roleData->name;
-        $this->roleRepository->save($role);
+        $role->save();
 
         return $role;
     }

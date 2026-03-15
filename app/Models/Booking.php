@@ -13,6 +13,8 @@ class Booking extends Model
     protected $fillable = [
         'customer_id',
         'booking_date',
+        'checkin_date',
+        'checkout_date',
         'staff_id',
         'status',
         'total_service_amount',
@@ -23,6 +25,8 @@ class Booking extends Model
 
     protected $casts = [
         'booking_date' => 'datetime',
+        'checkin_date' => 'datetime',
+        'checkout_date' => 'datetime',
         'total_service_amount' => 'decimal:2',
         'total_room_amount' => 'decimal:2',
         'surcharge_amount' => 'decimal:2',

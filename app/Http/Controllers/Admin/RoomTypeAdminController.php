@@ -17,9 +17,13 @@ class RoomTypeAdminController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(GetRoomTypeListAction $action)
+    public function index(Request $request, GetRoomTypeListAction $action)
     {
-        $roomTypes = $action->executeWithRoomCount();
+        $filters = [
+            'search' => $request->input('search'),
+            'status' => $request->input('status'),
+        ];
+        $roomTypes = $action->executeWithRoomCount(filters: $filters);
         return view('admin.room-type.index', compact('roomTypes'));
     }
     public function getAll(GetRoomTypeListAction $action) {

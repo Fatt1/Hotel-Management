@@ -4,17 +4,11 @@ declare(strict_types=1);
 
 namespace App\Actions\Customers;
 
-use App\Abstractions\Repositories\CustomerRepository;
-use App\Models\Customer;
-use Illuminate\Pagination\LengthAwarePaginator;
 use App\Data\CustomerData;
+use App\Models\Customer;
 
 class AddCustomerAction
 {
-    public function __construct(
-        private CustomerRepository $customerRepository
-    ) {
-    }
     public function handle(CustomerData $data): Customer
     {
         $customer = new Customer();
@@ -23,7 +17,7 @@ class AddCustomerAction
         $customer->phone_number = $data->phone_number;
         $customer->country = $data->country;
         $customer->email = $data->email;
-        $this->customerRepository->save($customer);
+        $customer->save();
         return $customer;
     }
 }

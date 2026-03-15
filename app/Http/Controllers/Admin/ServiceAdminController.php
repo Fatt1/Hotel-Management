@@ -15,6 +15,15 @@ use App\ViewModels\ServiceViewModel;
 class ServiceAdminController extends Controller
 {
     /**
+     * Trả về toàn bộ danh sách dịch vụ dạng JSON (dùng cho select/dropdown)
+     */
+    public function getAll(GetServiceListAction $action)
+    {
+        $services = $action->execute();
+        return response()->json($services, 200);
+    }
+
+    /**
      * Danh sách dịch vụ
      */
     public function index(GetServiceListAction $action)

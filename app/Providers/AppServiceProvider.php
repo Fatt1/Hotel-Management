@@ -37,18 +37,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-       $this->app->bind(RoleRepository::class, EloquentRoleRepository::class);
-       $this->app->bind(BookingRepository::class, EloquentBookingRepository::class);
-       $this->app->bind(CustomerRepository::class, EloquentCustomerRepository::class);
-       $this->app->bind(RoomTypeRepository::class, EloquentRoomTypeRepository::class);
-       $this->app->bind(EquipmentCategoryRepository::class, EloquentEquipmentCategoryRepository::class);
-       $this->app->bind(EquipmentRepository::class, EloquentEquipmentRepository::class);
-       $this->app->bind(IStaffRepository::class, EloquentStaffRepository::class);
-       $this->app->bind(UtilityRepository::class, EloquentUtilityRepository::class);
-       $this->app->bind(FloorRepository::class, EloquentFloorRepository::class);
-       $this->app->bind(RoomRepository::class, EloquentRoomRepository::class);
-       $this->app->bind(ServiceGroupRepository::class, EloquentServiceGroupRepository::class);
-       $this->app->bind(ServiceRepository::class, EloquentServiceRepository::class);
+        //
     }
 
     /**

@@ -15,25 +15,26 @@
     </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6 flex items-center gap-4">
+    <form action="{{ route('admin.room-types.index') }}" method="GET"
+          class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6 flex items-center gap-4">
       <div class="relative flex-1">
         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-        <input 
-          type="text" 
-          id="search" 
-          placeholder="Tìm theo tên loại phòng (Room Type)..." 
+        <input
+          type="text"
+          name="search"
+          value="{{ request('search') }}"
+          placeholder="Tìm theo tên loại phòng (Room Type)..."
           class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-900/20 outline-none"
         />
       </div>
-      <select id="status-filter" class="bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-600 outline-none focus:ring-2 focus:ring-blue-900/20">
+      <select name="status" onchange="this.form.submit()"
+              class="bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-600 outline-none focus:ring-2 focus:ring-blue-900/20">
         <option value="">Tất cả trạng thái</option>
-        <option value="active">Đang hoạt động</option>
-        <option value="inactive">Ngừng hoạt động</option>
+        <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Đang hoạt động</option>
+        <option value="2" {{ request('status') === '2' ? 'selected' : '' }}>Sắp ra mắt</option>
+        <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Không hoạt động</option>
       </select>
-      <button class="p-2 text-slate-400 hover:text-blue-900 border border-slate-200 rounded-lg transition-colors">
-        <span class="material-symbols-outlined">tune</span>
-      </button>
-    </div>
+    </form>
 
     <!-- Table -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
@@ -45,7 +46,7 @@
             <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">SL C CHL A (NL/TE)</th>
             <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Giá theo giờ</th>
             <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Giá theo ngày</th>
-            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">Số lượng</th>
+            <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">Trạng thái</th>
             <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">Hành động</th>
           </tr>
         </thead>
@@ -54,12 +55,12 @@
           <tr class="hover:bg-slate-50/50 transition-colors group">
             <td class="px-6 py-4">
               <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-900 transition-colors">
+                {{-- <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-900 transition-colors">
                   <span class="material-symbols-outlined">hotel</span>
-                </div>
+                </div> --}}
                 <div>
                   <p class="font-bold text-slate-900">{{ $room['name'] }}</p>
-                  <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ $room['code'] ?? 'N/A' }}</p>
+                  {{-- <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ $room['code'] ?? 'N/A' }}</p> --}}
                 </div>
               </div>
             </td>
@@ -79,8 +80,24 @@
             <td class="px-6 py-4 text-right font-bold text-blue-900">{{ number_format($room['hourly_price'], 0, ',', '.') }}đ</td>
             <td class="px-6 py-4 text-right font-bold text-blue-900">{{ number_format($room['daily_price'], 0, ',', '.') }}đ</td>
             <td class="px-6 py-4 text-center">
-              <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-900 rounded-full text-xs font-bold">
-                {{ $room['total_rooms'] }} phòng
+              @php $status = $room['status'] ?? 0; @endphp
+              @if($status === 1)
+                <span class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  Đang hoạt động
+                </span>
+              @elseif($status === 2)
+                <span class="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                  Sắp ra mắt
+                </span>
+              @else
+                <span class="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-xs font-bold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                  Không hoạt động
+                </span>
+              @endif
+
               </span>
             </td>
             <td class="px-6 py-4">

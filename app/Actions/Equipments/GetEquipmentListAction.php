@@ -31,7 +31,7 @@ class GetEquipmentListAction
      */
     public function executePaginated(array $filters = [], $perPage = 10)
     {
-        $query = Equipment::with('category')->orderBy('name', 'asc');
+        $query = Equipment::with('category')->orderBy('id', 'asc');
 
         if (!empty($filters['search'])) {
             $query->where('name', 'like', '%' . $filters['search'] . '%');

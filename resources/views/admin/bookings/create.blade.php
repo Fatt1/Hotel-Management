@@ -207,14 +207,45 @@
                     </div>
                 </div>
                 <div class="space-y-3">
-                    <button type="button" id="confirm-booking-btn"
-                        class="w-full bg-primary hover:bg-blue-800 text-white font-medium py-3 rounded-lg shadow-lg shadow-blue-500/30 transition-all transform active:scale-95">
-                        Xác nhận đặt phòng
+                    {{-- Thanh toán --}}
+                    <div class="border border-border-light dark:border-border-dark rounded-xl p-4 space-y-3">
+                        <span class="text-xs font-bold uppercase text-gray-500 dark:text-gray-400">Thanh toán</span>
+                        {{-- Row 1: currency + method --}}
+                        <div class="flex items-center gap-2">
+                            <select id="payment-currency"
+                                class="w-20 shrink-0 px-2 py-2 text-sm border border-border-light dark:border-border-dark rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="VND">VND</option>
+                            </select>
+                            <select id="payment-method"
+                                class="min-w-0 flex-1 px-2 py-2 text-sm border border-border-light dark:border-border-dark rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                <option value="cash">Tiền mặt</option>
+                                <option value="bank_transfer">Chuyển khoản</option>
+                                <option value="card">Thẻ tín dụng</option>
+                            </select>
+                        </div>
+                        {{-- Row 2: amount (full width) --}}
+                        <input type="number" id="payment-amount" value="0" min="0" step="1000"
+                            class="w-full px-3 py-2 text-sm border border-border-light dark:border-border-dark rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary text-right" />
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Còn lại</span>
+                            <span id="payment-remaining" class="text-sm font-bold text-rose-500">0 đ</span>
+                        </div>
+                    </div>
+
+                    <button type="button" id="btn-checkin"
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-lg shadow-lg shadow-emerald-500/30 transition-all transform active:scale-95 flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">door_front</span>
+                        Nhận phòng
                     </button>
-                    <button type="button"
-                        class="w-full bg-white dark:bg-transparent border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium py-3 rounded-lg transition-colors">
+                    <button type="button" id="btn-reserve"
+                        class="w-full bg-primary hover:bg-blue-800 text-white font-medium py-3 rounded-lg shadow-lg shadow-blue-500/30 transition-all transform active:scale-95 flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-sm">bookmark_add</span>
+                        Đặt phòng
+                    </button>
+                    <a  href="{{ route('admin.bookings.index') }}"
+                        class="block text-center w-full bg-white dark:bg-transparent border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium py-3 rounded-lg transition-colors">
                         Hủy bỏ
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>

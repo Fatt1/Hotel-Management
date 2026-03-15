@@ -2,7 +2,6 @@
 
 namespace App\Actions\Bookings;
 
-use App\Abstractions\Repositories\BookingRepository;
 use App\Models\Booking;
 
 class GetAllBookingsAction

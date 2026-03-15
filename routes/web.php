@@ -7,12 +7,14 @@ use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\RoleAdminController;
 use App\Http\Controllers\Admin\StaffAdminController;
 use App\Http\Controllers\Admin\RoomDiagramAdminController;
+use App\Http\Controllers\Admin\LayoutRoomController;
 use App\Http\Controllers\Admin\EquipmentCategoryAdminController;
 use App\Http\Controllers\Admin\EquipmentAdminController;
 use App\Http\Controllers\Admin\UtilityAdminController;
 use App\Http\Controllers\Admin\RoomTypeAdminController;
 use App\Http\Controllers\Admin\ServiceGroupAdminController;
 use App\Http\Controllers\Admin\ServiceAdminController;
+use App\Http\Controllers\Admin\GeneralConfigAdminController;
 use App\Http\Controllers\Client\AmenityController;
 use App\Http\Controllers\Client\BookingCheckoutController;
 use App\Http\Controllers\Client\DiningController;
@@ -20,6 +22,7 @@ use App\Http\Controllers\Client\GalleryController;
 use App\Http\Controllers\Client\RoomController;
 use App\Http\Controllers\RoomAdminController;
 use Illuminate\Support\Facades\Route;
+
 
 use App\Http\Controllers\Client\HomeController;
 
@@ -53,6 +56,22 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::get("/bookings", [BookingAdminController::class, "index"])->name("admin.bookings.index");
     Route::get('/bookings/create', [BookingAdminController::class,'create'])->name('admin.bookings.create');
     Route::post('/bookings', [BookingAdminController::class,'store'])->name('admin.bookings.store');
+    Route::get('bookings/{id}/edit', [BookingAdminController::class, 'edit'])->name('admin.bookings.edit');
+    Route::put('bookings/{id}', [BookingAdminController::class, 'update'])->name('admin.bookings.update');
+    Route::get('bookings/{id}/checkin', [BookingAdminController::class, 'checkinConfirm'])->name('admin.bookings.checkin');
+    Route::post('bookings/{id}/checkin', [BookingAdminController::class, 'checkin'])->name('admin.bookings.checkin.confirm');
+    Route::post('bookings/{id}/cancel', [BookingAdminController::class, 'cancel'])->name('admin.bookings.cancel');
+    Route::get("bookings/{id}/checkout", [BookingAdminController::class, "checkoutConfirm"])->name('admin.bookings.checkout');
+    Route::post("bookings/{id}/checkout", [BookingAdminController::class, "checkout"])->name('admin.bookings.checkout.confirm');
+    Route::post('bookings/calculate-payment', [BookingAdminController::class, 'calculatePayment'])->name('admin.bookings.calculate-payment');
+    Route::post('bookings/{id}/record-payment', [BookingAdminController::class, 'recordPayment'])->name('admin.bookings.record-payment');
+    // Room and service management in booking
+    Route::post('bookings/{id}/rooms', [BookingAdminController::class, 'addRoom'])->name('admin.bookings.add-room');
+    Route::delete('bookings/{id}/rooms/{roomId}', [BookingAdminController::class, 'removeRoom'])->name('admin.bookings.remove-room');
+    Route::put('bookings/{id}/rooms/{roomId}/dates', [BookingAdminController::class, 'updateRoomDates'])->name('admin.bookings.update-room-dates');
+    Route::post('bookings/{id}/rooms/{roomId}/services', [BookingAdminController::class, 'addOrUpdateService'])->name('admin.bookings.add-service');
+    Route::delete('bookings/{id}/rooms/{roomId}/services/{serviceId}', [BookingAdminController::class, 'removeService'])->name('admin.bookings.remove-service');
+    Route::get('bookings/{id}', [BookingAdminController::class, 'show'])->name('admin.bookings.show');
     // Room Type routes
     Route::get('room-types/all', [RoomTypeAdminController::class, 'getAll'])->name('admin.room-types.all');
     Route::resource('room-types', RoomTypeAdminController::class)->names([
@@ -68,9 +87,12 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::get('/rooms/available', [RoomAdminController::class, 'getAvailableRooms'])->name('admin.rooms.available');
 
     // Room Diagram routes
-    Route::get('room-diagrams', [RoomDiagramAdminController::class, 'index'])->name('admin.room-diagrams.index');
+
     Route::get('room-diagrams/edit', [RoomDiagramAdminController::class, 'edit'])->name('admin.room-diagrams.edit');
     Route::post('room-diagrams/update', [RoomDiagramAdminController::class, 'update'])->name('admin.room-diagrams.update');
+    
+    // Layout Room routes
+    Route::get('layout-rooms', [LayoutRoomController::class, 'index'])->name('admin.layout-rooms.index');
     
     // Floor API routes
     Route::post('floors', [RoomDiagramAdminController::class, 'storeFloor'])->name('admin.floors.store');
@@ -105,6 +127,7 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     ]);
 
     // Utility routes
+    Route::get('utilities/icons/search', [UtilityAdminController::class, 'searchIcons'])->name('admin.utilities.icons.search');
     Route::resource('utilities', UtilityAdminController::class)->names([
         'index'   => 'admin.utilities.index',
         'create'  => 'admin.utilities.create',
@@ -127,6 +150,7 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     ]);
 
     // Service routes
+    Route::get('services/all', [ServiceAdminController::class, 'getAll'])->name('admin.services.all');
     Route::resource('services', ServiceAdminController::class)->names([
         'index'   => 'admin.services.index',
         'create'  => 'admin.services.create',
@@ -136,6 +160,11 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
         'update'  => 'admin.services.update',
         'destroy' => 'admin.services.destroy',
     ]);
+    
+    // General Config routes
+    Route::get('general-config', [GeneralConfigAdminController::class, 'index'])->name('admin.general-config.index');
+    Route::post('general-config/general', [GeneralConfigAdminController::class, 'updateGeneral'])->name('admin.general-config.update-general');
+    Route::post('general-config/surcharge', [GeneralConfigAdminController::class, 'updateSurcharge'])->name('admin.general-config.update-surcharge');
     
     Route::post("/logout", [AuthAdminController::class, "logout"])->name('admin.logout');
 

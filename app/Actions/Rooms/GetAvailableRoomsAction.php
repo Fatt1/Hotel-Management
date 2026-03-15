@@ -14,13 +14,13 @@ class GetAvailableRoomsAction
      *
      * Phòng được coi là bận nếu:
      * - Có booking_detail trùng lịch (checkin_date < $checkout_date AND checkout_date > $checkin_date)
-     * - Thuộc booking đang active (status: 'Chờ xác nhận' hoặc 'Đang ở')
+     * - Thuộc booking đang active (status: 'Đã đặt' hoặc 'Đang ở')
      */
     public function handle(string $checkinDate, string $checkoutDate, ?int $roomTypeId = null, ?int $floorId = null): Collection
     {
         $bookedRoomIds = DB::table('booking_details')
             ->join('bookings', 'booking_details.booking_id', '=', 'bookings.id')
-            ->whereIn('bookings.status', ['Chờ xác nhận', 'Đang ở'])
+            ->whereIn('bookings.status', ['Đã đặt', 'Đang ở'])
             ->where('booking_details.checkin_date', '<', $checkoutDate)
             ->where('booking_details.checkout_date', '>', $checkinDate)
             ->pluck('booking_details.room_id');

@@ -18,9 +18,10 @@ class EquipmentCategoryAdminController extends Controller
     /**
      * Danh sách loại thiết bị
      */
-    public function index(GetEquipmentCategoryListAction $action)
+    public function index(Request $request, GetEquipmentCategoryListAction $action)
     {
-        $equipmentCategories = $action->executePaginated(perPage: 10);
+        $filters = ['search' => $request->input('search')];
+        $equipmentCategories = $action->executePaginated(filters: $filters, perPage: 5);
         return view('admin.equipment-category.index', compact('equipmentCategories'));
     }
 
@@ -96,14 +97,9 @@ class EquipmentCategoryAdminController extends Controller
         try {
             $action->execute($equipment_category);
 
-            return redirect()
-                ->route('admin.equipment-categories.index')
-                ->with('success', 'Loại thiết bị đã được xóa thành công');
+            return response()->json(['message' => 'Loại thiết bị đã được xóa thành công']);
         } catch (\Exception $e) {
-
-            return redirect()
-                ->route('admin.equipment-categories.index')
-                ->with('error', $e->getMessage());
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 }

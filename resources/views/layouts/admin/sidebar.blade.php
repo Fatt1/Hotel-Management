@@ -18,72 +18,117 @@
       <span>Tổng quan</span>
     </a>
     <div class="sidebar-group-label">VẬN HÀNH</div>
-    <a class="{{ request()->routeIs("admin.room-diagrams.index") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.room-diagrams.index') }}">
+    @can('layouts.view')
+    <a class="{{ request()->routeIs("admin.layout-rooms.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.layout-rooms.index') }}">
       <span class="material-symbols-outlined">grid_view</span>
       <span>Sơ đồ phòng</span>
     </a>
+    @endcan
+    @can('edit_layouts.view')
     <a class="{{ request()->routeIs("admin.room-diagrams.edit") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.room-diagrams.edit') }}">
       <span class="material-symbols-outlined">edit</span>
       <span>Chỉnh sửa sơ đồ phòng</span>
     </a>
+    @endcan
+    @can('bookings.view')
     <a class="{{ request()->routeIs("admin.bookings.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route("admin.bookings.index") }}">
       <span class="material-symbols-outlined">calendar_month</span>
       <span>Quản lý đặt lịch</span>
     </a>
+    @endcan
     <div class="sidebar-group-label">QUẢN LÝ PHÒNG</div>
     <a class="{{ request()->routeIs("admin.room-types.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.room-types.index') }}">
       <span class="material-symbols-outlined">category</span>
       <span>Quản lý loại phòng</span>
     </a>
     <div class="sidebar-group-label">QUẢN LÝ TÀI SẢN</div>
+    @can('equipments.view')
     <a class="{{ request()->routeIs("admin.equipments.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.equipments.index') }}">
       <span class="material-symbols-outlined">inventory_2</span>
       <span>Trang thiết bị</span>
     </a>
+    @endcan
+    @can('equipment_categories.view')
     <a class="{{ request()->routeIs("admin.equipment-categories.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.equipment-categories.index') }}">
       <span class="material-symbols-outlined">category</span>
       <span>Quản lý loại thiết bị</span>
     </a>
+    @endcan
+    @can('maintenance_tickets.view')
     <a class="sidebar-item" href="#">
       <span class="material-symbols-outlined">build</span>
       <span>Phiếu sửa chữa</span>
     </a>
+    @endcan
     <div class="sidebar-group-label">KHÁCH HÀNG</div>
+    @can('customers.view')
     <a class="{{ request()->routeIs("admin.customers.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.customers.index') }}">
       <span class="material-symbols-outlined">groups</span>
       <span>Quản lý khách hàng</span>
     </a>
+    @endcan
     <div class="sidebar-group-label">DỊCH VỤ &amp; TIỆN ÍCH</div>
+    @can('services.view')
     <a class="{{ request()->routeIs('admin.services.*') ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.services.index') }}">
       <span class="material-symbols-outlined">room_service</span>
       <span>Quản lý dịch vụ</span>
     </a>
+    @endcan
+    @can('service_categories.view')
     <a class="{{ request()->routeIs('admin.service-groups.*') ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.service-groups.index') }}">
       <span class="material-symbols-outlined">list_alt</span>
       <span>Loại dịch vụ</span>
     </a>
+    @endcan
+    @can('amenities.view')
     <a class="{{ request()->routeIs('admin.utilities.*') ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.utilities.index') }}">
       <span class="material-symbols-outlined">spa</span>
       <span>Quản lý tiện ích</span>
     </a>
+    @endcan
     <div class="sidebar-group-label">HỆ THỐNG</div>
+    @can('staffs.view')
     <a class="{{ request()->routeIs('admin.staffs.*') ? 'sidebar-item-active' : 'sidebar-item' }}"
       href="{{ route('admin.staffs.index') }}">
       <span class="material-symbols-outlined">groups</span>
       <span>Quản lý nhân viên</span>
     </a>
+    @endcan
+    @can('roles.view')
     <a class="{{ request()->routeIs('admin.roles.*') ? 'sidebar-item-active' : 'sidebar-item' }}"
       href="{{ route('admin.roles.index') }}">
       <span class="material-symbols-outlined">admin_panel_settings</span>
       <span>Quản lý vai trò</span>
     </a>
-    <a class="sidebar-item" href="#">
+    @endcan
+    @can('settings.view')
+    <a class="{{ request()->routeIs('admin.general-config.*') ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.general-config.index') }}">
       <span class="material-symbols-outlined">settings</span>
       <span>Cấu hình chung</span>
     </a>
+    @endcan
+    @can('statistics.view')
     <a class="sidebar-item" href="#">
       <span class="material-symbols-outlined">bar_chart</span>
       <span>Thống kê</span>
     </a>
+    @endcan
   </nav>
 </aside>
+
+<script>
+  // Auto scroll to active sidebar item on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const activeItem = document.querySelector('.sidebar-item-active');
+    if (activeItem) {
+      // Delay slightly to ensure layout is complete
+      setTimeout(function() {
+        activeItem.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+      }, 100);
+    }
+  });
+</script>

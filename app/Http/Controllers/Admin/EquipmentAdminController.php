@@ -9,19 +9,24 @@ use App\Actions\Equipments\UpdateEquipmentAction;
 use App\Data\EquipmentData;
 use App\Http\Controllers\Controller;
 use App\Models\Equipment;
+use App\Models\EquipmentCategory;
 use App\ViewModels\EquipmentViewModel;
 use Exception;
 use Illuminate\Http\Request;
 
 class EquipmentAdminController extends Controller
 {
-    public function index(GetEquipmentListAction $action)
+    public function index(Request $request, GetEquipmentListAction $action)
     {
-        $equipments = $action->executePaginated(perPage: 10);
+        $filters = [
+            'search'                => $request->input('search'),
+            'equipment_category_id' => $request->input('category_id'),
+        ];
 
-        return view('admin.equipments.index', [
-            'equipments' => $equipments,
-        ]);
+        $equipments = $action->executePaginated(filters: $filters, perPage: 5);
+        $categories = EquipmentCategory::orderBy('name')->get();
+
+        return view('admin.equipments.index', compact('equipments', 'categories'));
     }
 
     public function create()

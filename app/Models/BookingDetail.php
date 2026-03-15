@@ -18,6 +18,7 @@ class BookingDetail extends Model
         'checkout_status',
         'hourly_price',
         'daily_price',
+        'room_amount',
         'service_amount',
         'surcharge_amount',
     ];
@@ -27,6 +28,7 @@ class BookingDetail extends Model
         'checkout_date' => 'datetime',
         'hourly_price' => 'decimal:2',
         'daily_price' => 'decimal:2',
+        'room_amount' => 'decimal:2',
         'service_amount' => 'decimal:2',
         'surcharge_amount' => 'decimal:2',
     ];

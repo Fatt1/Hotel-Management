@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('total_room_amount', 12, 2)->default(0);
             $table->decimal('surcharge_amount', 12, 2)->default(0);
             $table->decimal('final_amount', 12, 2)->default(0);
-            $table->enum('status', ['Chờ xác nhận', 'Đang ở', 'Hoàn tất', 'Hủy', 'Không đến'])->default('Chờ xác nhận');
+            $table->enum('status', ['Đã đặt', 'Đang ở', 'Hoàn tất', 'Hủy', 'Không đến'])->default('Đã đặt');
         });
     }
 

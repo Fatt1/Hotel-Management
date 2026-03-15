@@ -52,16 +52,12 @@
 
           <!-- Icon Grid -->
           <div id="iconGrid" class="grid grid-cols-8 gap-2 p-4 bg-slate-50 border border-slate-200 rounded-lg max-h-80 overflow-y-auto">
-            @foreach($viewModel->availableIcons() as $icon)
-              <button 
-                type="button" 
-                class="icon-option p-3 rounded-lg border-2 border-slate-200 hover:border-blue-900 hover:bg-blue-50 transition-all cursor-pointer flex items-center justify-center group relative" 
-                data-icon="{{ $icon }}"
-                title="{{ $icon }}"
-              >
-                <span class="material-symbols-outlined text-3xl text-slate-500 group-hover:text-blue-900">{{ $icon }}</span>
-              </button>
-            @endforeach
+            <div id="iconGridLoading" class="col-span-8 flex justify-center items-center py-8 hidden">
+              <span class="text-sm text-slate-400">Đang tải...</span>
+            </div>
+            <div id="iconGridEmpty" class="col-span-8 text-center py-8 hidden">
+              <span class="text-sm text-slate-400">Không tìm thấy icon nào.</span>
+            </div>
           </div>
 
           <input 
@@ -105,81 +101,112 @@
 </div>
 
 <script>
-  // Icon selection
-  const iconOptions = document.querySelectorAll('.icon-option');
-  const iconInput = document.getElementById('icon');
+  const iconInput  = document.getElementById('icon');
   const iconSearch = document.getElementById('iconSearch');
+  const iconGrid   = document.getElementById('iconGrid');
+  const loadingEl  = document.getElementById('iconGridLoading');
+  const emptyEl    = document.getElementById('iconGridEmpty');
+  const searchUrl  = '{{ route('admin.utilities.icons.search') }}';
 
-  // Select icon from grid
-  iconOptions.forEach(option => {
-    option.addEventListener('click', (e) => {
-      e.preventDefault();
-      selectIcon(option.getAttribute('data-icon'));
-    });
-  });
+  let debounceTimer = null;
 
-  // Function to select/highlight icon
-  function selectIcon(iconName) {
-    iconInput.value = iconName;
-    
-    // Reset all icons
-    iconOptions.forEach(opt => {
-      opt.classList.remove('border-blue-900', 'bg-blue-900', 'shadow-lg');
+  // ── Highlight a button as selected ──────────────────────────────────────
+  function highlightButton(btn) {
+    iconGrid.querySelectorAll('.icon-option').forEach(opt => {
+      opt.classList.remove('border-blue-900', 'bg-blue-900', 'shadow-lg', 'shadow-blue-900/30');
       opt.classList.add('border-slate-200');
       opt.querySelector('span').classList.remove('text-white');
       opt.querySelector('span').classList.add('text-slate-500');
     });
-    
-    // Highlight selected icon if in grid
-    const selectedOption = document.querySelector(`[data-icon="${iconName}"]`);
-    if (selectedOption) {
-      selectedOption.classList.remove('border-slate-200');
-      selectedOption.classList.add('border-blue-900', 'bg-blue-900', 'shadow-lg', 'shadow-blue-900/30');
-      selectedOption.querySelector('span').classList.remove('text-slate-500');
-      selectedOption.querySelector('span').classList.add('text-white');
-    }
+    btn.classList.remove('border-slate-200');
+    btn.classList.add('border-blue-900', 'bg-blue-900', 'shadow-lg', 'shadow-blue-900/30');
+    btn.querySelector('span').classList.remove('text-slate-500');
+    btn.querySelector('span').classList.add('text-white');
+  }
 
-    // Update preview
+  // ── Render icon buttons into grid ────────────────────────────────────────
+  function renderIcons(icons) {
+    iconGrid.querySelectorAll('.icon-option').forEach(el => el.remove());
+    emptyEl.classList.toggle('hidden', icons.length > 0);
+
+    icons.forEach(iconName => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'icon-option p-3 rounded-lg border-2 border-slate-200 hover:border-blue-900 hover:bg-blue-50 transition-all cursor-pointer flex items-center justify-center group relative';
+      btn.dataset.icon = iconName;
+      btn.title = iconName;
+      btn.innerHTML = `<span class="material-symbols-outlined text-3xl text-slate-500 group-hover:text-blue-900">${iconName}</span>`;
+      btn.addEventListener('click', (e) => { e.preventDefault(); selectIcon(iconName); });
+      iconGrid.appendChild(btn);
+    });
+
+    // Re-highlight if current value is visible
+    if (iconInput.value) {
+      const existing = iconGrid.querySelector(`[data-icon="${iconInput.value}"]`);
+      if (existing) highlightButton(existing);
+    }
+  }
+
+  // ── Fetch icons from backend (proxies Google Fonts API) ─────────────────
+  function fetchIcons(search = '') {
+    loadingEl.classList.remove('hidden');
+    iconGrid.querySelectorAll('.icon-option').forEach(el => el.remove());
+    emptyEl.classList.add('hidden');
+
+    const url = search ? `${searchUrl}?search=${encodeURIComponent(search)}` : searchUrl;
+
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(r => r.json())
+      .then(icons => {
+        loadingEl.classList.add('hidden');
+        renderIcons(icons);
+      })
+      .catch(() => {
+        loadingEl.classList.add('hidden');
+        emptyEl.classList.remove('hidden');
+      });
+  }
+
+  // ── Select icon ──────────────────────────────────────────────────────────
+  function selectIcon(iconName) {
+    iconInput.value = iconName;
+    const btn = iconGrid.querySelector(`[data-icon="${iconName}"]`);
+    if (btn) highlightButton(btn);
     updateIconPreview(iconName);
   }
 
-  // Update icon preview
+  // ── Preview ──────────────────────────────────────────────────────────────
   function updateIconPreview(iconName) {
     const previewContainer = document.getElementById('iconPreview');
-    if (iconName) {
-      previewContainer.innerHTML = `
-        <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <div class="p-2 bg-blue-100 rounded-lg">
-            <span class="material-symbols-outlined text-3xl text-blue-900">${iconName}</span>
-          </div>
-          <span class="text-sm text-blue-900 font-medium">Đã chọn: <span class="font-bold">${iconName}</span></span>
+    previewContainer.innerHTML = iconName ? `
+      <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <div class="p-2 bg-blue-100 rounded-lg">
+          <span class="material-symbols-outlined text-3xl text-blue-900">${iconName}</span>
         </div>
-      `;
-    } else {
-      previewContainer.innerHTML = '';
-    }
+        <span class="text-sm text-blue-900 font-medium">Đã chọn: <span class="font-bold">${iconName}</span></span>
+      </div>` : '';
   }
 
-  // Icon search - filter grid AND allow custom input
-  iconSearch.addEventListener('input', (e) => {
-    const searchTerm = e.target.value.toLowerCase().trim();
-    
-    // Filter icons in grid
-    iconOptions.forEach(option => {
-      const iconName = option.getAttribute('data-icon');
-      option.style.display = iconName.includes(searchTerm) ? '' : 'none';
-    });
+  // ── Default hotel icons from ViewModel (rendered by PHP) ─────────────────
+  const defaultIcons = @json($viewModel->availableIcons());
 
-    // If user types a custom icon name (press Enter or blur)
-    if (searchTerm) {
-      selectIcon(searchTerm);
+  // ── Search with debounce ─────────────────────────────────────────────────
+  iconSearch.addEventListener('input', (e) => {
+    clearTimeout(debounceTimer);
+    const term = e.target.value.trim();
+    if (term === '') {
+      // Quay về danh sách mặc định khi xóa hết từ khóa
+      renderIcons(defaultIcons);
+    } else {
+      debounceTimer = setTimeout(() => fetchIcons(term), 350);
     }
   });
 
-  // Highlight selected icon on page load
-  if (iconInput.value) {
-    selectIcon(iconInput.value);
-  }
+  // ── Init: hiển thị icon khách sạn mặc định, không cần gọi API ────────────
+  renderIcons(defaultIcons);
+  @if(old('icon'))
+    updateIconPreview('{{ old('icon') }}');
+  @endif
 </script>
 
 @endsection

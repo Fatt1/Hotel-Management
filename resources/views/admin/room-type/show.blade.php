@@ -53,6 +53,26 @@
               <p class="text-base font-bold text-blue-600">{{ $viewModel->totalRooms() }} phòng ({{ $viewModel->availableRooms() }} phòng trống)</p>
             </div>
             <div>
+              <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">Trạng thái</p>
+              @php $status = $viewModel->roomType()->is_active; @endphp
+              @if($status?->value === 1)
+                <span class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  Đang hoạt động
+                </span>
+              @elseif($status?->value === 2)
+                <span class="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                  Sắp ra mắt
+                </span>
+              @else
+                <span class="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-xs font-bold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                  Không hoạt động
+                </span>
+              @endif
+            </div>
+            <div>
               <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">Mô tả</p>
               <p class="text-base text-slate-600">{{ $viewModel->roomType()->description ?? 'Không có mô tả' }}</p>
             </div>
