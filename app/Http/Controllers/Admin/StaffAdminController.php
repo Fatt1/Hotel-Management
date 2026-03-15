@@ -6,6 +6,7 @@ use App\Actions\Staff\AddStaffAction;
 use App\Actions\Staff\DeleteStaffAction;
 use App\Actions\Staff\GetAllStaffAction;
 use App\Actions\Staff\GetStaffByIdAction;
+use App\Actions\Staff\ToggleStaffActiveAction;
 use App\Actions\Staff\UpdateStaffAction;
 use App\Data\StaffData;
 use App\Http\Controllers\Controller;
@@ -59,16 +60,16 @@ class StaffAdminController extends Controller
         if ($staff == null) {
             return response()->json(['message' => 'Nhân viên không tồn tại'], 404);
         }
-        $staffData = new StaffData(
-            first_name: $staff->first_name,
-            last_name: $staff->last_name,
-            email: $staff->email,
-            phone_number: $staff->phone_number,
-            role_id: $staff->role_id,
-            is_active: $staff->is_active,
-            id: $staff->id,
-        );
-        return response()->json($staffData, 200);
+        return response()->json([
+            'id'           => $staff->id,
+            'first_name'   => $staff->first_name,
+            'last_name'    => $staff->last_name,
+            'email'        => $staff->email,
+            'phone_number' => $staff->phone_number,
+            'role_id'      => $staff->role_id,
+            'role_name'    => $staff->role?->name,
+            'is_active'    => $staff->is_active,
+        ], 200);
     }
 
     public function store(StaffData $staffData, AddStaffAction $addStaffAction)
@@ -96,6 +97,22 @@ class StaffAdminController extends Controller
         try {
             $deleteStaffAction->handle($id);
             return response()->json(['message' => 'Xóa nhân viên thành công'], 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    public function toggleActive(int $id, ToggleStaffActiveAction $toggleStaffActiveAction)
+    {
+        try {
+            $staff = $toggleStaffActiveAction->handle($id);
+
+            return response()->json([
+                'message' => $staff->is_active
+                    ? 'Mở khóa tài khoản nhân viên thành công'
+                    : 'Khóa tài khoản nhân viên thành công',
+                'is_active' => $staff->is_active,
+            ], 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }

@@ -47,6 +47,7 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::post("/staffs", [StaffAdminController::class, "store"])->name('admin.staffs.store');
     Route::put("/staffs/{id}", [StaffAdminController::class, "update"])->name('admin.staffs.update');
     Route::delete("/staffs/{id}", [StaffAdminController::class, "destroy"])->name('admin.staffs.destroy');
+    Route::patch("/staffs/{id}/toggle-active", [StaffAdminController::class, "toggleActive"])->name('admin.staffs.toggle-active');
 
     // Booking routes
     Route::get("/bookings", [BookingAdminController::class, "index"])->name("admin.bookings.index");
