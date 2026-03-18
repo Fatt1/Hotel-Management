@@ -5,7 +5,26 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            input: [
+                'resources/css/app.css',
+                'resources/js/app.js',
+                'resources/js/admin/login.js',
+                'resources/js/admin/role-permission.js',
+                'resources/js/admin/bookings/create-booking.js',
+                'resources/js/admin/bookings/update-booking.js',
+                'resources/js/admin/bookings/checkout.js',
+                'resources/js/admin/customers/index.js',
+                'resources/js/admin/customers/edit.js',
+                'resources/js/admin/equipment-categories/index.js',
+                'resources/js/admin/equipments/index.js',
+                'resources/js/admin/general-config/surcharge.js',
+                'resources/js/admin/layout-room/index.js',
+                'resources/js/admin/maintenance-tickets/index.js',
+                'resources/js/admin/roles/index.js',
+                'resources/js/admin/service-groups/index.js',
+                'resources/js/admin/services/index.js',
+                'resources/js/admin/utilities/index.js',
+            ],
             refresh: true,
         }),
         tailwindcss(),

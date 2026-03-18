@@ -43,4 +43,11 @@ class MaintenanceTicket extends Model
     {
         return $this->belongsTo(Staff::class, 'technician_id');
     }
+
+    public function getTicketCodeAttribute(): string
+    {
+        $year = optional($this->reported_date)->format('Y') ?? now()->format('Y');
+
+        return sprintf('MNT-%s-%04d', $year, $this->id);
+    }
 }

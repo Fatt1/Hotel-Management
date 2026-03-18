@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\RoomTypeAdminController;
 use App\Http\Controllers\Admin\ServiceGroupAdminController;
 use App\Http\Controllers\Admin\ServiceAdminController;
 use App\Http\Controllers\Admin\GeneralConfigAdminController;
+use App\Http\Controllers\Admin\MaintenanceTicketAdminController;
 use App\Http\Controllers\Client\AmenityController;
 use App\Http\Controllers\Client\BookingCheckoutController;
 use App\Http\Controllers\Client\DiningController;
@@ -124,6 +125,17 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
         'edit' => 'admin.equipments.edit',
         'update' => 'admin.equipments.update',
         'destroy' => 'admin.equipments.destroy',
+    ]);
+
+    // Maintenance Ticket routes
+    Route::resource('maintenance-tickets', MaintenanceTicketAdminController::class)->names([
+        'index' => 'admin.maintenance-tickets.index',
+        'create' => 'admin.maintenance-tickets.create',
+        'store' => 'admin.maintenance-tickets.store',
+        'show' => 'admin.maintenance-tickets.show',
+        'edit' => 'admin.maintenance-tickets.edit',
+        'update' => 'admin.maintenance-tickets.update',
+        'destroy' => 'admin.maintenance-tickets.destroy',
     ]);
 
     // Utility routes

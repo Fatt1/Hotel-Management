@@ -55,7 +55,7 @@
     </a>
     @endcan
     @can('maintenance_tickets.view')
-    <a class="sidebar-item" href="#">
+    <a class="{{ request()->routeIs('admin.maintenance-tickets.*') ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.maintenance-tickets.index') }}">
       <span class="material-symbols-outlined">build</span>
       <span>Phiếu sửa chữa</span>
     </a>
