@@ -196,22 +196,22 @@
                     <div class="flex-grow h-px bg-slate-800"></div>
                 </div>
 
-                <!-- Social Login -->
-                <div class="flex justify-center gap-4 mb-8">
-                    <button type="button" class="w-10 h-10 rounded-full bg-[#1c2331] border border-slate-700/40 flex items-center justify-center text-gray-300 hover:bg-[#232b3c] hover:text-white transition-colors">
-                        <i class="fa-brands fa-apple text-lg"></i>
-                    </button>
-                    <button type="button" class="w-10 h-10 rounded-full bg-[#1c2331] border border-slate-700/40 flex items-center justify-center text-gray-300 hover:bg-[#232b3c] hover:text-white transition-colors">
-                        <i class="fa-brands fa-facebook-f text-sm"></i>
-                    </button>
-                </div>
+               
 
                 <!-- Terms -->
-                <div class="text-center text-[0.65rem] text-gray-500 leading-relaxed px-4">
+                <div class="text-center text-[0.65rem] text-gray-500 leading-relaxed px-4 mb-6">
                     Bằng việc tiếp tục, bạn đồng ý với<br>
                     Điều khoản dịch vụ và Chính sách<br>
                     bảo mật của chúng tôi.
                 </div>
+
+                <!-- Registration Link -->
+                <p class="text-center text-[0.75rem] text-gray-400">
+                    Chưa có tài khoản?
+                    <a href="{{ route('client.register') }}" class="text-white font-semibold hover:underline">
+                        Đăng ký ngay
+                    </a>
+                </p>
             </div>
 
         </div>

@@ -200,6 +200,8 @@ use App\Http\Controllers\Client\AuthController;
 Route::name('client.')->group(function () {
     // Đăng nhập Client
     Route::get('/login', [AuthController::class, 'index'])->name('login');
+    Route::get('/register', [AuthController::class, 'register'])->name('register');
+    Route::post('/register', [AuthController::class, 'storeRegister'])->name('register.store');
 
     // Danh sách loại phòng
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');

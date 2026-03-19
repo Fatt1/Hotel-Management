@@ -30,8 +30,9 @@ class CustomerData extends Data
     }
     public static function rules(ValidationContext|null $context = null): array
     {
-        $customerId = $context->payload['id'] ?? null;
-        $isUpdate = $customerId !== null;
+        $payload = $context?->payload ?? [];
+        $customerId = $payload['id'] ?? null;
+
         return [
             'last_name' => 'required|string|max:255',
             'first_name' => 'required|string|max:255',
