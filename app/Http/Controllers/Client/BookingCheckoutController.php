@@ -186,7 +186,7 @@ class BookingCheckoutController extends Controller
                     $price = (float) $rt->daily_price;
                     $selectedRooms[] = [
                         'name'       => $rt->name,
-                        'image_url'  => $rt->images->first()?->image_url ?? '',
+                        'image_url'  => $this->resolveImageUrl($rt->images->first()?->image_url),
                         'width'      => $rt->width ?? 0,
                         'qty'        => $qty,
                         'line_total' => $price * $qty * $nights,
@@ -253,5 +253,26 @@ class BookingCheckoutController extends Controller
         }
 
         return view('client.booking.confirmation', compact('bookingRef', 'bookingData', 'checkInDate', 'checkOutDate'));
+    }
+
+    /**
+     * Convert DB image path to browser-usable URL.
+     */
+    private function resolveImageUrl(?string $imageUrl): string
+    {
+        if (!is_string($imageUrl) || trim($imageUrl) === '') {
+            return '';
+        }
+
+        $imageUrl = trim($imageUrl);
+        if (
+            str_starts_with($imageUrl, 'http://') ||
+            str_starts_with($imageUrl, 'https://') ||
+            str_starts_with($imageUrl, '//')
+        ) {
+            return $imageUrl;
+        }
+
+        return asset('storage/' . ltrim($imageUrl, '/'));
     }
 }

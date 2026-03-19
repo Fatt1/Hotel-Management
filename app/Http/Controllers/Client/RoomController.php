@@ -12,7 +12,6 @@ class RoomController extends Controller
 {
     /**
      * Hiển thị danh sách loại phòng với bộ lọc tìm kiếm.
-     * Dùng Eloquent trực tiếp theo rule.md (query đơn giản không cần Repository).
      */
     public function index(Request $request)
     {
@@ -70,7 +69,7 @@ class RoomController extends Controller
     }
 
     /**
-     * Hiển thị chi tiết một loại phòng.
+     * Hiển thị chi tiết một loại phòng (show page).
      */
     public function show(int $id)
     {

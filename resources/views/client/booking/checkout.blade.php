@@ -179,8 +179,17 @@
             @foreach($selectedRooms as $item)
               @php
                 $rt      = $item['room_type'];
-                $imgUrl  = $rt->images->first()?->image_url
-                           ?? 'https://picsum.photos/seed/room' . $rt->id . '/120/80';
+                $imgUrl  = $rt->images->first()?->image_url;
+                if (
+                  is_string($imgUrl) &&
+                  $imgUrl !== '' &&
+                  !str_starts_with($imgUrl, 'http://') &&
+                  !str_starts_with($imgUrl, 'https://') &&
+                  !str_starts_with($imgUrl, '//')
+                ) {
+                  $imgUrl = asset('storage/' . ltrim($imgUrl, '/'));
+                }
+                $imgUrl  = $imgUrl ?: 'https://picsum.photos/seed/room' . $rt->id . '/120/80';
                 $priceFmt = number_format($item['line_total'], 0, ',', '.');
               @endphp
               <div class="flex items-start gap-3 px-6 py-4">

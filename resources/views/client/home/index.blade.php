@@ -237,8 +237,17 @@
     <div class="grid grid-cols-3 gap-5">
       @forelse($featuredRooms as $room)
         @php
-          $imgUrl = $room->images->first()?->image_url
-                    ?? 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80';
+          $imgUrl = $room->images->first()?->image_url;
+          if (
+            is_string($imgUrl) &&
+            $imgUrl !== '' &&
+            !str_starts_with($imgUrl, 'http://') &&
+            !str_starts_with($imgUrl, 'https://') &&
+            !str_starts_with($imgUrl, '//')
+          ) {
+            $imgUrl = asset('storage/' . ltrim($imgUrl, '/'));
+          }
+          $imgUrl = $imgUrl ?: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80';
           $bedText = '';
           if ($room->double_bed_quantity > 0) $bedText = $room->double_bed_quantity . ' giường đôi';
           elseif ($room->single_bed_quantity > 0) $bedText = $room->single_bed_quantity . ' giường đơn';
@@ -288,7 +297,7 @@
               <div>
                 <span class="text-white/30 text-[10px]">Từ</span>
                 <div class="text-white font-bold text-lg">
-                  {{ number_format($room->daily_price / 1000, 0, ',', '.') }}K
+                  {{ number_format($room->daily_price, 0, ',', '.') }}đ
                   <span class="text-white/30 text-xs font-normal">/đêm</span>
                 </div>
               </div>

@@ -116,11 +116,23 @@
         {{-- Room row --}}
         @php $totalQty = array_sum(array_column($bookingData['rooms'], 'qty')); @endphp
         @foreach($bookingData['rooms'] as $idx => $room)
+          @php
+            $roomImageUrl = $room['image_url'] ?? '';
+            if (
+              is_string($roomImageUrl) &&
+              $roomImageUrl !== '' &&
+              !str_starts_with($roomImageUrl, 'http://') &&
+              !str_starts_with($roomImageUrl, 'https://') &&
+              !str_starts_with($roomImageUrl, '//')
+            ) {
+              $roomImageUrl = asset('storage/' . ltrim($roomImageUrl, '/'));
+            }
+          @endphp
           <div class="flex items-center gap-5 @if(!$loop->last) mb-4 pb-4 border-b border-gray-100 @endif">
             {{-- Room image --}}
             <div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
-              @if(!empty($room['image_url']))
-                <img src="{{ $room['image_url'] }}" alt="{{ $room['name'] }}" class="w-full h-full object-cover">
+              @if(!empty($roomImageUrl))
+                <img src="{{ $roomImageUrl }}" alt="{{ $room['name'] }}" class="w-full h-full object-cover">
               @else
                 <div class="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
                   <i class="fas fa-bed text-gray-400 text-xl"></i>

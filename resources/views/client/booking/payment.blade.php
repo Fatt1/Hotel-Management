@@ -265,8 +265,17 @@
             @foreach($selectedRooms as $item)
               @php
                 $rt     = $item['room_type'];
-                $imgUrl = $rt->images->first()?->image_url
-                          ?? 'https://picsum.photos/seed/room' . $rt->id . '/120/80';
+                $imgUrl = $rt->images->first()?->image_url;
+                if (
+                  is_string($imgUrl) &&
+                  $imgUrl !== '' &&
+                  !str_starts_with($imgUrl, 'http://') &&
+                  !str_starts_with($imgUrl, 'https://') &&
+                  !str_starts_with($imgUrl, '//')
+                ) {
+                  $imgUrl = asset('storage/' . ltrim($imgUrl, '/'));
+                }
+                $imgUrl = $imgUrl ?: 'https://picsum.photos/seed/room' . $rt->id . '/120/80';
                 $badges = [
                   'STD' => ['Giá Tốt Nhất', 'text-green-600 bg-green-50'],
                   'DLX' => ['Bữa Sáng Kèm',  'text-amber-600 bg-amber-50'],
