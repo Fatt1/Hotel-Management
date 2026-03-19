@@ -14,7 +14,7 @@
           <p class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mt-2">Maintenance Ticket #{{ $ticket->ticket_code }}</p>
         </div>
       </div>
-      <a href="{{ route('admin.maintenance-tickets.index') }}" class="print:hidden text-slate-400 hover:text-slate-600 transition-colors" aria-label="Đóng">
+      <a href="{{ $returnUrl ?? route('admin.maintenance-tickets.index') }}" class="print:hidden text-slate-400 hover:text-slate-600 transition-colors" aria-label="Đóng">
         <span class="material-symbols-outlined">close</span>
       </a>
     </div>
@@ -116,7 +116,7 @@
     </div>
 
     <div class="px-8 py-5 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3 print:hidden">
-      <a href="{{ route('admin.maintenance-tickets.index') }}" class="px-6 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-white transition-colors">
+      <a href="{{ $returnUrl ?? route('admin.maintenance-tickets.index') }}" class="px-6 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-white transition-colors">
         Đóng cửa sổ
       </a>
       <button type="button" onclick="window.print()" class="px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors inline-flex items-center gap-2">

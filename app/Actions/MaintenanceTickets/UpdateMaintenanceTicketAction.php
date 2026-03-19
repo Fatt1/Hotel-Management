@@ -7,8 +7,10 @@ use App\Models\MaintenanceTicket;
 
 class UpdateMaintenanceTicketAction
 {
-    public function execute(MaintenanceTicket $ticket, MaintenanceTicketData $data): MaintenanceTicket
+    public function execute(int $id, MaintenanceTicketData $data): MaintenanceTicket
     {
+        $ticket = MaintenanceTicket::query()->findOrFail($id);
+
         $ticket->room_id = $data->room_id;
         $ticket->equipment_id = $data->equipment_id;
         $ticket->issue_description = $data->issue_description;

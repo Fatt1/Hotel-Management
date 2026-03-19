@@ -9,7 +9,6 @@ use App\Actions\MaintenanceTickets\GetMaintenanceTicketListAction;
 use App\Actions\MaintenanceTickets\UpdateMaintenanceTicketAction;
 use App\Data\MaintenanceTicketData;
 use App\Http\Controllers\Controller;
-use App\Models\MaintenanceTicket;
 use App\ViewModels\MaintenanceTicketViewModel;
 use Exception;
 use Illuminate\Http\Request;
@@ -18,12 +17,17 @@ class MaintenanceTicketAdminController extends Controller
 {
     public function index(Request $request, GetMaintenanceTicketListAction $action)
     {
+        $allowedPageSizes = [10, 25, 50, 100];
         $filters = [
             'search' => $request->input('search'),
             'status' => $request->input('status'),
         ];
+        $page_size = (int) $request->input('page_size', 10);
+        if (!in_array($page_size, $allowedPageSizes, true)) {
+            $page_size = 10;
+        }
 
-        $tickets = $action->executePaginated(filters: $filters, perPage: 7);
+        $tickets = $action->executePaginated(filters: $filters, perPage: $page_size);
 
         return view('admin.maintenance-tickets.index', [
             'tickets' => $tickets,
@@ -52,7 +56,7 @@ class MaintenanceTicketAdminController extends Controller
         }
     }
 
-    public function show(int $id, GetMaintenanceTicketByIdAction $action)
+    public function show(Request $request, int $id, GetMaintenanceTicketByIdAction $action)
     {
         $ticket = $action->execute($id);
 
@@ -62,25 +66,41 @@ class MaintenanceTicketAdminController extends Controller
 
         return view('admin.maintenance-tickets.show', [
             'ticket' => $ticket,
+            'returnUrl' => $this->sanitizeReturnUrl($request->query('return_url')),
         ]);
     }
 
-    public function edit(MaintenanceTicket $maintenanceTicket)
+    public function edit(Request $request, int $id, GetMaintenanceTicketByIdAction $action)
     {
-        $viewModel = new MaintenanceTicketViewModel($maintenanceTicket);
+        $ticket = $action->execute($id);
+
+        if (!$ticket) {
+            return redirect()->route('admin.maintenance-tickets.index')->with('error', 'Phiếu sửa chữa không tồn tại.');
+        }
+
+        $viewModel = new MaintenanceTicketViewModel($ticket);
 
         return view('admin.maintenance-tickets.form', [
             'viewModel' => $viewModel,
+            'returnUrl' => $this->sanitizeReturnUrl($request->query('return_url')),
         ]);
     }
 
     public function update(
+        Request $request,
         MaintenanceTicketData $data,
-        MaintenanceTicket $maintenanceTicket,
+        int $id,
         UpdateMaintenanceTicketAction $action
     ) {
         try {
-            $action->execute($maintenanceTicket, $data);
+            $action->execute($id, $data);
+
+            $returnUrl = $this->sanitizeReturnUrl($request->input('return_url'));
+            if ($returnUrl !== null) {
+                return redirect()
+                    ->to($returnUrl)
+                    ->with('success', 'Cập nhật phiếu sửa chữa thành công.');
+            }
 
             return redirect()
                 ->route('admin.maintenance-tickets.index')
@@ -90,10 +110,23 @@ class MaintenanceTicketAdminController extends Controller
         }
     }
 
-    public function destroy(MaintenanceTicket $maintenanceTicket, DeleteMaintenanceTicketAction $action)
+    private function sanitizeReturnUrl(mixed $returnUrl): ?string
+    {
+        if (!is_string($returnUrl) || $returnUrl === '') {
+            return null;
+        }
+
+        if (!str_starts_with($returnUrl, url('/admin/maintenance-tickets'))) {
+            return null;
+        }
+
+        return $returnUrl;
+    }
+
+    public function destroy(int $id, DeleteMaintenanceTicketAction $action)
     {
         try {
-            $action->execute($maintenanceTicket);
+            $action->execute($id);
 
             return response()->json([
                 'success' => true,
