@@ -6,8 +6,10 @@ use App\Models\MaintenanceTicket;
 
 class DeleteMaintenanceTicketAction
 {
-    public function execute(MaintenanceTicket $ticket): void
+    public function execute(int $id): void
     {
+        $ticket = MaintenanceTicket::query()->findOrFail($id);
+
         $ticket->delete();
     }
 }

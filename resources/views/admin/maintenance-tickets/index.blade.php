@@ -88,12 +88,12 @@
               <td class="table-cell text-right">
                 <div class="flex items-center justify-end gap-2">
                   @can('maintenance_tickets.view')
-                    <a href="{{ route('admin.maintenance-tickets.show', $ticket->id) }}" class="text-blue-500 hover:text-blue-700 transition-colors" title="Xem">
+                    <a href="{{ route('admin.maintenance-tickets.show', ['maintenance_ticket' => $ticket->id, 'return_url' => request()->fullUrl()]) }}" class="text-blue-500 hover:text-blue-700 transition-colors" title="Xem">
                       <span class="material-symbols-outlined text-lg">visibility</span>
                     </a>
                   @endcan
                   @can('maintenance_tickets.edit')
-                    <a href="{{ route('admin.maintenance-tickets.edit', $ticket->id) }}" class="text-amber-500 hover:text-amber-700 transition-colors" title="Sửa">
+                    <a href="{{ route('admin.maintenance-tickets.edit', ['maintenance_ticket' => $ticket->id, 'return_url' => request()->fullUrl()]) }}" class="text-amber-500 hover:text-amber-700 transition-colors" title="Sửa">
                       <span class="material-symbols-outlined text-lg">edit</span>
                     </a>
                   @endcan

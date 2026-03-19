@@ -16,7 +16,7 @@ class MaintenanceTicketData extends Data
         public string $issue_description,
         public ?string $technician_note,
         public string $status,
-        public float $repair_cost,
+        public string $repair_cost,
         public int $technician_id,
     ) {
     }
@@ -29,7 +29,7 @@ class MaintenanceTicketData extends Data
             'issue_description' => ['required', 'string', 'max:2000'],
             'technician_note' => ['nullable', 'string', 'max:2000'],
             'status' => ['required', 'in:' . implode(',', MaintenanceTicketStatus::values())],
-            'repair_cost' => ['required', 'numeric', 'min:0'],
+            'repair_cost' => ['required', 'regex:/^\d+(\.\d{1,2})?$/'],
             'technician_id' => ['required', 'integer', 'exists:staffs,id'],
         ];
     }
@@ -46,8 +46,7 @@ class MaintenanceTicketData extends Data
             'status.required' => 'Vui lòng chọn trạng thái.',
             'status.in' => 'Trạng thái không hợp lệ.',
             'repair_cost.required' => 'Vui lòng nhập chi phí sửa chữa.',
-            'repair_cost.numeric' => 'Chi phí sửa chữa phải là số.',
-            'repair_cost.min' => 'Chi phí sửa chữa không được âm.',
+            'repair_cost.regex' => 'Chi phí sửa chữa phải là số không âm và tối đa 2 chữ số thập phân.',
             'technician_id.required' => 'Vui lòng chọn kỹ thuật viên.',
             'technician_id.exists' => 'Kỹ thuật viên không tồn tại.',
         ];

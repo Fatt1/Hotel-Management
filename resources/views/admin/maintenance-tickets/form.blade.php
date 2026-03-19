@@ -20,6 +20,9 @@
         @if($viewModel->isEditing())
           @method('PUT')
         @endif
+        @if(!empty($returnUrl))
+          <input type="hidden" name="return_url" value="{{ $returnUrl }}">
+        @endif
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
