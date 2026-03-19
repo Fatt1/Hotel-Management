@@ -3,6 +3,8 @@
 @section('content')
 @php
     $status = ["Đã đặt", "Đang ở", "Hoàn tất", "Hủy"];
+    $fromDate = request('from_date');
+    $toDate = request('to_date');
 @endphp
     <div class="p-8 space-y-6">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -27,11 +29,30 @@
                     class="w-full flex flex-col xl:flex-row gap-4 justify-between items-center">
                     <div class="relative w-full xl:w-96">
                         <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-                            <span class="material-symbols-outlined !text-lg">search</span>
+                            <span class="material-symbols-outlined text-lg!">search</span>
                         </span>
                         <input name="search" value="{{ request('search') }}"
                             class="block w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 transition-all"
                             placeholder="Tìm theo Tên khách / Mã đặt phòng..." type="text" />
+                    </div>
+                    <div class="relative w-full xl:w-72">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 pointer-events-none">
+                            <span class="material-symbols-outlined text-lg!">date_range</span>
+                        </span>
+                        <input
+                            id="booking-date-range"
+                            type="text"
+                            class="block w-full pl-10 pr-10 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 transition-all"
+                            placeholder="Từ ngày - Đến ngày"
+                            autocomplete="off"
+                            value="{{ $fromDate && $toDate ? \Carbon\Carbon::parse($fromDate)->format('d/m/Y') . ' - ' . \Carbon\Carbon::parse($toDate)->format('d/m/Y') : '' }}" />
+                        <button type="button" id="clear-date-range"
+                            class="absolute inset-y-0 right-0 pr-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hidden"
+                            title="Xóa ngày lọc">
+                            <span class="material-symbols-outlined text-lg!">close</span>
+                        </button>
+                        <input type="hidden" name="from_date" id="from_date" value="{{ $fromDate }}">
+                        <input type="hidden" name="to_date" id="to_date" value="{{ $toDate }}">
                     </div>
                     <div class="flex flex-wrap items-center gap-3 w-full xl:w-auto">
                         <select name="status" onchange="this.form.submit()"
@@ -116,26 +137,7 @@
             {{ $bookings->withQueryString()->links('vendor.pagination.custom') }}
         </div>
     </div>
-<script>
-document.querySelectorAll('.cancel-booking-form').forEach(form => {
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        Swal.fire({
-            title: 'Xác nhận hủy đặt phòng',
-            text: 'Bạn có chắc chắn muốn hủy đặt phòng này?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Hủy đặt phòng',
-            cancelButtonText: 'Không'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                form.submit();
-            }
-        });
-    });
-});
-</script>
 @endsection
+@push('scripts')
+   @vite(['resources/js/admin/bookings/index.js'])
+@endpush
