@@ -197,10 +197,18 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
 // =========================================================
 use App\Http\Controllers\Client\AuthController;
 
+
+Route::middleware('auth:customer')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('client.logout');
+});
+
 Route::name('client.')->group(function () {
     // Đăng nhập Client
     Route::get('/login', [AuthController::class, 'index'])->name('login');
-
+    Route::get('/login/otp', [AuthController::class, 'otp'])->name('login.otp');
+    Route::post('/login/send-otp', [AuthController::class, 'sendOTP'])->name('login.send-otp');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    
     // Danh sách loại phòng
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
 
