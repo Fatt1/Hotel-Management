@@ -9,23 +9,28 @@
     unset($query['page']);
 @endphp
 
-<div class="flex items-center justify-between gap-3 flex-wrap">
-    <div class="flex items-center gap-2">
-        <label for="page-size-select" class="text-xs text-slate-500">Số dòng/trang</label>
-        <select id="page-size-select"
-            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-primary/20"
-            onchange="window.location.href = this.value">
-            @foreach ($pageSizeOptions as $size)
-                @php
-                    $pageSizeUrl = request()->url() . '?' . http_build_query(array_merge($query, ['page_size' => $size]));
-                @endphp
-                <option value="{{ $pageSizeUrl }}" @selected($currentPageSize === $size)>{{ $size }}</option>
-            @endforeach
-        </select>
+<div class="p-5 border-t border-slate-100 flex items-center justify-between gap-3 flex-wrap">
+    <div class="flex items-center gap-4 flex-wrap">
+        <span class="text-xs font-medium text-slate-500">Hiển thị {{ $paginator->lastItem() ?? 0 }} trên {{ $paginator->total() }} mục</span>
     </div>
 
-    @if ($paginator->hasPages())
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-3 flex-wrap">
+        <div class="flex items-center gap-2">
+            <label for="page-size-select" class="text-xs text-slate-500">Số dòng/trang</label>
+            <select id="page-size-select"
+                class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-primary/20"
+                onchange="window.location.href = this.value">
+                @foreach ($pageSizeOptions as $size)
+                    @php
+                        $pageSizeUrl = request()->url() . '?' . http_build_query(array_merge($query, ['page_size' => $size]));
+                    @endphp
+                    <option value="{{ $pageSizeUrl }}" @selected($currentPageSize === $size)>{{ $size }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        @if ($paginator->hasPages())
+        <div class="flex items-center gap-2">
         @if ($paginator->onFirstPage())
             <span
                 class="p-2 rounded-lg border border-slate-200 opacity-50 cursor-not-allowed flex items-center justify-center">
@@ -69,6 +74,7 @@
                 <span class="material-symbols-outlined !text-lg">chevron_right</span>
             </span>
         @endif
+        </div>
+        @endif
     </div>
-    @endif
 </div>

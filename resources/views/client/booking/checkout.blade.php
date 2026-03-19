@@ -55,6 +55,7 @@
             <div class="relative flex-1">
               <i class="far fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
               <input type="email" id="emailVerify" placeholder="Nhập địa chỉ email của bạn"
+                oninput="syncEmailForSubmit()"
                      class="w-full border border-gray-200 rounded-lg py-3 pl-10 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all">
             </div>
             <button type="button"
@@ -81,6 +82,7 @@
           @foreach($selectedRooms as $item)
             <input type="hidden" name="qty_{{ $item['room_type']->id }}" value="{{ $item['qty'] }}">
           @endforeach
+          <input type="hidden" name="email_verify" id="emailVerifyHidden" value="">
 
           {{-- First + Last Name --}}
           <div class="grid grid-cols-2 gap-4 mb-4">
@@ -300,6 +302,13 @@
 
 @push('scripts')
 <script>
+function syncEmailForSubmit() {
+  var emailInput = document.getElementById('emailVerify');
+  var hiddenInput = document.getElementById('emailVerifyHidden');
+  if (!emailInput || !hiddenInput) return;
+  hiddenInput.value = emailInput.value.trim();
+}
+
 function validateCheckout() {
   var lastName  = document.getElementById('lastNameInput').value.trim();
   var firstName = document.getElementById('firstNameInput').value.trim();
@@ -311,5 +320,6 @@ function validateCheckout() {
 }
 // run on page load in case browser auto-fills
 document.addEventListener('DOMContentLoaded', validateCheckout);
+document.addEventListener('DOMContentLoaded', syncEmailForSubmit);
 </script>
 @endpush

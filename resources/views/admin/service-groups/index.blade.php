@@ -109,15 +109,7 @@
             </table>
         </div>
 
-        {{-- Pagination --}}
-        <div class="p-5 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-xs font-medium text-slate-500">
-                Hiển thị {{ $serviceGroups->count() }} trên {{ $serviceGroups->total() }} nhóm dịch vụ
-            </span>
-            <div>
-                {{ $serviceGroups->withQueryString()->links('vendor.pagination.custom') }}
-            </div>
-        </div>
+        {{ $serviceGroups->withQueryString()->links('vendor.pagination.custom') }}
 
     </div>
 </div>

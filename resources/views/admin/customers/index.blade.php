@@ -129,15 +129,7 @@
                 </table>
             </div>
 
-      
-           <div class="p-5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <span class="text-xs font-medium text-slate-500">Hiển thị {{ $customers->lastItem() }} trên {{ $customers->total() }} khách hàng</span>
-                <div class="mt-4 md:mt-0">
-                    {{ $customers->withQueryString()->links('vendor.pagination.custom') }}
-                 
-                </div>
-
-        </div>
+      {{ $customers->withQueryString()->links('vendor.pagination.custom') }}
 
     </div>
 @endsection

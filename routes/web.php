@@ -21,7 +21,9 @@ use App\Http\Controllers\Client\BookingCheckoutController;
 use App\Http\Controllers\Client\DiningController;
 use App\Http\Controllers\Client\GalleryController;
 use App\Http\Controllers\Client\RoomController;
+use App\Mail\BookingSuccessMail;
 use App\Http\Controllers\RoomAdminController;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 
@@ -226,3 +228,33 @@ Route::name('client.')->group(function () {
     // Confirmation (Step 4) — shows booking confirmed page
     Route::get('/booking/confirmation', [BookingCheckoutController::class, 'confirmation'])->name('booking.confirmation');
 });
+
+if (app()->environment('local')) {
+    Route::get('/dev/test-booking-mail', function () {
+        $bookingRef = 'UL-TEST' . now()->format('His');
+        $bookingData = [
+            'check_in' => now()->format('Y-m-d'),
+            'check_out' => now()->addDays(2)->format('Y-m-d'),
+            'adults' => 2,
+            'children' => 0,
+            'nights' => 2,
+            'rooms' => [
+                ['name' => 'Phong test', 'qty' => 1, 'line_total' => 1200000],
+            ],
+            'subtotal' => 1200000,
+            'guest_name' => 'Khach test',
+            'guest_email' => request('email', 'test@example.com'),
+            'payment' => 'credit',
+            'confirmed_at' => now()->format('d/m/Y H:i'),
+        ];
+
+        Mail::to($bookingData['guest_email'])->queue(new BookingSuccessMail($bookingRef, $bookingData));
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Da queue mail test',
+            'booking_ref' => $bookingRef,
+            'email' => $bookingData['guest_email'],
+        ]);
+    })->name('dev.test-booking-mail');
+}

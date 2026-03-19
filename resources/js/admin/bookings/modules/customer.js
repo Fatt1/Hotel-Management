@@ -59,7 +59,23 @@ export function getCustomerSubmitData() {
 // ─── Internal ────────────────────────────────────────────────────────────────
 
 async function doSearch(email) {
-    if (!email) return;
+    if (!email) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Thiếu email',
+            text: 'Vui lòng nhập email trước khi tìm kiếm khách hàng.',
+        });
+        return;
+    }
+
+    if (!isValidEmail(email)) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Email không hợp lệ',
+            text: 'Vui lòng nhập đúng định dạng email (ví dụ: abc@gmail.com).',
+        });
+        return;
+    }
 
     const btn     = document.getElementById('search-customer-btn');
     const icon    = document.getElementById('search-customer-icon');
@@ -185,4 +201,8 @@ function setError(spanId, message) {
     if (!span) return;
     span.textContent = message;
     span.classList.toggle('hidden', !message);
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }

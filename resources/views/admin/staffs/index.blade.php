@@ -157,51 +157,10 @@
           </tbody>
         </table>
       </div>
+      {{ $staff->withQueryString()->links('vendor.pagination.custom')}}
     </div>
 
-    {{-- Pagination --}}
-    @if ($staff->hasPages() || $staff->total() > 0)
-      <div class="flex items-center justify-between">
-        <div class="text-sm text-slate-500">
-          Hiển thị {{ $staff->firstItem() ?? 0 }}-{{ $staff->lastItem() ?? 0 }} hàng {{ $staff->total() }} nhân viên
-        </div>
-        
-        @if ($staff->hasPages())
-          <div class="flex items-center justify-center gap-1">
-            {{-- Previous Page Link --}}
-            @if ($staff->onFirstPage())
-              <span class="w-8 h-8 rounded-lg border border-slate-200 text-slate-400 flex items-center justify-center text-xs font-bold cursor-not-allowed">
-                <span class="material-symbols-outlined !text-sm">chevron_left</span>
-              </span>
-            @else
-              <a href="{{ $staff->previousPageUrl() }}" class="pagination-link">
-                <span class="material-symbols-outlined !text-sm">chevron_left</span>
-              </a>
-            @endif
-
-            {{-- Pagination Elements --}}
-            @foreach ($staff->getUrlRange(1, $staff->lastPage()) as $page => $url)
-              @if ($page == $staff->currentPage())
-                <span class="w-8 h-8 cursor-pointer rounded-lg text-xs font-bold flex items-center justify-center bg-primary text-white">{{ $page }}</span>
-              @else
-                <a href="{{ $url }}" class="pagination-link">{{ $page }}</a>
-              @endif
-            @endforeach
-
-            {{-- Next Page Link --}}
-            @if ($staff->hasMorePages())
-              <a href="{{ $staff->nextPageUrl() }}" class="pagination-link">
-                <span class="material-symbols-outlined !text-sm">chevron_right</span>
-              </a>
-            @else
-              <span class="w-8 h-8 rounded-lg border border-slate-200 text-slate-400 flex items-center justify-center text-xs font-bold cursor-not-allowed">
-                <span class="material-symbols-outlined !text-sm">chevron_right</span>
-              </span>
-            @endif
-          </div>
-        @endif
-      </div>
-    @endif
+    
   </div>
 
   {{-- Delete Confirmation Modal --}}

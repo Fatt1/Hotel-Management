@@ -24,8 +24,11 @@ class AddRoomToBookingAction
             }
             
             $room = Room::with('roomType')->findOrFail($data['room_id']);
-            $days = max((new DateTime($data['checkin_date']))->diff(new DateTime($data['checkout_date']))->days, 1);
-            $roomAmount = $room->roomType->daily_price * $days;
+            $chargedDays = $this->calculateChargedDays(
+                new DateTime($data['checkin_date']),
+                new DateTime($data['checkout_date']),
+            );
+            $roomAmount = $room->roomType->daily_price * $chargedDays;
             // Create booking detail
             $bookingDetail = BookingDetail::create([
                 'booking_id'    => $bookingId,
@@ -42,5 +45,12 @@ class AddRoomToBookingAction
 
             return $bookingDetail->load('room.roomType', 'serviceUsages.service');
         });
+    }
+
+    private function calculateChargedDays(DateTime $checkinDate, DateTime $checkoutDate): int
+    {
+        $seconds = max($checkoutDate->getTimestamp() - $checkinDate->getTimestamp(), 0);
+
+        return max((int) ceil($seconds / 86400), 1);
     }
 }

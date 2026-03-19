@@ -137,9 +137,7 @@
             </table>
         </div>
 
-     <div class="pt-5">
-         {{ $services->withQueryString()->links('vendor.pagination.custom')}}  
-     </div>
+         {{ $services->withQueryString()->links('vendor.pagination.custom')}}
     </div>
   </div>
 </div>

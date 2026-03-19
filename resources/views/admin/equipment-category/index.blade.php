@@ -72,13 +72,7 @@
         </table>
       </div>
 
-      <!-- Table Footer with Pagination -->
-      <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-        <span class="text-xs font-medium text-slate-500">Hiển thị {{ $equipmentCategories->lastItem() ?? 0 }} trên {{ $equipmentCategories->total() }} nhóm thiết bị</span>
-        <div class="mt-5">
-          {{ $equipmentCategories->withQueryString()->links('vendor.pagination.custom') }}
-        </div>
-      </div>
+      {{ $equipmentCategories->withQueryString()->links('vendor.pagination.custom') }}
     </div>
   </div>
 </div>
