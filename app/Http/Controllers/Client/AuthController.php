@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers\Client;
 
+
 use App\Actions\Auths\LoginAction;
 use App\Actions\Auths\SendOtpEmailAction;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Actions\Customers\AddCustomerAction;
+use App\Data\CustomerData;
+use App\ViewModels\ClientAuthViewModel;
+use Exception;
+
 
 class AuthController extends Controller
 {
@@ -17,7 +23,6 @@ class AuthController extends Controller
     {
         return view('client.auth.login');
     }
-
     public function otp(Request $request)
     {
         $email = (string) ($request->query('email') ?? old('email', ''));
@@ -70,5 +75,35 @@ class AuthController extends Controller
         }
 
         return redirect()->route('client.home');
+    }
+
+    /**
+     * Show the client register form.
+     */
+    public function register()
+    {
+        $viewModel = new ClientAuthViewModel();
+        return view('client.auth.register', [
+            'viewModel' => $viewModel,
+        ]);
+    }
+
+    /**
+     * Handle client registration.
+     */
+    public function storeRegister(CustomerData $data, AddCustomerAction $action)
+    {
+        try {
+            $action->handle($data);
+
+            return redirect()
+                ->route('client.login')
+                ->with('success', 'Đăng ký thành công. Bạn có thể đăng nhập bằng email vừa tạo.');
+        } catch (Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Không thể đăng ký tài khoản. Vui lòng thử lại.');
+        }
+
     }
 }

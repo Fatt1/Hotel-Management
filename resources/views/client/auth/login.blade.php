@@ -67,10 +67,29 @@
                     @enderror
                 </div>
 
+
                 <button type="submit" class="w-full bg-[#1a2c42] hover:bg-[#20344d] text-[#e2e8f0] font-medium text-sm py-3 rounded-lg transition-colors border border-blue-900/30">
                     Gửi OTP
                 </button>
             </form>
+
+               
+
+                <!-- Terms -->
+                <div class="text-center text-[0.65rem] text-gray-500 leading-relaxed px-4 mb-6">
+                    Bằng việc tiếp tục, bạn đồng ý với<br>
+                    Điều khoản dịch vụ và Chính sách<br>
+                    bảo mật của chúng tôi.
+                </div>
+
+                <!-- Registration Link -->
+                <p class="text-center text-[0.75rem] text-gray-400">
+                    Chưa có tài khoản?
+                    <a href="{{ route('client.register') }}" class="text-white font-semibold hover:underline">
+                        Đăng ký ngay
+                    </a>
+                </p>
+            </div>
         </div>
     </div>
 </body>
