@@ -16,15 +16,14 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .register-bg {
-            background-image: linear-gradient(rgba(4, 16, 28, 0.70), rgba(4, 16, 28, 0.70)),
-                url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1920&q=80');
+            background-image: url('https://picsum.photos/seed/hotelcity/1920/1080');
             background-size: cover;
             background-position: center;
         }
     </style>
 </head>
 <body class="register-bg min-h-screen text-white">
-    <div class="min-h-screen w-full flex items-center justify-center px-4 py-10 backdrop-blur-[2px]">
+    <div class="min-h-screen w-full flex  bg-[#0f151c]/80 items-center justify-center px-4 py-10 backdrop-blur-[2px]">
         <div class="w-full max-w-2xl">
             <div class="text-center mb-6">
                 <div class="mx-auto w-10 h-10 rounded-lg border border-white/20 bg-white/10 flex items-center justify-center mb-3">
