@@ -83,13 +83,7 @@
         </table>
 
       </div>
-      <div class="p-5 border-t border-slate-100 flex items-center justify-between">
-        <span class="text-xs font-medium text-slate-500">Hiển thị {{ $roles->lastItem() }} trên {{ $roles->total() }} vai
-          trò hệ thống</span>
-        <div class="mt-5">
-          {{ $roles->withQueryString()->links('vendor.pagination.custom')}}
-        </div>
-      </div>
+      {{ $roles->withQueryString()->links('vendor.pagination.custom')}}
     </div>
   </div>  
 @endsection

@@ -89,13 +89,7 @@
         </table>
       </div>
 
-      <!-- Table Footer with Pagination -->
-      <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-        <span class="text-xs font-medium text-slate-500">Hiển thị {{ $utilities->lastItem() }} trên {{ $utilities->total() }} tiện ích</span>
-        <div class="mt-5">
-          {{ $utilities->withQueryString()->links('vendor.pagination.custom') }}
-        </div>
-      </div>
+      {{ $utilities->withQueryString()->links('vendor.pagination.custom') }}
     </div>
   </div>
 </div>

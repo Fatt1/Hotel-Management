@@ -113,13 +113,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="p-5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <span class="text-xs font-medium text-slate-500">Hiển thị {{ $bookings->lastItem() }} trên {{ $bookings->total() }} đặt lịch</span>
-                <div class="mt-4 md:mt-0">
-                    {{ $bookings->withQueryString()->links('vendor.pagination.custom') }}
-                 
-                </div>
-            </div>
+            {{ $bookings->withQueryString()->links('vendor.pagination.custom') }}
         </div>
     </div>
 <script>

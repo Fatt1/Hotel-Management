@@ -116,12 +116,7 @@
       </table>
     </div>
 
-    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-      <span class="text-xs font-medium text-slate-500">Hiển thị {{ $tickets->lastItem() ?? 0 }} trên {{ $tickets->total() }} phiếu sửa chữa</span>
-      <div class="mt-5">
-        {{ $tickets->withQueryString()->links('vendor.pagination.custom') }}
-      </div>
-    </div>
+    {{ $tickets->withQueryString()->links('vendor.pagination.custom') }}
   </div>
 </div>
 

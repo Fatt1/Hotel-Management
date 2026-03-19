@@ -21,4 +21,6 @@ class BookingData extends Data
         public string $status,
         public ?array $payment = null,
     ) {}
+
+    
 }

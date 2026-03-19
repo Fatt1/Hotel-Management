@@ -28,7 +28,7 @@ class EquipmentData extends Data
         public float $import_price,
     ) {}
 
-    public static function messages(): array
+    public static function messages(...$args): array
     {
         return [
             'name.required' => 'Tên thiết bị không được để trống.',

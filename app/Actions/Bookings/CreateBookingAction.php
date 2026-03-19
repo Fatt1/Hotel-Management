@@ -59,11 +59,11 @@ class CreateBookingAction
                 
                 // Tính tiền phòng
                 if ($room?->roomType) {
-                    $days = max(
-                        (new \DateTime($detail['checkin_date']))->diff(new \DateTime($detail['checkout_date']))->days,
-                        1
+                    $chargedDays = $this->calculateChargedDays(
+                        new \DateTime($detail['checkin_date']),
+                        new \DateTime($detail['checkout_date']),
                     );
-                    $totalRoomAmount += $room->roomType->daily_price * $days;
+                    $totalRoomAmount += $room->roomType->daily_price * $chargedDays;
                 }
                 
                 // Tính tiền dịch vụ cho phòng này (LẤY GIÁ TỪ DB)
@@ -98,11 +98,11 @@ class CreateBookingAction
                 $room = $rooms->get($detail['room_id']);
                 $roomAmount = 0;
                 if($room?->roomType) {
-                    $days = max(
-                        (new \DateTime($detail['checkin_date']))->diff(new \DateTime($detail['checkout_date']))->days,
-                        1
+                    $chargedDays = $this->calculateChargedDays(
+                        new \DateTime($detail['checkin_date']),
+                        new \DateTime($detail['checkout_date']),
                     );
-                    $roomAmount = $room->roomType->daily_price * $days;
+                    $roomAmount = $room->roomType->daily_price * $chargedDays;
                 }
                 
 
@@ -167,5 +167,12 @@ class CreateBookingAction
 
             return $booking;
         });
+    }
+
+    private function calculateChargedDays(\DateTime $checkinDate, \DateTime $checkoutDate): int
+    {
+        $seconds = max($checkoutDate->getTimestamp() - $checkinDate->getTimestamp(), 0);
+
+        return max((int) ceil($seconds / 86400), 1);
     }
 }

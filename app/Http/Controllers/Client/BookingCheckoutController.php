@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Mail\BookingSuccessMail;
 use App\Models\RoomType;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 
 class BookingCheckoutController extends Controller
@@ -193,23 +196,38 @@ class BookingCheckoutController extends Controller
             }
         }
 
+        $bookingData = [
+            'check_in'    => $checkIn,
+            'check_out'   => $checkOut,
+            'adults'      => $adults,
+            'children'    => $children,
+            'nights'      => $nights,
+            'rooms'       => $selectedRooms,
+            'subtotal'    => $subtotal,
+            'guest_name'  => trim($request->input('first_name', '') . ' ' . $request->input('last_name', '')),
+            'guest_email' => $request->input('email_verify', ''),
+            'payment'     => $request->input('payment_method', 'credit'),
+            'confirmed_at'=> now()->format('d/m/Y H:i'),
+        ];
+
         // Store in session
         session([
-            'booking_ref'    => $bookingRef,
-            'booking_data'   => [
-                'check_in'    => $checkIn,
-                'check_out'   => $checkOut,
-                'adults'      => $adults,
-                'children'    => $children,
-                'nights'      => $nights,
-                'rooms'       => $selectedRooms,
-                'subtotal'    => $subtotal,
-                'guest_name'  => trim($request->input('first_name', '') . ' ' . $request->input('last_name', '')),
-                'guest_email' => $request->input('email_verify', ''),
-                'payment'     => $request->input('payment_method', 'credit'),
-                'confirmed_at'=> now()->format('d/m/Y H:i'),
-            ],
+            'booking_ref'  => $bookingRef,
+            'booking_data' => $bookingData,
         ]);
+
+        // Queue confirmation email asynchronously (do not block response)
+        if (filter_var($bookingData['guest_email'], FILTER_VALIDATE_EMAIL)) {
+            try {
+                Mail::to($bookingData['guest_email'])->queue(new BookingSuccessMail($bookingRef, $bookingData));
+            } catch (\Throwable $e) {
+                Log::warning('Queue booking confirmation email failed', [
+                    'booking_ref' => $bookingRef,
+                    'guest_email' => $bookingData['guest_email'],
+                    'message' => $e->getMessage(),
+                ]);
+            }
+        }
 
         return redirect()->route('client.booking.confirmation');
     }

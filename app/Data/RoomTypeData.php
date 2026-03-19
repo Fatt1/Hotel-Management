@@ -85,7 +85,7 @@ class RoomTypeData extends Data
         public int $is_active = 1,
     ) {}
 
-    public static function messages(): array
+    public static function messages(...$args): array
     {
         return [
             'name.required' => 'Tên loại phòng là bắt buộc',

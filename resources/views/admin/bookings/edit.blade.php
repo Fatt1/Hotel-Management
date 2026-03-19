@@ -5,10 +5,14 @@
         $isCompleted = $booking->status === 'Hoàn tất';
         $isOccupied = $booking->status === 'Đang ở';
         function formatDuration(float $hour) {
+                                if ($hour >= 24) {
+                                    return (int) ceil($hour / 24) . ' ngày';
+                                }
+
                                 $h = floor($hour);
                                 $m = round(($hour - $h) * 60);
-                                $d = floor($h / 24);
-                                return ($d > 0 ? $d . ' ngày' : '') . ($h > 0 ? ' ' . $h . ' giờ' : '') . ($m > 0 ? ' ' . $m . ' phút' : '');
+
+                                return ($h > 0 ? $h . ' giờ' : '') . ($m > 0 ? ' ' . $m . ' phút' : '');
                             }
     @endphp
     
@@ -188,7 +192,7 @@
                             $checkinDate = \Carbon\Carbon::parse($detail->checkin_date);
                             $checkoutDate = \Carbon\Carbon::parse($detail->checkout_date);
                             
-                            $hours = $checkinDate->diffInHours($checkoutDate);
+                            $hours = $checkinDate->diffInMinutes($checkoutDate) / 60;
                             $roomCost = $detail->room_amount;
 
                             
@@ -218,7 +222,10 @@
                                         <p class="text-[10px] text-gray-400">{{ number_format($detail->hourly_price, 0, ',', '.') }} đ/giờ</p>
                                     </div>
                                     @if($canEdit)
-                                        <button type="button" onclick="removeRoom({{ $booking->id }}, {{ $room->id }})"
+                                        <button type="button"
+                                            data-action="remove-room"
+                                            data-booking-id="{{ $booking->id }}"
+                                            data-room-id="{{ $room->id }}"
                                             class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors shrink-0">
                                             <span class="material-symbols-outlined text-base">delete</span>
                                         </button>
@@ -233,7 +240,13 @@
                                         - Thời gian lưu trú
                                     </span>
                                     @if($canEdit)
-                                        <button type="button" onclick="openEditDateModal({{ $booking->id }}, {{ $room->id }}, '{{ $detail->checkin_date }}', '{{ $detail->checkout_date }}', '{{ $booking->status }}')"
+                                        <button type="button"
+                                            data-action="edit-room-dates"
+                                            data-booking-id="{{ $booking->id }}"
+                                            data-room-id="{{ $room->id }}"
+                                            data-checkin-date="{{ $detail->checkin_date }}"
+                                            data-checkout-date="{{ $detail->checkout_date }}"
+                                            data-booking-status="{{ $booking->status }}"
                                             class="text-[11px] font-semibold text-primary hover:text-blue-800 dark:hover:text-blue-400 transition-colors">
                                             <span class="material-symbols-outlined text-sm">edit</span>
                                         </button>
@@ -258,7 +271,9 @@
                                         - Dịch vụ đã dùng
                                     </span>
                                     @if($canEdit)
-                                        <button type="button" onclick="openServiceModalForRoom({{ $room->id }})"
+                                        <button type="button"
+                                            data-action="add-room-service"
+                                            data-room-id="{{ $room->id }}"
                                             class="flex items-center gap-0.5 text-[11px] font-semibold text-primary hover:text-blue-800 dark:hover:text-blue-400 transition-colors">
                                             <span class="material-symbols-outlined text-sm">add</span>
                                             Thêm dịch vụ
@@ -427,112 +442,11 @@
         </div>
     </div>
 
-    {{-- Pass booking data to JavaScript --}}
-    <script>
-        window.bookingData = @json($booking);
-        window.isCompleted = {{ $isCompleted ? 'true' : 'false' }};
-        
-        // Remove room function
-        async function removeRoom(bookingId, roomId) {
-            const result = await Swal.fire({
-                title: 'Xác nhận xóa phòng?',
-                text: 'Bạn có chắc muốn xóa phòng này khỏi booking?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Xóa',
-                cancelButtonText: 'Hủy'
-            });
-
-            if (!result.isConfirmed) return;
-
-            try {
-                await axios.delete(`/admin/bookings/${bookingId}/rooms/${roomId}`);
-                window.location.reload();
-            } catch (error) {
-                const msg = error.response?.data?.message ?? 'Có lỗi xảy ra khi xóa phòng.';
-                Swal.fire({ icon: 'error', title: 'Thất bại', text: msg });
-            }
-        }
-        
-        // Open service modal
-        function openServiceModalForRoom(roomId) {
-            // This will be handled by the existing service modal logic
-            const event = new CustomEvent('open-service-modal', { detail: { roomId } });
-            document.dispatchEvent(event);
-        }
-        
-        // Helper function to format date for datetime-local input (keeps local timezone)
-        function formatDateTimeLocal(dateString) {
-            const date = new Date(dateString);
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            return `${year}-${month}-${day}T${hours}:${minutes}`;
-        }
-        
-        // Edit date modal
-        async function openEditDateModal(bookingId, roomId, checkinDate, checkoutDate, bookingStatus) {
-            const isOccupied = bookingStatus === 'Đang ở';
-            
-            const { value: formValues } = await Swal.fire({
-                title: 'Cập nhật thời gian',
-                html: `
-                    <div class="space-y-4 text-left">
-                        ${isOccupied ? '<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3"><p class="text-xs text-yellow-700">Booking đang ở - chỉ có thể cập nhật ngày checkout</p></div>' : ''}
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Check-in</label>
-                            <input type="datetime-local" id="swal-checkin" 
-                                value="${formatDateTimeLocal(checkinDate)}"
-                                ${isOccupied ? 'disabled' : ''}
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg ${isOccupied ? 'bg-gray-100 cursor-not-allowed' : ''}">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Check-out</label>
-                            <input type="datetime-local" id="swal-checkout" 
-                                value="${formatDateTimeLocal(checkoutDate)}"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                        </div>
-                    </div>
-                `,
-                focusConfirm: false,
-                showCancelButton: true,
-                confirmButtonText: 'Cập nhật',
-                cancelButtonText: 'Hủy',
-                preConfirm: () => {
-                    const checkin = document.getElementById('swal-checkin').value;
-                    const checkout = document.getElementById('swal-checkout').value;
-                    
-                    if (!checkin || !checkout) {
-                        Swal.showValidationMessage('Vui lòng nhập đầy đủ thông tin');
-                        return false;
-                    }
-                    
-                    if (new Date(checkout) <= new Date(checkin)) {
-                        Swal.showValidationMessage('Ngày checkout phải sau ngày checkin');
-                        return false;
-                    }
-                    
-                    return { checkin, checkout };
-                }
-            });
-
-            if (formValues) {
-                try {
-                    await axios.put(`/admin/bookings/${bookingId}/rooms/${roomId}/dates`, {
-                        checkin_date: formValues.checkin,
-                        checkout_date: formValues.checkout
-                    });
-                    
-                    window.location.reload();
-                } catch (error) {
-                    const msg = error.response?.data?.message ?? 'Có lỗi xảy ra khi cập nhật ngày.';
-                    Swal.fire({ icon: 'error', title: 'Thất bại', text: msg });
-                }
-            }
-        }
-    </script>
+    {{-- Pass booking context to update-booking.js --}}
+    <div id="booking-edit-context"
+        data-booking='@json($booking)'
+        data-is-completed="{{ $isCompleted ? 'true' : 'false' }}"
+        class="hidden"></div>
 @endsection
 @push('scripts')
     @vite(['resources/js/admin/bookings/update-booking.js'])
