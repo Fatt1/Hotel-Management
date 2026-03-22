@@ -27,7 +27,10 @@ class GetRoomTypeListAction
 
         // Filter theo trạng thái
         if (isset($filters['status']) && $filters['status'] !== '') {
-            $query->where('is_active', $filters['status']);
+            $status = (int) $filters['status'];
+            if (in_array($status, [0, 1], true)) {
+                $query->where('is_active', $status);
+            }
         }
 
         // Filter theo giá (từ -> đến)
@@ -68,7 +71,7 @@ class GetRoomTypeListAction
                 'daily_price' => $roomType->daily_price,
                 'total_rooms' => $roomType->rooms()->count(),
                 'available_rooms' => $roomType->rooms()->where('status', 'available')->count(),
-                'status' => $roomType->is_active?->value ?? 0,
+                'status' => (int) $roomType->is_active,
             ];
         });
     }

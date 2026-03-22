@@ -74,11 +74,10 @@
             <!-- Trạng thái -->
             <div>
               <label class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2 block">Trạng thái <span class="text-red-500">*</span></label>
-              @php $currentStatus = old('is_active', $viewModel->roomType()->is_active->value ?? 1); @endphp
+              @php $currentStatus = (int) old('is_active', (int) $viewModel->roomType()->is_active); @endphp
               <select name="is_active" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('is_active') border-red-500 @enderror bg-white" required>
-                @foreach(\App\Enums\RoomTypeStatus::cases() as $status)
-                  <option value="{{ $status->value }}" {{ $currentStatus == $status->value ? 'selected' : '' }}>{{ $status->label() }}</option>
-                @endforeach
+                <option value="1" {{ $currentStatus === 1 ? 'selected' : '' }}>Đang hoạt động</option>
+                <option value="0" {{ $currentStatus === 0 ? 'selected' : '' }}>Không hoạt động</option>
               </select>
               @error('is_active')
                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -264,6 +263,13 @@
         </div>
 
         <!-- Amenities -->
+        @php
+          $hasOldInput = old('_token') !== null;
+          $oldAmenityIds = collect(old('amenities', []))->map(fn ($id) => (int) $id);
+          $selectedAmenities = $hasOldInput
+            ? $viewModel->allAmenities()->whereIn('id', $oldAmenityIds->all())
+            : $viewModel->amenities();
+        @endphp
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
           <div class="flex items-center gap-3 mb-4">
             <span class="material-symbols-outlined text-blue-900 text-2xl">star</span>
@@ -271,7 +277,7 @@
           </div>
           
           <div class="flex flex-wrap gap-2" id="amenitiesList">
-            @foreach($viewModel->amenities() as $amenity)
+            @foreach($selectedAmenities as $amenity)
               <span class="inline-flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-900 rounded-full text-sm font-medium cursor-pointer hover:bg-blue-200 transition-all" onclick="removeAmenity(this)" data-id="{{ $amenity->id }}">
                 <span class="material-symbols-outlined text-sm">{{ $amenity->icon ?? 'star' }}</span>
                 {{ $amenity->name }}
@@ -287,6 +293,13 @@
         </div>
 
         <!-- Equipment -->
+        @php
+          $oldEquipmentIds = collect(old('equipments', []))->map(fn ($id) => (int) $id);
+          $oldEquipmentQuantities = old('equipment_quantities', []);
+          $selectedEquipments = $hasOldInput
+            ? $viewModel->allEquipments()->whereIn('id', $oldEquipmentIds->all())
+            : $viewModel->equipment();
+        @endphp
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           <div class="p-6 border-b border-slate-100">
             <div class="flex items-center justify-between mb-6">
@@ -306,7 +319,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @forelse($viewModel->equipment() as $equipment)
+                  @forelse($selectedEquipments as $equipment)
                     <tr class="hover:bg-slate-50 border-b border-slate-100">
                       <td class="px-6 py-4">
                         <div>
@@ -320,7 +333,7 @@
                           <button type="button" onclick="decrementValue(this)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 border border-slate-300 rounded-l-lg">
                             <span class="material-symbols-outlined text-sm">remove</span>
                           </button>
-                          <input type="number" name="equipment_quantities[{{ $equipment->id }}]" value="{{ $equipment->pivot->quantity ?? 1 }}" class="w-12 h-8 text-center border-y border-slate-300 text-sm" min="1">
+                          <input type="number" name="equipment_quantities[{{ $equipment->id }}]" value="{{ (int) ($oldEquipmentQuantities[$equipment->id] ?? ($equipment->pivot->quantity ?? 1)) }}" class="w-12 h-8 text-center border-y border-slate-300 text-sm" min="1">
                           <button type="button" onclick="incrementValue(this)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 border border-slate-300 rounded-r-lg">
                             <span class="material-symbols-outlined text-sm">add</span>
                           </button>
@@ -354,348 +367,7 @@
   </div>
 </div>
 
-<script>
-  // Helper function to truncate filename
-  function truncateFilename(filename, maxLength = 25) {
-    if (filename.length <= maxLength) return filename;
-    const ext = filename.split('.').pop();
-    const nameWithoutExt = filename.substring(0, filename.lastIndexOf('.'));
-    const truncatedName = nameWithoutExt.substring(0, maxLength - ext.length - 4) + '...';
-    return truncatedName + '.' + ext;
-  }
-
-  // Toggle image for deletion
-  function toggleDeleteImage(imageId) {
-    const item = document.getElementById('image-item-' + imageId);
-    const isMarked = item.classList.contains('marked-delete');
-    
-    if (isMarked) {
-      // Undo delete mark
-      item.classList.remove('marked-delete', 'bg-red-50', 'border-red-300');
-      item.classList.add('bg-white', 'border-slate-200');
-      item.querySelector('img').classList.remove('opacity-40');
-      item.querySelector('.flex-1 p:first-child').classList.remove('line-through', 'text-red-400');
-      item.querySelector('.flex-1 p:last-child').textContent = 'Đã lưu';
-      item.querySelector('.flex-1 p:last-child').classList.remove('text-red-500');
-      item.querySelector('.flex-1 p:last-child').classList.add('text-slate-500');
-      item.querySelector('.delete-btn span').textContent = 'close';
-      // Remove hidden input
-      const hiddenInput = item.querySelector('input[name="delete_images[]"]');
-      if (hiddenInput) hiddenInput.remove();
-    } else {
-      // Mark for deletion
-      item.classList.add('marked-delete', 'bg-red-50', 'border-red-300');
-      item.classList.remove('bg-white', 'border-slate-200');
-      item.querySelector('img').classList.add('opacity-40');
-      item.querySelector('.flex-1 p:first-child').classList.add('line-through', 'text-red-400');
-      item.querySelector('.flex-1 p:last-child').textContent = 'Sẽ xóa';
-      item.querySelector('.flex-1 p:last-child').classList.add('text-red-500');
-      item.querySelector('.flex-1 p:last-child').classList.remove('text-slate-500');
-      item.querySelector('.delete-btn span').textContent = 'undo';
-      // Add hidden input
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'delete_images[]';
-      input.value = imageId;
-      item.appendChild(input);
-    }
-  }
-
-  function incrementValue(btn) {
-    const input = btn.parentElement.querySelector('input');
-    input.value = parseInt(input.value) + 1;
-  }
-
-  function decrementValue(btn) {
-    const input = btn.parentElement.querySelector('input');
-    if (parseInt(input.value) > 1) {
-      input.value = parseInt(input.value) - 1;
-    }
-  }
-
-  function removeEquipmentRow(btn) {
-    const row = btn.closest('tr');
-    row.remove();
-    
-    // Check if table is empty and show empty row
-    const tbody = document.querySelector('#equipmentTable tbody');
-    if (tbody.querySelectorAll('tr:not(.empty-row)').length === 0) {
-      tbody.innerHTML = '<tr class="hover:bg-slate-50 empty-row"><td colspan="3" class="px-6 py-8 text-center text-slate-500 text-sm">Chưa có thiết bị nào</td></tr>';
-    }
-  }
-
-  function handleImageUpload(event) {
-    const files = event.target.files;
-    const gallery = document.getElementById('imageGallery');
-    const count = document.getElementById('imageCount');
-    
-    Array.from(files).forEach((file, index) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const row = document.createElement('div');
-        row.className = 'flex items-center gap-4 p-3 border border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-all group';
-        row.setAttribute('data-image-item', 'true');
-        row.innerHTML = `
-          <img src="${e.target.result}" alt="${file.name}" class="w-16 h-16 object-cover rounded">
-          <div class="flex-1">
-            <p class="text-sm font-medium text-slate-900 truncate" title="${file.name}">${truncateFilename(file.name)}</p>
-            <p class="text-xs text-green-600">${(file.size / 1024).toFixed(2)} KB - Ảnh mới</p>
-          </div>
-          <button type="button" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded transition-all opacity-0 group-hover:opacity-100" onclick="this.closest('div').remove(); updateImageCount();">
-            <span class="material-symbols-outlined text-lg">delete</span>
-          </button>
-        `;
-        gallery.appendChild(row);
-        updateImageCount();
-      };
-      reader.readAsDataURL(file);
-    });
-    
-    count.textContent = files.length;
-  }
-
-  function updateImageCount() {
-    const gallery = document.getElementById('imageGallery');
-    const count = document.getElementById('imageCount');
-    const items = gallery.querySelectorAll('[data-image-item]');
-    count.textContent = items.length;
-  }
-
-  function removeAmenity(element) {
-    element.remove();
-  }
-
-  function addAmenityModal() {
-    document.getElementById('amenityModal').classList.remove('hidden');
-    document.getElementById('amenitySearch').value = '';
-    filterAmenities('');
-    
-    // Mark already selected amenities
-    const selectedIds = Array.from(document.querySelectorAll('#amenitiesList input[name="amenities[]"]')).map(input => input.value);
-    document.querySelectorAll('#amenityGrid .amenity-item').forEach(item => {
-      const id = item.getAttribute('data-id');
-      if (selectedIds.includes(id)) {
-        item.classList.add('ring-2', 'ring-green-500', 'bg-green-50', 'opacity-50', 'pointer-events-none');
-        item.querySelector('input[type="checkbox"]').checked = false;
-        // Add "Đã chọn" label
-        if (!item.querySelector('.selected-label')) {
-          const label = document.createElement('span');
-          label.className = 'selected-label text-xs text-green-600 font-bold';
-          label.textContent = 'Đã chọn';
-          item.appendChild(label);
-        }
-      } else {
-        item.classList.remove('ring-2', 'ring-green-500', 'bg-green-50', 'ring-blue-900', 'opacity-50', 'pointer-events-none');
-        const label = item.querySelector('.selected-label');
-        if (label) label.remove();
-      }
-    });
-  }
-
-  function closeAmenityModal() {
-    document.getElementById('amenityModal').classList.add('hidden');
-    uncheckAllAmenities();
-  }
-
-  function filterAmenities(query) {
-    const items = document.querySelectorAll('#amenityGrid .amenity-item');
-    items.forEach(item => {
-      const text = item.getAttribute('data-text').toLowerCase();
-      if (text.includes(query.toLowerCase())) {
-        item.classList.remove('hidden');
-      } else {
-        item.classList.add('hidden');
-      }
-    });
-  }
-
-  function toggleAmenity(element) {
-    element.classList.toggle('ring-2');
-    element.classList.toggle('ring-blue-900');
-    element.classList.toggle('bg-blue-50');
-    element.querySelector('input[type="checkbox"]').checked = !element.querySelector('input[type="checkbox"]').checked;
-  }
-
-  function uncheckAllAmenities() {
-    document.querySelectorAll('#amenityGrid .amenity-item').forEach(item => {
-      item.classList.remove('ring-2', 'ring-blue-900', 'bg-blue-50');
-      item.querySelector('input[type="checkbox"]').checked = false;
-    });
-  }
-
-  function confirmAmenities() {
-    const selected = Array.from(document.querySelectorAll('#amenityGrid .amenity-item input[type="checkbox"]:checked'))
-      .map(input => ({
-        id: input.closest('.amenity-item').getAttribute('data-id'),
-        name: input.getAttribute('data-name'),
-        icon: input.getAttribute('data-icon')
-      }));
-
-    if (selected.length === 0) {
-      alert('Vui lòng chọn ít nhất một tiện ích!');
-      return;
-    }
-
-    const list = document.getElementById('amenitiesList');
-    
-    selected.forEach(amenity => {
-      // Check if already exists by ID
-      const exists = list.querySelector(`input[name="amenities[]"][value="${amenity.id}"]`);
-      if (!exists) {
-        const span = document.createElement('span');
-        span.className = 'inline-flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-900 rounded-full text-sm font-medium cursor-pointer hover:bg-blue-200 transition-all';
-        span.setAttribute('data-id', amenity.id);
-        span.onclick = function() { removeAmenity(this); };
-        span.innerHTML = `
-          <span class="material-symbols-outlined text-sm">${amenity.icon}</span>
-          ${amenity.name}
-          <input type="hidden" name="amenities[]" value="${amenity.id}">
-          <span class="material-symbols-outlined text-sm cursor-pointer">close</span>
-        `;
-        list.insertBefore(span, list.lastElementChild);
-      }
-    });
-
-    closeAmenityModal();
-  }
-
-  function addEquipmentRow(id, name, category, quantity) {
-    const table = document.getElementById('equipmentTable');
-    const tbody = table.querySelector('tbody');
-    
-    // Check if already exists
-    if (tbody.querySelector(`input[name="equipments[]"][value="${id}"]`)) {
-      return; // Already exists
-    }
-    
-    // Remove empty row if exists
-    const emptyRow = tbody.querySelector('tr.empty-row');
-    if (emptyRow) {
-      emptyRow.remove();
-    }
-    
-    const row = document.createElement('tr');
-    row.className = 'border-b border-slate-100 hover:bg-slate-50';
-    row.innerHTML = `
-      <td class="px-6 py-4">
-        <div>
-          <p class="font-medium text-slate-900">${name}</p>
-          <p class="text-xs text-slate-500">${category || 'Chưa phân loại'}</p>
-        </div>
-        <input type="hidden" name="equipments[]" value="${id}">
-      </td>
-      <td class="px-6 py-4 text-right">
-        <div class="flex items-center justify-end">
-          <button type="button" onclick="decrementValue(this)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 border border-slate-300 rounded-l-lg">
-            <span class="material-symbols-outlined text-sm">remove</span>
-          </button>
-          <input type="number" name="equipment_quantities[${id}]" value="${quantity}" class="w-12 h-8 text-center border-y border-slate-300 text-sm" min="1">
-          <button type="button" onclick="incrementValue(this)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 border border-slate-300 rounded-r-lg">
-            <span class="material-symbols-outlined text-sm">add</span>
-          </button>
-        </div>
-      </td>
-      <td class="px-6 py-4 text-center">
-        <button type="button" onclick="removeEquipmentRow(this)" class="text-red-500 hover:text-red-700 transition-all">
-          <span class="material-symbols-outlined">delete</span>
-        </button>
-      </td>
-    `;
-    tbody.appendChild(row);
-  }
-
-  function openEquipmentModal() {
-    document.getElementById('equipmentModal').classList.remove('hidden');
-    document.getElementById('equipmentSearch').value = '';
-    filterEquipment('');
-    
-    // Mark already selected equipment
-    const selectedIds = Array.from(document.querySelectorAll('#equipmentTable input[name="equipments[]"]')).map(input => input.value);
-    document.querySelectorAll('#equipmentGrid .equipment-item').forEach(item => {
-      const id = item.getAttribute('data-id');
-      const iconDiv = item.querySelector('div:last-of-type');
-      if (selectedIds.includes(id)) {
-        item.classList.add('ring-2', 'ring-green-500', 'bg-green-50', 'opacity-50', 'pointer-events-none');
-        item.classList.remove('ring-blue-900');
-        item.querySelector('input[type="checkbox"]').checked = false;
-        iconDiv.innerHTML = '<span class="material-symbols-outlined text-green-500">check_circle</span><span class="text-xs text-green-600 font-bold ml-1">Đã chọn</span>';
-      } else {
-        item.classList.remove('ring-2', 'ring-green-500', 'bg-green-50', 'ring-blue-900', 'opacity-50', 'pointer-events-none');
-        iconDiv.innerHTML = '<span class="material-symbols-outlined text-slate-300">radio_button_unchecked</span>';
-      }
-    });
-  }
-
-  function closeEquipmentModal() {
-    document.getElementById('equipmentModal').classList.add('hidden');
-    uncheckAllEquipment();
-  }
-
-  function filterEquipment(query) {
-    const items = document.querySelectorAll('#equipmentGrid .equipment-item');
-    items.forEach(item => {
-      const text = item.getAttribute('data-text').toLowerCase();
-      if (text.includes(query.toLowerCase())) {
-        item.classList.remove('hidden');
-      } else {
-        item.classList.add('hidden');
-      }
-    });
-  }
-
-  function toggleEquipment(element) {
-    // Don't toggle if already selected (disabled state)
-    if (element.classList.contains('pointer-events-none')) {
-      return;
-    }
-    
-    const isSelected = element.classList.toggle('ring-2');
-    element.classList.toggle('ring-blue-900');
-    element.classList.toggle('bg-blue-50');
-    const checkbox = element.querySelector('input[type="checkbox"]');
-    checkbox.checked = !checkbox.checked;
-    
-    // Update icon
-    const iconDiv = element.querySelector('div:last-of-type');
-    if (checkbox.checked) {
-      iconDiv.innerHTML = '<span class="material-symbols-outlined text-blue-900">check_circle</span>';
-    } else {
-      iconDiv.innerHTML = '<span class="material-symbols-outlined text-slate-300">radio_button_unchecked</span>';
-    }
-  }
-
-  function uncheckAllEquipment() {
-    document.querySelectorAll('#equipmentGrid .equipment-item').forEach(item => {
-      // Don't uncheck already selected (disabled) items
-      if (!item.classList.contains('pointer-events-none')) {
-        item.classList.remove('ring-2', 'ring-blue-900', 'bg-blue-50');
-        item.querySelector('input[type="checkbox"]').checked = false;
-        const iconDiv = item.querySelector('div:last-of-type');
-        iconDiv.innerHTML = '<span class="material-symbols-outlined text-slate-300">radio_button_unchecked</span>';
-      }
-    });
-  }
-
-  function confirmEquipment() {
-    const selected = Array.from(document.querySelectorAll('#equipmentGrid .equipment-item input[type="checkbox"]:checked'))
-      .map(input => ({
-        id: input.closest('.equipment-item').getAttribute('data-id'),
-        name: input.getAttribute('data-name'),
-        category: input.getAttribute('data-category')
-      }));
-
-    if (selected.length === 0) {
-      alert('Vui lòng chọn ít nhất một thiết bị!');
-      return;
-    }
-
-    selected.forEach(equipment => {
-      addEquipmentRow(equipment.id, equipment.name, equipment.category, '1');
-    });
-
-    closeEquipmentModal();
-  }
-</script>
+@vite(['resources/js/admin/room-types/edit.js'])
 
 <!-- Amenity Modal -->
 <div id="amenityModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950" style="background-color: rgba(15, 23, 42, 0.5);">

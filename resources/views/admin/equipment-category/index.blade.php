@@ -77,12 +77,6 @@
   </div>
 </div>
 
-<script>
-
-  function openDeleteModal(url, categoryName) {
-    // Logic in resources/js/admin/equipment-categories/index.js
-  }
-</script>
 
 @endsection
 @push('scripts')

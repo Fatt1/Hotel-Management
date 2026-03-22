@@ -6,17 +6,26 @@ use App\Enums\PolicyType;
 use App\Models\Booking;
 use App\Models\BookingDetail;
 use App\Models\SurchargePolicy;
+use App\Models\SystemSetting;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class CalculateCheckoutPaymentAction
 {
-    // Giờ check-in / checkout tiêu chuẩn
-    private const STANDARD_CHECKIN_HOUR  = 14; // 14:00
-    private const STANDARD_CHECKOUT_HOUR = 12; // 12:00
+    private int $standardCheckinHour;
+    private int $standardCheckoutHour;
+    private int $roundingTime;
 
     private Collection $surchargePolicies;
     private Carbon $now;
+
+    public function __construct()
+    {
+        // Load cấu hình ở runtime (PHP const không thể chứa query DB).
+        $this->standardCheckinHour = (int) (SystemSetting::where('setting_key', 'checkin_time')->value('setting_value') ?? 14);
+        $this->standardCheckoutHour = (int) (SystemSetting::where('setting_key', 'checkout_time')->value('setting_value') ?? 12);
+        $this->roundingTime = (int) (SystemSetting::where('setting_key', 'rounding_time')->value('setting_value') ?? 15);
+    }
 
     public function execute(array $input): array
     {
@@ -179,7 +188,7 @@ class CalculateCheckoutPaymentAction
         $info = null;
 
         // Giờ check-in tiêu chuẩn của NGÀY check-in
-        $standardCheckin = $checkinDate->copy()->setTime(self::STANDARD_CHECKIN_HOUR, 0, 0);
+        $standardCheckin = $checkinDate->copy()->setTime($this->standardCheckinHour, 0, 0);
         
         // Chỉ tính phụ thu nếu checkin trước giờ tiêu chuẩn
         if ($checkinDate->lt($standardCheckin)) {
@@ -217,14 +226,19 @@ class CalculateCheckoutPaymentAction
         $info = null;
 
         // Mốc checkout tiêu chuẩn: ngày checkout_date lúc 12:00
-        $standardCheckout = $checkoutDate->copy()->setTime(self::STANDARD_CHECKOUT_HOUR, 0, 0);
+        $standardCheckout = $checkoutDate->copy()->setTime($this->standardCheckoutHour, 0, 0);
         
-        // Chỉ tính phụ thu nếu hiện tại sau giờ tiêu chuẩn
+        // Chỉ tính phụ thu nếu hiện tại sau giờ tiêu chuẩn.
         if ($this->now->gt($standardCheckout)) {
-            // Fix: Đảo ngược thứ tự để được số dương
-            $hoursLate = $standardCheckout->diffInMinutes($this->now) / 60.0;
-            
-            // Tìm policy phù hợp: hour_mark <= hoursLate, lấy cao nhất
+            $lateMinutes = max(0, $standardCheckout->diffInMinutes($this->now, false));
+            $roundingThresholdMinutes = max(0, min(59, $this->roundingTime));
+            $lateWholeHours = intdiv($lateMinutes, 60);
+            $lateRemainderMinutes = $lateMinutes % 60;
+            $hoursLate = (float) ($lateWholeHours + (
+                $lateRemainderMinutes > 0 && $lateRemainderMinutes >= $roundingThresholdMinutes ? 1 : 0
+            ));
+
+            // Tìm policy phù hợp: hour_mark <= hoursLate (đã làm tròn), lấy cao nhất.
             $policy = $this->surchargePolicies
                 ->filter(fn ($p) => $p->policy_type === PolicyType::CHECKOUT_LATE->value
                                  && (float) $p->hour_mark <= $hoursLate)

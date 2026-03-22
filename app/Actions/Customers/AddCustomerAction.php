@@ -17,7 +17,6 @@ class AddCustomerAction
         $customer->phone_number = $data->phone_number;
         $customer->country = $data->country;
         $customer->email = $data->email;
-        $customer->password = bcrypt(uniqid());
         $customer->save();
         return $customer;
     }
