@@ -48,7 +48,7 @@ class StatisticsAdminController extends Controller
         $prevMonthStart = $monthStart->copy()->subMonth()->startOfMonth();
         $prevMonthEnd = $monthStart->copy()->subMonth()->endOfMonth();
 
-        $activeBookingStatuses = ['Đã đặt', 'Đang ở', 'Hoàn tất'];
+        $activeBookingStatuses = ['Chờ xác nhận', 'Đã đặt', 'Đang ở', 'Hoàn tất'];
 
         $currentMonthBookings = Booking::query()
             ->whereIn('status', $activeBookingStatuses)
@@ -298,10 +298,37 @@ class StatisticsAdminController extends Controller
                 'title' => $title,
                 'subtitle' => "Khách hàng: {$customerName}",
                 'time' => $usage->created_at?->diffForHumans() ?? 'Vừa xong',
+                'timestamp' => $usage->created_at?->timestamp ?? 0,
                 'icon' => $this->isSpaGroup($groupName) ? 'spa' : ($this->isFnbGroup($groupName) ? 'restaurant' : 'room_service'),
                 'color' => $this->isSpaGroup($groupName) ? 'text-violet-600 bg-violet-100' : ($this->isFnbGroup($groupName) ? 'text-emerald-600 bg-emerald-100' : 'text-orange-600 bg-orange-100'),
             ];
         }
+
+        $recentBookings = Booking::query()
+            ->with('customer')
+            ->latest('booking_date')
+            ->limit($limit)
+            ->get();
+
+        foreach ($recentBookings as $booking) {
+            $statusText = (string) $booking->status;
+            $activities[] = [
+                'title' => "Đơn đặt phòng mới - UL-{$booking->id}",
+                'subtitle' => "Khách hàng: " . ($booking->customer?->full_name ?? 'Khách lưu trú') . " • Trạng thái: {$statusText}",
+                'time' => $booking->booking_date?->diffForHumans() ?? 'Vừa xong',
+                'timestamp' => $booking->booking_date?->timestamp ?? 0,
+                'icon' => 'event_available',
+                'color' => 'text-blue-600 bg-blue-100',
+            ];
+        }
+
+        usort($activities, static fn (array $a, array $b): int => ($b['timestamp'] ?? 0) <=> ($a['timestamp'] ?? 0));
+        $activities = array_slice($activities, 0, $limit);
+
+        foreach ($activities as &$activity) {
+            unset($activity['timestamp']);
+        }
+        unset($activity);
 
         return $activities;
     }
