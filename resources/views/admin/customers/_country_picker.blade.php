@@ -2,6 +2,7 @@
     $inputName       = $inputName ?? 'country';
     $selectedValue   = $selectedValue ?? '';
     $hasError        = $errors->has($inputName);
+    $inputId         = $inputId ?? null;
     $formId          = $formId ?? null;
     $placeholder     = $placeholder ?? 'Chọn quốc gia';
     $autoWidth       = $autoWidth ?? false;
@@ -36,7 +37,7 @@
 
 <div id="{{ $pickerId }}" class="relative {{ $autoWidth ? 'inline-block' : '' }}">
     {{-- Hidden input cho form submission --}}
-    <input type="hidden" name="{{ $inputName }}" value="{{ $selectedValue }}" />
+    <input type="hidden" name="{{ $inputName }}" id="{{ $inputId }}" value="{{ $selectedValue }}" />
 
     {{-- Trigger button --}}
     <button type="button"
@@ -165,7 +166,10 @@
         item.addEventListener('click', function () {
             var val = item.dataset.value;
             var iso = item.dataset.iso;
-            hidden.value = val;
+            if (hidden.value !== val) {
+                hidden.value = val;
+                hidden.dispatchEvent(new Event('change', { bubbles: true }));
+            }
             setFlag(iso);
             nameEl.textContent = val || '{{ $placeholder }}';
             nameEl.classList.toggle('text-slate-400', !val);

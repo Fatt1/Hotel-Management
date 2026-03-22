@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Client;
 
+use App\Actions\Customers\GetCustomerByEmailAction;
+
 use App\Http\Controllers\Controller;
 use App\Mail\BookingSuccessMail;
 use App\Models\RoomType;
@@ -253,6 +255,36 @@ class BookingCheckoutController extends Controller
         }
 
         return view('client.booking.confirmation', compact('bookingRef', 'bookingData', 'checkInDate', 'checkOutDate'));
+    }
+
+    /**
+     * Nhận email từ ajax, xác thực khách hàng để tự điền thông tin.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function verifyEmail(Request $request, GetCustomerByEmailAction $action)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $customer = $action->handle($request->input('email'));
+
+        if ($customer) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'first_name' => $customer->first_name,
+                    'last_name'  => $customer->last_name,
+                    'phone'      => $customer->phone,
+                    'country'    => $customer->country ?? '',
+                ]
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Không tìm thấy tài khoản. Vui lòng điền thông tin bên dưới để tạo mới.'
+        ], 404);
     }
 
     /**
