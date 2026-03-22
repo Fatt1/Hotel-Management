@@ -29,9 +29,7 @@
 - Dat QUEUE_CONNECTION=database.
 - Cau hinh SMTP that (MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, MAIL_ENCRYPTION).
 - Chay cac lenh:
-  - php artisan queue:table
-  - php artisan queue:failed-table
-  - php artisan migrate
+  - php 
 
 ### Buoc 2: Chuan hoa Mailables
 - Tao hoac cap nhat cac Mailable:

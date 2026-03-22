@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\ServiceGroupAdminController;
 use App\Http\Controllers\Admin\ServiceAdminController;
 use App\Http\Controllers\Admin\GeneralConfigAdminController;
 use App\Http\Controllers\Admin\MaintenanceTicketAdminController;
+use App\Http\Controllers\Admin\StatisticsAdminController;
 use App\Http\Controllers\Client\AmenityController;
 use App\Http\Controllers\Client\BookingCheckoutController;
 use App\Http\Controllers\Client\DiningController;
@@ -179,6 +180,11 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::get('general-config', [GeneralConfigAdminController::class, 'index'])->name('admin.general-config.index');
     Route::post('general-config/general', [GeneralConfigAdminController::class, 'updateGeneral'])->name('admin.general-config.update-general');
     Route::post('general-config/surcharge', [GeneralConfigAdminController::class, 'updateSurcharge'])->name('admin.general-config.update-surcharge');
+
+    // Statistics routes
+    Route::get('statistics/{section?}', [StatisticsAdminController::class, 'index'])
+        ->where('section', 'overview|revenue|room-performance|customers')
+        ->name('admin.statistics.index');
     
     Route::post("/logout", [AuthAdminController::class, "logout"])->name('admin.logout');
 
