@@ -108,7 +108,7 @@
     </a>
     @endcan
     @can('statistics.view')
-    <a class="sidebar-item" href="#">
+    <a class="{{ request()->routeIs('admin.statistics.*') ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.statistics.index') }}">
       <span class="material-symbols-outlined">bar_chart</span>
       <span>Thống kê</span>
     </a>
