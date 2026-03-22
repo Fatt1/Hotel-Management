@@ -6,19 +6,24 @@ use App\Enums\PolicyType;
 use App\Models\Booking;
 use App\Models\BookingDetail;
 use App\Models\SurchargePolicy;
+use App\Models\SystemSetting;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class CheckoutBookingAction
 {
+    private int $standardCheckinHour;
+    private int $standardCheckoutHour;
+    private int $roundingTime;
+
     public function __construct(private RecalculateBookingAmountsAction $recalculateBookingAmountsAction)
     {
+        // Load cấu hình ở runtime vì PHP const không hỗ trợ query DB.
+        $this->standardCheckinHour = (int) (SystemSetting::where('setting_key', 'checkin_time')->value('setting_value') ?? 14);
+        $this->standardCheckoutHour = (int) (SystemSetting::where('setting_key', 'checkout_time')->value('setting_value') ?? 12);
+        $this->roundingTime = (int) (SystemSetting::where('setting_key', 'rounding_time')->value('setting_value') ?? 15);
     }
-    
-    // Giờ check-in / checkout tiêu chuẩn
-    private const STANDARD_CHECKIN_HOUR  = 14; // 14:00
-    private const STANDARD_CHECKOUT_HOUR = 12; // 12:00
 
     public function execute(array $bookingDetailIds, $bookingId): void
     {
@@ -63,13 +68,25 @@ class CheckoutBookingAction
     private function calculateSurchargeAmount($detail, Carbon $now, Collection $surchargePolicies): float
     {
         $checkinDate = Carbon::parse($detail->checkin_date);
-        $checkoutDate = Carbon::parse($detail->checkout_date);
+        $checkoutDate = $now->copy();
         
-        $standardCheckin = $checkinDate->copy()->setTime(self::STANDARD_CHECKIN_HOUR, 0, 0);
-        $standardCheckout = $checkoutDate->copy()->setTime(self::STANDARD_CHECKOUT_HOUR, 0, 0);
+        $standardCheckin = $checkinDate->copy()->setTime($this->standardCheckinHour, 0, 0);
+        $standardCheckout = $checkoutDate->copy()->setTime($this->standardCheckoutHour, 0, 0);
 
-        $checkinEarlyHours =  $checkinDate->diffInMinutes($standardCheckin) / 60.0;
-        $checkoutLateHours = $checkoutDate->diffInMinutes($standardCheckout) / 60.0;
+        // Chỉ tính check-in sớm khi giờ vào thực tế trước giờ check-in chuẩn.
+        $checkinEarlyMinutes = max(0, $checkinDate->diffInMinutes($standardCheckin, false));
+        $checkinEarlyHours = $checkinEarlyMinutes / 60.0;
+
+        // Tính checkout muộn dựa trên thời điểm checkout thực tế (now).
+        // ROUNDING_TIME là ngưỡng phút để làm tròn lên 1 giờ kế tiếp.
+        // Ví dụ ROUNDING_TIME=15: trễ 15p => 1h, trễ 2h15 => 3h.
+        $checkoutLateMinutes = max(0, $standardCheckout->diffInMinutes($checkoutDate, false));
+        $roundingThresholdMinutes = max(0, min(59, $this->roundingTime));
+        $lateWholeHours = intdiv($checkoutLateMinutes, 60);
+        $lateRemainderMinutes = $checkoutLateMinutes % 60;
+        $checkoutLateHours = (float) ($lateWholeHours + (
+            $lateRemainderMinutes > 0 && $lateRemainderMinutes >= $roundingThresholdMinutes ? 1 : 0
+        ));
 
         $earlyCheckinSurcharge = 0;
         $lateCheckoutSurcharge = 0;
@@ -129,7 +146,7 @@ class CheckoutBookingAction
     private function calculateHourlySurcharge(BookingDetail $detail, float $totalHoursStayed):float {
         $chargedHours = (int) floor($totalHoursStayed);
             $fraction = $totalHoursStayed - $chargedHours;
-            if( $fraction > 0.25) {
+            if( $fraction > $this->roundingTime / 60) {
                 $chargedHours++;
             }
             // Tối thiểu tính 1 giờ nếu khách ở chưa đến 1 giờ

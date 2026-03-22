@@ -5,14 +5,24 @@
         $isCompleted = $booking->status === 'Hoàn tất';
         $isOccupied = $booking->status === 'Đang ở';
         function formatDuration(float $hour) {
-                                if ($hour >= 24) {
-                                    return (int) ceil($hour / 24) . ' ngày';
+                                $totalMinutes = (int) floor($hour * 60);
+                                $days = intdiv($totalMinutes, 24 * 60);
+                                $remainingMinutes = $totalMinutes % (24 * 60);
+                                $h = intdiv($remainingMinutes, 60);
+                                $m = $remainingMinutes % 60;
+
+                                $parts = [];
+                                if ($days > 0) {
+                                    $parts[] = $days . ' ngày';
+                                }
+                                if ($h > 0) {
+                                    $parts[] = $h . ' giờ';
+                                }
+                                if ($m > 0) {
+                                    $parts[] = $m . ' phút';
                                 }
 
-                                $h = floor($hour);
-                                $m = round(($hour - $h) * 60);
-
-                                return ($h > 0 ? $h . ' giờ' : '') . ($m > 0 ? ' ' . $m . ' phút' : '');
+                                return empty($parts) ? '0 phút' : implode(' ', $parts);
                             }
     @endphp
     
@@ -192,7 +202,7 @@
                             $checkinDate = \Carbon\Carbon::parse($detail->checkin_date);
                             $checkoutDate = \Carbon\Carbon::parse($detail->checkout_date);
                             
-                            $hours = $checkinDate->diffInMinutes($checkoutDate) / 60;
+                            $hours = $checkinDate->diffInSeconds($checkoutDate) / 3600;
                             $roomCost = $detail->room_amount;
 
                             
