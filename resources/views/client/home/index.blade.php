@@ -44,10 +44,10 @@
     {{-- Search Bar --}}
     <form method="GET" action="{{ route('client.rooms.index') }}" id="heroSearchForm"
           class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl shadow-2xl max-w-4xl">
-      <div class="grid grid-cols-4 divide-x divide-white/10">
+      <div class="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/10">
 
         {{-- Check-in --}}
-        <div class="px-5 py-4 group">
+        <div class="flex-1 px-5 py-4 group">
           <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-1.5 flex items-center gap-1.5">
             <i class="far fa-calendar text-white/30 text-[10px]"></i> Nhận Phòng
           </div>
@@ -58,7 +58,7 @@
         </div>
 
         {{-- Check-out --}}
-        <div class="px-5 py-4 group">
+        <div class="flex-1 px-5 py-4 group">
           <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-1.5 flex items-center gap-1.5">
             <i class="far fa-calendar text-white/30 text-[10px]"></i> Trả Phòng
           </div>
@@ -69,7 +69,7 @@
         </div>
 
         {{-- Guests --}}
-        <div class="px-5 py-4 relative" id="guestWrapper">
+        <div class="flex-1 px-5 py-4 relative" id="guestWrapper">
           <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-1.5 flex items-center gap-1.5">
             <i class="fas fa-user text-white/30 text-[10px]"></i> Khách
           </div>
@@ -86,7 +86,7 @@
         </div>
 
         {{-- Search Button --}}
-        <div class="px-5 py-3 flex items-center">
+        <div class="flex-none md:flex-1 px-5 py-4 md:py-3 flex items-center">
           <button type="submit"
                   class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold tracking-wider uppercase py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
             <i class="fas fa-search text-xs"></i>
@@ -234,7 +234,7 @@
     </div>
 
     {{-- Room cards --}}
-    <div class="grid grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
       @forelse($featuredRooms as $room)
         @php
           $imgUrl = $room->images->first()?->image_url;
@@ -260,7 +260,7 @@
                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
             {{-- Best value badge --}}
             @if($loop->last)
-              <div class="absolute top-3 right-3 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-full tracking-wider uppercase">
+              <div class="absolute top-3 right-3 bg-blue-600 text-white text-[9px] md:text-[10px] font-bold px-2 py-1 rounded-full tracking-wider uppercase">
                 Best Value
               </div>
             @endif
