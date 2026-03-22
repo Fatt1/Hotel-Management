@@ -182,9 +182,12 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::post('general-config/surcharge', [GeneralConfigAdminController::class, 'updateSurcharge'])->name('admin.general-config.update-surcharge');
 
     // Statistics routes
-    Route::get('statistics/{section?}', [StatisticsAdminController::class, 'index'])
-        ->where('section', 'overview|revenue|room-performance|customers')
-        ->name('admin.statistics.index');
+    Route::prefix('statistics')->name('admin.statistics.')->group(function () {
+        Route::get('/', [StatisticsAdminController::class, 'overview'])->name('index');
+        Route::get('/revenue', [StatisticsAdminController::class, 'revenue'])->name('revenue');
+        Route::get('/room-performance', [StatisticsAdminController::class, 'roomPerformance'])->name('room-performance');
+        Route::get('/customers', [StatisticsAdminController::class, 'customers'])->name('customers');
+    });
     
     Route::post("/logout", [AuthAdminController::class, "logout"])->name('admin.logout');
 

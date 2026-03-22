@@ -9,6 +9,7 @@ use App\Models\MaintenanceTicket;
 use App\Models\Room;
 use App\Models\ServiceUsage;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -21,22 +22,37 @@ class StatisticsAdminController extends Controller
         'customers' => 'Khách hàng',
     ];
 
-    public function index(?string $section = 'overview')
+    public function overview()
     {
-        $section = $section ?: 'overview';
-
-        if (!array_key_exists($section, self::SECTION_LABELS)) {
-            abort(404);
-        }
-
-        $overviewData = $section === 'overview'
-            ? $this->buildOverviewData()
-            : null;
-
         return view('admin.statistics.index', [
-            'section' => $section,
+            'section' => 'overview',
             'sectionLabels' => self::SECTION_LABELS,
-            'overviewData' => $overviewData,
+            'overviewData' => $this->buildOverviewData(),
+        ]);
+    }
+
+    public function revenue(Request $request)
+    {
+        return view('admin.statistics.index', [
+            'section' => 'revenue',
+            'sectionLabels' => self::SECTION_LABELS,
+            'revenueData' => $this->buildRevenueData($request),
+        ]);
+    }
+
+    public function roomPerformance()
+    {
+        return view('admin.statistics.index', [
+            'section' => 'room-performance',
+            'sectionLabels' => self::SECTION_LABELS,
+        ]);
+    }
+
+    public function customers()
+    {
+        return view('admin.statistics.index', [
+            'section' => 'customers',
+            'sectionLabels' => self::SECTION_LABELS,
         ]);
     }
 
@@ -94,7 +110,6 @@ class StatisticsAdminController extends Controller
 
         $trendSeries = $this->buildRevenueCostTrend($activeBookingStatuses);
         $revenueComposition = $this->buildRevenueComposition($monthStart, $monthEnd, $activeBookingStatuses);
-        $recentActivities = $this->buildRecentActivities(30);
 
         return [
             'kpi' => [
@@ -124,8 +139,6 @@ class StatisticsAdminController extends Controller
             ],
             'trend' => $trendSeries,
             'composition' => $revenueComposition,
-            'recentActivities' => $recentActivities,
-            'recentActivitiesPreview' => array_slice($recentActivities, 0, 5),
         ];
     }
 
@@ -224,6 +237,11 @@ class StatisticsAdminController extends Controller
             ->whereBetween('booking_date', [$monthStart, $monthEnd])
             ->sum('total_room_amount');
 
+        $surchargeRevenue = (float) Booking::query()
+            ->whereIn('status', $activeBookingStatuses)
+            ->whereBetween('booking_date', [$monthStart, $monthEnd])
+            ->sum('surcharge_amount');
+
         $serviceRows = ServiceUsage::query()
             ->join('booking_details', 'booking_details.id', '=', 'service_usages.booking_detail_id')
             ->join('bookings', 'bookings.id', '=', 'booking_details.booking_id')
@@ -236,23 +254,22 @@ class StatisticsAdminController extends Controller
             ->selectRaw('SUM(service_usages.quantity * service_usages.unit_price) as amount')
             ->get();
 
-        $fnbRevenue = 0.0;
-        $spaAndOtherRevenue = 0.0;
+        $labels = ['Tiền phòng'];
+        $series = [$roomRevenue];
 
-        /** @var Collection<int, object> $serviceRows */
-        foreach ($serviceRows as $row) {
-            $groupName = Str::lower((string) $row->group_name);
-            $amount = (float) $row->amount;
-
-            if ($this->isFnbGroup($groupName)) {
-                $fnbRevenue += $amount;
-                continue;
-            }
-
-            $spaAndOtherRevenue += $amount;
+        if ($surchargeRevenue > 0) {
+            $labels[] = 'Phụ thu';
+            $series[] = $surchargeRevenue;
         }
 
-        $series = [$roomRevenue, $fnbRevenue, $spaAndOtherRevenue];
+        foreach ($serviceRows as $row) {
+            $groupName = (string) $row->group_name;
+            $amount = (float) $row->amount;
+
+            $labels[] = 'Dịch vụ ' . $groupName;
+            $series[] = $amount;
+        }
+
         $total = array_sum($series);
 
         $percentages = array_map(
@@ -261,104 +278,11 @@ class StatisticsAdminController extends Controller
         );
 
         return [
-            'labels' => ['Đặt phòng (Room)', 'Dịch vụ F&B', 'Spa & Khác'],
+            'labels' => $labels,
             'series' => $series,
             'percentages' => $percentages,
             'total' => $total,
         ];
-    }
-
-    private function buildRecentActivities(int $limit = 8): array
-    {
-        $activities = [];
-
-        $serviceUsages = ServiceUsage::query()
-            ->with([
-                'service.group',
-                'bookingDetail.room',
-                'bookingDetail.booking.customer',
-            ])
-            ->latest()
-            ->limit($limit)
-            ->get();
-
-        foreach ($serviceUsages as $usage) {
-            $serviceName = $usage->service?->name ?? 'Dịch vụ';
-            $groupName = Str::lower((string) ($usage->service?->group?->service_name ?? 'khác'));
-            $customerName = $usage->bookingDetail?->booking?->customer?->full_name ?? 'Khách lưu trú';
-            $roomName = $usage->bookingDetail?->room?->name ?? 'N/A';
-
-            $title = $this->isSpaGroup($groupName)
-                ? "Dịch vụ Spa - Phòng {$roomName}"
-                : ($this->isFnbGroup($groupName)
-                    ? "Dịch vụ F&B - Phòng {$roomName}"
-                    : "{$serviceName} - Phòng {$roomName}");
-
-            $activities[] = [
-                'title' => $title,
-                'subtitle' => "Khách hàng: {$customerName}",
-                'time' => $usage->created_at?->diffForHumans() ?? 'Vừa xong',
-                'timestamp' => $usage->created_at?->timestamp ?? 0,
-                'icon' => $this->isSpaGroup($groupName) ? 'spa' : ($this->isFnbGroup($groupName) ? 'restaurant' : 'room_service'),
-                'color' => $this->isSpaGroup($groupName) ? 'text-violet-600 bg-violet-100' : ($this->isFnbGroup($groupName) ? 'text-emerald-600 bg-emerald-100' : 'text-orange-600 bg-orange-100'),
-            ];
-        }
-
-        $recentBookings = Booking::query()
-            ->with('customer')
-            ->latest('booking_date')
-            ->limit($limit)
-            ->get();
-
-        foreach ($recentBookings as $booking) {
-            $statusText = (string) $booking->status;
-            $activities[] = [
-                'title' => "Đơn đặt phòng mới - UL-{$booking->id}",
-                'subtitle' => "Khách hàng: " . ($booking->customer?->full_name ?? 'Khách lưu trú') . " • Trạng thái: {$statusText}",
-                'time' => $booking->booking_date?->diffForHumans() ?? 'Vừa xong',
-                'timestamp' => $booking->booking_date?->timestamp ?? 0,
-                'icon' => 'event_available',
-                'color' => 'text-blue-600 bg-blue-100',
-            ];
-        }
-
-        usort($activities, static fn (array $a, array $b): int => ($b['timestamp'] ?? 0) <=> ($a['timestamp'] ?? 0));
-        $activities = array_slice($activities, 0, $limit);
-
-        foreach ($activities as &$activity) {
-            unset($activity['timestamp']);
-        }
-        unset($activity);
-
-        return $activities;
-    }
-
-    private function isFnbGroup(string $groupName): bool
-    {
-        return Str::contains($groupName, [
-            'f&b',
-            'fb',
-            'food',
-            'restaurant',
-            'nha hang',
-            'nhà hàng',
-            'am thuc',
-            'ẩm thực',
-            'ăn uống',
-            'buffet',
-            'bar',
-        ]);
-    }
-
-    private function isSpaGroup(string $groupName): bool
-    {
-        return Str::contains($groupName, [
-            'spa',
-            'massage',
-            'wellness',
-            'xông',
-            'relax',
-        ]);
     }
 
     private function percentChange(float|int $currentValue, float|int $previousValue): float
@@ -371,5 +295,157 @@ class StatisticsAdminController extends Controller
         }
 
         return round((($current - $previous) / abs($previous)) * 100, 1);
+    }
+
+    private function buildRevenueData(Request $request): array
+    {
+        $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date'))->startOfDay() : now()->startOfMonth();
+        $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date'))->endOfDay() : now()->endOfMonth();
+        
+        $source = $request->input('source', 'all'); // 'all', 'room', 'service', 'surcharge'
+        $status = $request->input('status', 'all'); // 'all', 'paid' ('Hoàn tất'), 'unpaid' (!= 'Hoàn tất')
+
+        $query = Booking::query()->whereBetween('booking_date', [$startDate, $endDate]);
+
+        if ($status === 'paid') {
+            $query->where('status', 'Hoàn tất');
+        } elseif ($status === 'unpaid') {
+            $query->where('status', '!=', 'Hoàn tất')->where('status', '!=', 'Đã hủy');
+        } else {
+            $query->where('status', '!=', 'Đã hủy'); // always exclude cancelled for revenue
+        }
+
+        $totalRoom = (float) (clone $query)->sum('total_room_amount');
+        $totalService = (float) (clone $query)->sum('total_service_amount');
+        $totalSurcharge = (float) (clone $query)->sum('surcharge_amount');
+
+        $filteredTotal = 0;
+        if ($source === 'room') {
+            $filteredTotal = $totalRoom;
+            $totalService = 0;
+            $totalSurcharge = 0;
+        } elseif ($source === 'service') {
+            $filteredTotal = $totalService;
+            $totalRoom = 0;
+            $totalSurcharge = 0;
+        } elseif ($source === 'surcharge') {
+            $filteredTotal = $totalSurcharge;
+            $totalRoom = 0;
+            $totalService = 0;
+        } else {
+            $filteredTotal = $totalRoom + $totalService + $totalSurcharge;
+        }
+
+        // Chart data
+        $trendSeries = $this->buildRevenueTrendChart($source, $status);
+        
+        $revenueComposition = [
+            'labels' => ['Tiền phòng', 'Tiền dịch vụ', 'Phụ thu'],
+            'series' => [$totalRoom, $totalService, $totalSurcharge],
+        ];
+
+        return [
+            'filters' => [
+                'start_date' => $startDate->format('Y-m-d'),
+                'end_date' => $endDate->format('Y-m-d'),
+                'source' => $source,
+                'status' => $status,
+            ],
+            'kpi' => [
+                [
+                    'label' => 'Tổng doanh thu',
+                    'value' => $filteredTotal,
+                    'isCurrency' => true,
+                    'icon' => 'account_balance_wallet',
+                    'color' => 'text-orange-500',
+                    'bg_color' => 'bg-orange-100'
+                ],
+                [
+                    'label' => 'Tiền phòng',
+                    'value' => $totalRoom,
+                    'isCurrency' => true,
+                    'icon' => 'bed',
+                    'color' => 'text-blue-500',
+                    'bg_color' => 'bg-blue-100'
+                ],
+                [
+                    'label' => 'Tiền dịch vụ',
+                    'value' => $totalService,
+                    'isCurrency' => true,
+                    'icon' => 'room_service',
+                    'color' => 'text-emerald-500',
+                    'bg_color' => 'bg-emerald-100'
+                ],
+                [
+                    'label' => 'Phụ thu',
+                    'value' => $totalSurcharge,
+                    'isCurrency' => true,
+                    'icon' => 'request_quote',
+                    'color' => 'text-violet-500',
+                    'bg_color' => 'bg-violet-100'
+                ],
+            ],
+            'trend' => $trendSeries,
+            'composition' => $revenueComposition,
+        ];
+    }
+
+    private function buildRevenueTrendChart(string $source, string $status): array
+    {
+        $currentYear = now()->year;
+        $lastYear = $currentYear - 1;
+
+        $labels = [];
+        $currentYearData = [];
+        $lastYearData = [];
+
+        for ($month = 1; $month <= 12; $month++) {
+            $labels[] = "Tháng $month";
+
+            $currentData = Booking::query()
+                ->whereYear('booking_date', $currentYear)
+                ->whereMonth('booking_date', $month);
+            
+            $lastData = Booking::query()
+                ->whereYear('booking_date', $lastYear)
+                ->whereMonth('booking_date', $month);
+
+            if ($status === 'paid') {
+                $currentData->where('status', 'Hoàn tất');
+                $lastData->where('status', 'Hoàn tất');
+            } elseif ($status === 'unpaid') {
+                $currentData->where('status', '!=', 'Hoàn tất')->where('status', '!=', 'Đã hủy');
+                $lastData->where('status', '!=', 'Hoàn tất')->where('status', '!=', 'Đã hủy');
+            } else {
+                $currentData->where('status', '!=', 'Đã hủy');
+                $lastData->where('status', '!=', 'Đã hủy');
+            }
+
+            $sumCurrent = 0;
+            $sumLast = 0;
+
+            if ($source === 'room' || $source === 'all') {
+                $sumCurrent += (float) (clone $currentData)->sum('total_room_amount');
+                $sumLast += (float) (clone $lastData)->sum('total_room_amount');
+            }
+            if ($source === 'service' || $source === 'all') {
+                $sumCurrent += (float) (clone $currentData)->sum('total_service_amount');
+                $sumLast += (float) (clone $lastData)->sum('total_service_amount');
+            }
+            if ($source === 'surcharge' || $source === 'all') {
+                $sumCurrent += (float) (clone $currentData)->sum('surcharge_amount');
+                $sumLast += (float) (clone $lastData)->sum('surcharge_amount');
+            }
+
+            $currentYearData[] = $sumCurrent;
+            $lastYearData[] = $sumLast;
+        }
+
+        return [
+            'labels' => $labels,
+            'current_year' => $currentYearData,
+            'last_year' => $lastYearData,
+            'year' => $currentYear,
+        ];
     }
 }

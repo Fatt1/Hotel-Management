@@ -11,22 +11,23 @@
 
     <div class="bg-white border border-slate-200 rounded-2xl p-2 inline-flex gap-2 shadow-sm">
       @foreach ($sectionLabels as $key => $label)
-        <a href="{{ route('admin.statistics.index', ['section' => $key]) }}"
-          class="px-6 py-2.5 rounded-xl text-sm font-bold transition-colors {{ $section === $key ? 'bg-orange-500 text-white shadow' : 'text-slate-600 hover:bg-slate-100' }}">
-          {{ $label }}
-        </a>
-      @endforeach
-    </div>
+          @php
+              $routeName = $key === 'overview' ? 'admin.statistics.index' : "admin.statistics.{$key}";
+          @endphp
+          <a href="{{ route($routeName) }}"
+            class="px-6 py-2.5 rounded-xl text-sm font-bold transition-colors {{ $section === $key ? 'bg-orange-500 text-white shadow' : 'text-slate-600 hover:bg-slate-100' }}">
+            {{ $label }}
+          </a>
+        @endforeach
+      </div>
 
-    @if ($section === 'overview' && $overviewData)
-      @php
-        $kpi = $overviewData['kpi'];
-        $trend = $overviewData['trend'];
-        $composition = $overviewData['composition'];
-        $recentActivities = $overviewData['recentActivities'];
-        $recentActivitiesPreview = $overviewData['recentActivitiesPreview'] ?? $recentActivities;
-      @endphp
-
+      @if ($section === 'overview' && $overviewData)
+        @php
+          $kpi = $overviewData['kpi'];
+          $trend = $overviewData['trend'];
+          $composition = $overviewData['composition'];
+        @endphp
+        
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         @foreach ($kpi as $item)
           @php
@@ -89,12 +90,13 @@
           <ul class="mt-3 space-y-2">
             @foreach ($composition['labels'] as $index => $label)
               @php
-                $colors = ['bg-orange-500', 'bg-emerald-500', 'bg-blue-500'];
+                $colors = ['bg-orange-500', 'bg-emerald-500', 'bg-blue-500', 'bg-violet-500', 'bg-pink-500', 'bg-rose-500', 'bg-yellow-500', 'bg-teal-500', 'bg-cyan-500', 'bg-sky-500'];
+                $colorIndex = $index % count($colors);
                 $percent = $composition['percentages'][$index] ?? 0;
               @endphp
               <li class="flex items-center justify-between text-sm">
                 <span class="inline-flex items-center gap-2 text-slate-600">
-                  <i class="w-2.5 h-2.5 rounded-full {{ $colors[$index] }}"></i>
+                  <i class="w-2.5 h-2.5 rounded-full {{ $colors[$colorIndex] }}"></i>
                   {{ $label }}
                 </span>
                 <span class="font-bold text-slate-800">{{ number_format($percent, 1, ',', '.') }}%</span>
@@ -104,116 +106,12 @@
         </article>
       </div>
 
-      <article class="bg-white border border-slate-200 rounded-2xl p-5">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-2xl font-black text-slate-900">Hoạt động gần đây</h2>
-          <button type="button" id="openRecentActivitiesModal"
-            class="text-xs font-bold text-orange-500 uppercase hover:text-orange-600 transition-colors">
-            Xem tất cả
-          </button>
-        </div>
-
-        @if (count($recentActivitiesPreview) > 0)
-          <div class="space-y-2">
-            @foreach ($recentActivitiesPreview as $activity)
-              <div class="border border-slate-100 rounded-xl p-3 flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3 min-w-0">
-                  <div class="w-10 h-10 rounded-lg flex items-center justify-center {{ $activity['color'] }}">
-                    <span class="material-symbols-outlined !text-xl">{{ $activity['icon'] }}</span>
-                  </div>
-                  <div class="min-w-0">
-                    <p class="text-sm font-bold text-slate-900 truncate">{{ $activity['title'] }}</p>
-                    <p class="text-xs text-slate-500 truncate">{{ $activity['subtitle'] }}</p>
-                  </div>
-                </div>
-                <span class="text-xs font-semibold text-slate-400 whitespace-nowrap">{{ $activity['time'] }}</span>
-              </div>
-            @endforeach
-          </div>
-        @else
-          <div class="py-10 text-center text-slate-500">
-            Chưa có hoạt động dịch vụ gần đây.
-          </div>
-        @endif
-      </article>
-
-      <div id="recentActivitiesModal" class="fixed inset-0 z-50 hidden" aria-hidden="true">
-        <div id="recentActivitiesBackdrop" class="absolute inset-0 bg-slate-900/45 backdrop-blur-sm"></div>
-        <div class="relative h-full w-full flex items-center justify-center p-4">
-          <div class="w-full max-w-3xl max-h-[85vh] overflow-hidden bg-white rounded-2xl border border-slate-200 shadow-xl">
-            <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
-              <h3 class="text-lg font-black text-slate-900">Tất cả hoạt động khách hàng chọn gần đây</h3>
-              <button type="button" id="closeRecentActivitiesModal"
-                class="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors">
-                <span class="material-symbols-outlined !text-xl text-slate-600">close</span>
-              </button>
-            </div>
-            <div class="p-5 overflow-y-auto max-h-[calc(85vh-72px)]">
-              @if (count($recentActivities) > 0)
-                <div class="space-y-2">
-                  @foreach ($recentActivities as $activity)
-                    <div class="border border-slate-100 rounded-xl p-3 flex items-center justify-between gap-4">
-                      <div class="flex items-center gap-3 min-w-0">
-                        <div class="w-10 h-10 rounded-lg flex items-center justify-center {{ $activity['color'] }}">
-                          <span class="material-symbols-outlined !text-xl">{{ $activity['icon'] }}</span>
-                        </div>
-                        <div class="min-w-0">
-                          <p class="text-sm font-bold text-slate-900 truncate">{{ $activity['title'] }}</p>
-                          <p class="text-xs text-slate-500 truncate">{{ $activity['subtitle'] }}</p>
-                        </div>
-                      </div>
-                      <span class="text-xs font-semibold text-slate-400 whitespace-nowrap">{{ $activity['time'] }}</span>
-                    </div>
-                  @endforeach
-                </div>
-              @else
-                <div class="py-10 text-center text-slate-500">
-                  Chưa có hoạt động dịch vụ gần đây.
-                </div>
-              @endif
-            </div>
-          </div>
-        </div>
-      </div>
-
       @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
           document.addEventListener('DOMContentLoaded', function() {
             const trendCanvas = document.getElementById('overviewTrendChart');
             const compositionCanvas = document.getElementById('overviewCompositionChart');
-            const recentActivitiesModal = document.getElementById('recentActivitiesModal');
-            const openRecentActivitiesModal = document.getElementById('openRecentActivitiesModal');
-            const closeRecentActivitiesModal = document.getElementById('closeRecentActivitiesModal');
-            const recentActivitiesBackdrop = document.getElementById('recentActivitiesBackdrop');
-
-            const showRecentActivitiesModal = () => {
-              if (!recentActivitiesModal) {
-                return;
-              }
-
-              recentActivitiesModal.classList.remove('hidden');
-              document.body.classList.add('overflow-hidden');
-            };
-
-            const hideRecentActivitiesModal = () => {
-              if (!recentActivitiesModal) {
-                return;
-              }
-
-              recentActivitiesModal.classList.add('hidden');
-              document.body.classList.remove('overflow-hidden');
-            };
-
-            openRecentActivitiesModal?.addEventListener('click', showRecentActivitiesModal);
-            closeRecentActivitiesModal?.addEventListener('click', hideRecentActivitiesModal);
-            recentActivitiesBackdrop?.addEventListener('click', hideRecentActivitiesModal);
-
-            document.addEventListener('keydown', function(event) {
-              if (event.key === 'Escape' && recentActivitiesModal && !recentActivitiesModal.classList.contains('hidden')) {
-                hideRecentActivitiesModal();
-              }
-            });
 
             const trendLabels = @json($trend['labels']);
             const trendRevenue = @json($trend['revenueData']);
@@ -283,7 +181,7 @@
                   labels: @json($composition['labels']),
                   datasets: [{
                     data: compositionSeries,
-                    backgroundColor: ['#f97316', '#10b981', '#3b82f6'],
+                    backgroundColor: ['#f97316', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e', '#eab308', '#14b8a6', '#06b6d4', '#0ea5e9'],
                     borderWidth: 0,
                   }]
                 },
@@ -310,6 +208,8 @@
           });
         </script>
       @endpush
+    @elseif ($section === 'revenue' && isset($revenueData))
+      @include('admin.statistics.partials.revenue')
     @else
       <article class="bg-white border border-slate-200 rounded-2xl p-10 text-center">
         <h2 class="text-2xl font-black text-slate-900">{{ $sectionLabels[$section] }}</h2>
