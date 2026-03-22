@@ -44,203 +44,40 @@
           <h2 class="text-lg font-bold text-gray-900 mb-1">Phương Thức Thanh Toán</h2>
           <p class="text-xs text-gray-400 mb-6">Tất cả giao dịch đều được mã hoá và bảo mật.</p>
 
-          {{-- 3 tabs --}}
-          <div class="grid grid-cols-3 gap-3 mb-6" id="methodTabs">
+          {{-- 1 tab (MoMo Only) --}}
+          <div class="mb-6 grid grid-cols-1">
 
-            {{-- Credit Card --}}
-            <div class="method-tab active" data-method="credit" onclick="switchMethod('credit')">
-              <div class="relative">
-                <div class="tab-dot absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-blue-600"></div>
+            {{-- MoMo --}}
+            <div class="method-tab active border-2 border-pink-500 bg-pink-50/50 p-4 rounded-xl text-center cursor-default">
+              <div class="flex flex-col items-center justify-center">
+                <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo" class="h-10 mb-2 object-contain block">
+                <div class="tab-label text-sm text-gray-800 font-bold">Thanh Toán Bằng Ví MoMo</div>
               </div>
-              <i class="far fa-credit-card text-2xl text-gray-400 mb-2 block"></i>
-              <div class="tab-label text-sm text-gray-600">Thẻ Tín Dụng</div>
-            </div>
-
-            {{-- PayPal --}}
-            <div class="method-tab" data-method="paypal" onclick="switchMethod('paypal')">
-              <div class="relative">
-                <div class="tab-dot absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-blue-600"></div>
-              </div>
-              <i class="fab fa-paypal text-2xl text-gray-400 mb-2 block"></i>
-              <div class="tab-label text-sm text-gray-600">PayPal</div>
-            </div>
-
-            {{-- Bank Transfer --}}
-            <div class="method-tab" data-method="bank" onclick="switchMethod('bank')">
-              <div class="relative">
-                <div class="tab-dot absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-blue-600"></div>
-              </div>
-              <i class="fas fa-landmark text-2xl text-gray-400 mb-2 block"></i>
-              <div class="tab-label text-sm text-gray-600">Chuyển Khoản</div>
             </div>
 
           </div>
 
-          {{-- ── Panel: Credit Card ── --}}
-          <div id="panel-credit" class="payment-panel active">
-            {{-- Card number --}}
-            <div class="mb-4">
-              <div class="flex items-center justify-between mb-1.5">
-                <label class="text-[11px] font-bold tracking-widest uppercase text-gray-500">
-                  Số thẻ <span class="text-red-500">*</span>
-                </label>
-                <div class="flex items-center gap-1.5">
-                  <span class="text-[10px] font-bold px-2 py-0.5 bg-gray-100 text-gray-500 rounded tracking-widest">VISA</span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 bg-gray-100 text-gray-500 rounded tracking-widest">MC</span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 bg-gray-100 text-gray-500 rounded tracking-widest">AMEX</span>
-                </div>
+          {{-- ── Panel: MoMo ── --}}
+          <div id="panel-momo" class="payment-panel active">
+            <div class="flex flex-col items-center py-6 px-4 text-center border border-pink-100 bg-white rounded-xl shadow-sm">
+              <div class="w-16 h-16 rounded-2xl bg-pink-50 flex items-center justify-center mb-4 p-2 border border-pink-100">
+                <i class="fas fa-qrcode text-3xl text-pink-600"></i>
               </div>
-              <div class="relative">
-                <i class="far fa-credit-card absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19"
-                       class="w-full border border-gray-200 rounded-lg py-3 pl-10 pr-10 text-sm font-mono text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all"
-                       oninput="formatCardNumber(this); updatePayBtn()">
-                <i class="fas fa-lock absolute right-3.5 top-1/2 -translate-y-1/2 text-green-400 text-xs"></i>
-              </div>
-            </div>
-
-            {{-- Expiry + CVV --}}
-            <div class="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <label class="block text-[11px] font-bold tracking-widest uppercase text-gray-500 mb-1.5">
-                  Ngày hết hạn <span class="text-red-500">*</span>
-                </label>
-                <input type="text" id="expiryInput" placeholder="MM / YY" maxlength="7"
-                       class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm font-mono text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all"
-                       oninput="formatExpiry(this); updatePayBtn()">
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold tracking-widest uppercase text-gray-500 mb-1.5 flex items-center gap-1">
-                  CVV / CVC <span class="text-red-500">*</span>
-                  <i class="fas fa-circle-info text-gray-300 text-[10px] ml-1 cursor-help" title="3 số ở mặt sau thẻ"></i>
-                </label>
-                <input type="text" id="cvvInput" placeholder="123" maxlength="4"
-                       class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm font-mono text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all"
-                       oninput="updatePayBtn()">
+              <h3 class="font-bold text-gray-800 mb-2 text-lg">Quét Mã QR MoMo</h3>
+              <p class="text-sm text-gray-500 max-w-sm mb-6 leading-relaxed">Sau khi bấm thanh toán, bạn sẽ được chuyển hướng an toàn đến cổng thanh toán MoMo để quét mã QR và hoàn tất quá trình đặt phòng.</p>
+              
+              <div class="flex items-start gap-3 bg-pink-50 border border-pink-200 rounded-xl px-5 py-4 text-left w-full">
+                 <i class="fas fa-circle-info text-pink-600 text-base mt-0.5 flex-shrink-0"></i>
+                 <div class="text-[13px] text-gray-700 leading-relaxed">
+                   <p class="font-bold text-gray-900 mb-1">Hướng dẫn thanh toán an toàn:</p>
+                   <ul class="list-disc pl-4 text-gray-600 space-y-1">
+                     <li>Mở ứng dụng <b>MoMo</b> trên điện thoại.</li>
+                     <li>Chọn chức năng <b>Quét Mã</b> ở góc phải màn hình.</li>
+                     <li>Quét mã QR hiển thị ở trang tiếp theo để thanh toán.</li>
+                   </ul>
+                 </div>
               </div>
             </div>
-
-            {{-- Cardholder name --}}
-            <div class="mb-5">
-              <label class="block text-[11px] font-bold tracking-widest uppercase text-gray-500 mb-1.5">
-                Tên chủ thẻ <span class="text-red-500">*</span>
-              </label>
-              <input type="text" id="holderInput" placeholder="Tên như trên thẻ"
-                     class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all"
-                     oninput="updatePayBtn()">
-            </div>
-
-
-            {{-- Save card --}}
-            <label class="flex items-start gap-3 cursor-pointer">
-              <div class="flex-shrink-0 mt-0.5">
-                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 accent-blue-600">
-              </div>
-              <div>
-                <p class="text-sm font-semibold text-gray-700">Lưu thẻ cho lần đặt phòng sau</p>
-                <p class="text-xs text-gray-400">Thông tin thẻ được bảo mật. Chúng tôi không lưu CVV.</p>
-              </div>
-            </label>
-          </div>
-
-          {{-- ── Panel: PayPal ── --}}
-          <div id="panel-paypal" class="payment-panel">
-            <div class="flex flex-col items-center py-8 text-center">
-              <div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mb-4">
-                <i class="fab fa-paypal text-3xl text-blue-600"></i>
-              </div>
-              <h3 class="font-bold text-gray-800 mb-2">Thanh toán qua PayPal</h3>
-              <p class="text-sm text-gray-400 max-w-xs">Bạn sẽ được chuyển đến trang PayPal để hoàn tất thanh toán một cách an toàn.</p>
-            </div>
-          </div>
-
-          {{-- ── Panel: Bank Transfer ── --}}
-          <div id="panel-bank" class="payment-panel">
-            @php $bookingRef = 'UL-' . strtoupper(substr(md5(now()->timestamp), 0, 6)); @endphp
-
-            {{-- 2-column: bank info + QR --}}
-            <div class="flex gap-4 mb-4">
-
-              {{-- Bank info fields --}}
-              <div class="flex-1 space-y-3">
-
-                <div>
-                  <label class="block text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-1">Tên Ngân Hàng</label>
-                  <div class="flex items-center gap-2.5 border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50">
-                    <i class="fas fa-landmark text-gray-400 text-sm"></i>
-                    <span class="text-sm font-semibold text-gray-800">Techcombank</span>
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-1">Chủ Tài Khoản</label>
-                  <div class="flex items-center gap-2.5 border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50">
-                    <i class="fas fa-user text-gray-400 text-sm"></i>
-                    <span class="text-sm font-semibold text-gray-800">URBAN LUXE HOTELS JSC</span>
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-1">Số Tài Khoản</label>
-                  <div class="flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50">
-                    <div class="flex items-center gap-2.5">
-                      <i class="fas fa-hashtag text-gray-400 text-sm"></i>
-                      <span class="text-sm font-mono font-semibold text-gray-800">1903 4829 1200 18</span>
-                    </div>
-                    <button type="button" onclick="copyAccNum()" title="Sao chép" class="text-gray-400 hover:text-blue-500 transition-colors">
-                      <i class="far fa-copy text-sm"></i>
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-1">Chi Nhánh</label>
-                  <div class="flex items-center gap-2.5 border border-gray-200 rounded-lg px-3 py-2.5 bg-gray-50">
-                    <i class="fas fa-location-dot text-gray-400 text-sm"></i>
-                    <span class="text-sm text-gray-700">Hội sở — Hồ Chí Minh</span>
-                  </div>
-                </div>
-
-              </div>
-
-              {{-- QR Code --}}
-              <div class="flex-shrink-0 w-36 flex flex-col items-center">
-                <div class="w-full bg-gray-50 border border-gray-200 rounded-xl overflow-hidden p-2">
-                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=00020101021238520010A000000727012700069704160113190348291200180208QRIBFTTA5303704540{{ number_format($subtotal, 0, '', '') }}5802VN5915URBAN+LUXE+HOTEL6008HOCHIMINH62180814{{ $bookingRef }}6304"
-                       alt="QR Chuyển Khoản" class="w-full rounded-lg">
-                </div>
-                <p class="text-[10px] text-gray-400 text-center mt-2 leading-tight">Quét bằng app ngân hàng<br>hoặc ví điện tử</p>
-              </div>
-
-            </div>
-
-            {{-- Important instruction --}}
-            <div class="flex items-start gap-2.5 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
-              <i class="fas fa-circle-info text-blue-500 text-sm mt-0.5 flex-shrink-0"></i>
-              <p class="text-xs text-blue-700 leading-relaxed">
-                <span class="font-bold">Hướng dẫn quan trọng:</span>
-                Vui lòng ghi rõ mã đặt phòng
-                <span class="font-bold text-blue-800 bg-blue-100 px-1.5 py-0.5 rounded font-mono">#{{ $bookingRef }}</span>
-                trong nội dung chuyển khoản để chúng tôi xử lý nhanh hơn.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {{-- Billing Address Card — only visible for credit card tab --}}
-        <div id="billingCard" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-          <h2 class="text-base font-bold text-gray-900 mb-5">Địa Chỉ Thanh Toán</h2>
-          <div class="flex items-center gap-6">
-            <label class="flex items-center gap-2.5 cursor-pointer">
-              <input type="radio" name="billing_addr" value="same" checked
-                     class="w-4 h-4 accent-blue-600">
-              <span class="text-sm font-semibold text-gray-700">Giống thông tin khách</span>
-            </label>
-            <label class="flex items-center gap-2.5 cursor-pointer">
-              <input type="radio" name="billing_addr" value="different"
-                     class="w-4 h-4 accent-blue-600">
-              <span class="text-sm text-gray-600">Địa chỉ khác</span>
-            </label>
           </div>
         </div>
 
@@ -372,14 +209,14 @@
               @foreach($allInputs as $key => $val)
                 <input type="hidden" name="{{ $key }}" value="{{ $val }}">
               @endforeach
-              <input type="hidden" id="paymentMethodInput" name="payment_method" value="credit">
+              <input type="hidden" id="paymentMethodInput" name="payment_method" value="momo">
             </form>
 
             <button id="payBtn" disabled
                     onclick="if(!this.disabled){ document.getElementById('confirmForm').submit(); }"
-                    class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold text-sm tracking-wider uppercase py-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
-              <i id="payIcon" class="far fa-credit-card text-sm"></i>
-              <span id="payLabel">Hoàn Tất Thanh Toán</span>
+                    class="w-full bg-[#A50064] hover:bg-[#8A0053] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold text-sm tracking-wider uppercase py-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
+              <i id="payIcon" class="fas fa-wallet text-sm text-white"></i>
+              <span id="payLabel">Thanh Toán Bằng MoMo</span>
             </button>
             <div class="flex items-center justify-center gap-1.5 mt-3 text-[10px] text-gray-400">
               <i class="fas fa-lock text-gray-300"></i>
@@ -424,76 +261,10 @@
 
 @push('scripts')
 <script>
-// ── Active payment method ──
-var activeMethod = 'credit';
-
-// ── Payment method switcher ──
-var methodLabels = {
-  credit: { label: 'Hoàn Tất Thanh Toán', icon: 'far fa-credit-card' },
-  paypal: { label: 'Thanh Toán Với PayPal', icon: 'fab fa-paypal' },
-  bank:   { label: 'Xác Nhận Chuyển Khoản', icon: 'fas fa-landmark' },
-};
-
-function switchMethod(method) {
-  activeMethod = method;
-  // tabs
-  document.querySelectorAll('.method-tab').forEach(function(tab) {
-    tab.classList.toggle('active', tab.dataset.method === method);
-  });
-  // panels
-  document.querySelectorAll('.payment-panel').forEach(function(p) {
-    p.classList.toggle('active', p.id === 'panel-' + method);
-  });
-  // billing address card: only show for credit card
-  var billingCard = document.getElementById('billingCard');
-  if (billingCard) billingCard.style.display = (method === 'credit') ? '' : 'none';
-  // sync hidden payment method input
-  var pmInput = document.getElementById('paymentMethodInput');
-  if (pmInput) pmInput.value = method;
-  // update CTA label/icon
-  var m = methodLabels[method];
-  document.getElementById('payLabel').textContent = m.label;
-  document.getElementById('payIcon').className = m.icon + ' text-sm';
-  // re-evaluate button state
-  updatePayBtn();
-}
-
-// ── Terms checkbox + card field validation toggles button ──
+// ── Terms checkbox validation toggles button ──
 function updatePayBtn() {
   var agreed = document.getElementById('agreeTerms').checked;
-  var canPay = false;
-  if (activeMethod === 'credit') {
-    var cardNum  = (document.getElementById('cardNumber').value.replace(/\s/g,'').length >= 16);
-    var expiry   = document.getElementById('expiryInput').value.trim().length >= 4;
-    var cvv      = document.getElementById('cvvInput').value.trim().length >= 3;
-    var holder   = document.getElementById('holderInput').value.trim().length > 0;
-    canPay = agreed && cardNum && expiry && cvv && holder;
-  } else {
-    // PayPal and Bank Transfer — only need terms
-    canPay = agreed;
-  }
-  document.getElementById('payBtn').disabled = !canPay;
-}
-
-// ── Card number auto-format ──
-function formatCardNumber(el) {
-  var v = el.value.replace(/\D/g, '').substring(0, 16);
-  el.value = v.replace(/(.{4})/g, '$1 ').trim();
-}
-
-// ── Expiry auto-format ──
-function formatExpiry(el) {
-  var v = el.value.replace(/\D/g, '').substring(0, 4);
-  if (v.length >= 3) v = v.substring(0, 2) + ' / ' + v.substring(2);
-  el.value = v;
-}
-
-// ── Copy account number ──
-function copyAccNum() {
-  navigator.clipboard.writeText('1903482912001 8').then(function() {
-    var icon = document.querySelector('[onclick="copyAccNum()"] i');
-    if (icon) { icon.className = 'fas fa-check text-green-500 text-sm'; setTimeout(function(){ icon.className = 'far fa-copy text-sm'; }, 1500); }
-  });
+  document.getElementById('payBtn').disabled = !agreed;
 }
 </script>
 @endpush

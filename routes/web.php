@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\ServiceGroupAdminController;
 use App\Http\Controllers\Admin\ServiceAdminController;
 use App\Http\Controllers\Admin\GeneralConfigAdminController;
 use App\Http\Controllers\Admin\MaintenanceTicketAdminController;
+use App\Http\Controllers\Admin\StatisticsAdminController;
 use App\Http\Controllers\Client\AmenityController;
 use App\Http\Controllers\Client\BookingCheckoutController;
 use App\Http\Controllers\Client\DiningController;
@@ -179,6 +180,11 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::get('general-config', [GeneralConfigAdminController::class, 'index'])->name('admin.general-config.index');
     Route::post('general-config/general', [GeneralConfigAdminController::class, 'updateGeneral'])->name('admin.general-config.update-general');
     Route::post('general-config/surcharge', [GeneralConfigAdminController::class, 'updateSurcharge'])->name('admin.general-config.update-surcharge');
+
+    // Statistics routes
+    Route::get('statistics/{section?}', [StatisticsAdminController::class, 'index'])
+        ->where('section', 'overview|revenue|room-performance|customers')
+        ->name('admin.statistics.index');
     
     Route::post("/logout", [AuthAdminController::class, "logout"])->name('admin.logout');
 
@@ -230,14 +236,23 @@ Route::name('client.')->group(function () {
     // Checkout — nhận dữ liệu phòng từ trang rooms và hiển thị form thông tin khách
     Route::post('/booking/checkout', [BookingCheckoutController::class, 'checkout'])->name('booking.checkout');
 
+    // Xác thực email khách hàng để tự điền form checkout. Trả về JSON.
+    Route::post('/booking/verify-email', [BookingCheckoutController::class, 'verifyEmail'])->name('booking.verify-email');
+
     // Payment page (Step 3) — receives guest info + booking data from checkout form
     Route::post('/booking/payment', [BookingCheckoutController::class, 'payment'])->name('booking.payment');
 
-    // Confirm — processes payment form, saves to session, redirects to confirmation
+    // Confirm — processes payment form, saves to DB, redirects to confirmation or MoMo
     Route::post('/booking/confirm', [BookingCheckoutController::class, 'confirm'])->name('booking.confirm');
+
+    // MoMo Return URL
+    Route::get('/booking/momo-return', [BookingCheckoutController::class, 'momoReturn'])->name('booking.momo-return');
 
     // Confirmation (Step 4) — shows booking confirmed page
     Route::get('/booking/confirmation', [BookingCheckoutController::class, 'confirmation'])->name('booking.confirmation');
+
+    // MoMo IPN Webhook (No CSRF via app.php)
+    Route::post('/api/payment/momo-ipn', [BookingCheckoutController::class, 'momoIpn']);
 });
 
 if (app()->environment('local')) {

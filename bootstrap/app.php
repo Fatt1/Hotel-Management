@@ -26,6 +26,9 @@ return Application::configure(basePath: dirname(__DIR__))
             }
             return route('login');
         });
+        $middleware->validateCsrfTokens(except: [
+            'api/payment/momo-ipn',
+        ]);
         $middleware->alias(['admin' => CheckAdmin::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
