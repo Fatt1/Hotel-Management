@@ -109,24 +109,16 @@
               Quốc gia / Khu vực <span class="text-red-500">*</span>
             </label>
             <div class="relative">
-              <select name="country" id="countryInput"
-                      class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-700 bg-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all appearance-none"
-                      required>
-                <option value="">Chọn quốc gia của bạn</option>
-                <option value="VN" selected>Việt Nam</option>
-                <option value="US">Hoa Kỳ</option>
-                <option value="JP">Nhật Bản</option>
-                <option value="KR">Hàn Quốc</option>
-                <option value="SG">Singapore</option>
-                <option value="AU">Australia</option>
-                <option value="GB">Vương quốc Anh</option>
-                <option value="DE">Đức</option>
-                <option value="FR">Pháp</option>
-                <option value="CA">Canada</option>
-                <option value="CN">Trung Quốc</option>
-                <option value="TH">Thái Lan</option>
-              </select>
-              <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                @php
+                  $clientAuthVM = new \App\ViewModels\ClientAuthViewModel();
+                @endphp
+                @include('admin.customers._country_picker', [
+                    'inputName' => 'country',
+                    'inputId' => 'countryInput',
+                    'selectedValue' => 'Việt Nam',
+                    'pickerCountries' => $clientAuthVM->countries(),
+                    'placeholder' => 'Chọn quốc gia của bạn'
+                ])
             </div>
           </div>
 

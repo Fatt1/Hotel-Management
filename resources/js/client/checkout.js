@@ -77,7 +77,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (lastNameInput) lastNameInput.value = response.data.last_name || "";
                 if (firstNameInput) firstNameInput.value = response.data.first_name || "";
                 if (phoneInput) phoneInput.value = response.data.phone || "";
-                if (countryInput && response.data.country) countryInput.value = response.data.country;
+                
+                if (countryInput && response.data.country) {
+                    const val = response.data.country;
+                    const item = document.querySelector(`.cp-item[data-value="${val}"]`);
+                    if (item) {
+                        item.click();
+                    } else {
+                        countryInput.value = val;
+                    }
+                }
 
                 validateCheckout();
             } else {
