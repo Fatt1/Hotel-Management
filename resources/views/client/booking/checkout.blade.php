@@ -46,28 +46,6 @@
           <span class="text-xs text-gray-400">Các trường có dấu <span class="text-red-500">*</span> là bắt buộc</span>
         </div>
 
-        {{-- Email verify --}}
-        <div class="bg-gray-50 border border-gray-100 rounded-xl p-5 mb-6">
-          <p class="text-sm font-semibold text-gray-700 mb-3">
-            <i class="fas fa-circle-check text-blue-500 mr-2"></i>Xác thực email để tự điền thông tin
-          </p>
-          <div class="flex flex-col sm:flex-row gap-3">
-            <div class="relative flex-1">
-              <i class="far fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-              <input type="email" id="emailVerify" placeholder="Nhập địa chỉ email của bạn"
-                     class="w-full border border-gray-200 rounded-lg py-3 pl-10 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all">
-            </div>
-            <button type="button" id="verifyEmailBtn"
-                    class="w-full sm:w-auto px-5 py-3 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
-              Xác Thực
-            </button>
-          </div>
-          <p id="verifyMessage" class="hidden text-[11px] text-red-500 mt-2 flex items-center gap-1.5">
-            <i class="fas fa-circle-info text-[10px]"></i>
-            Không tìm thấy tài khoản. Vui lòng điền thông tin bên dưới để tạo mới.
-          </p>
-        </div>
-
         {{-- The actual booking form —uses POST to /booking/checkout but we reuse the same route --}}
         <form method="POST" action="{{ route('client.booking.payment') }}" id="checkoutForm">
           @csrf
@@ -81,7 +59,28 @@
           @foreach($selectedRooms as $item)
             <input type="hidden" name="qty_{{ $item['room_type']->id }}" value="{{ $item['qty'] }}">
           @endforeach
-          <input type="hidden" name="email_verify" id="emailVerifyHidden" value="">
+
+          {{-- Email verify --}}
+          <div class="bg-gray-50 border border-gray-100 rounded-xl p-5 mb-6">
+            <p class="text-sm font-semibold text-gray-700 mb-3">
+              <i class="fas fa-circle-check text-blue-500 mr-2"></i>Xác thực email để tự điền thông tin
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <div class="relative flex-1">
+                <i class="far fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <input type="email" id="emailVerify" name="email_verify" placeholder="Nhập địa chỉ email của bạn"
+                       class="w-full border border-gray-200 rounded-lg py-3 pl-10 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all">
+              </div>
+              <button type="button" id="verifyEmailBtn"
+                      class="w-full sm:w-auto px-5 py-3 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
+                Xác Thực
+              </button>
+            </div>
+            <p id="verifyMessage" class="hidden text-[11px] text-red-500 mt-2 flex items-center gap-1.5">
+              <i class="fas fa-circle-info text-[10px]"></i>
+              Không tìm thấy tài khoản. Vui lòng điền thông tin bên dưới để tạo mới.
+            </p>
+          </div>
 
           {{-- First + Last Name --}}
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">

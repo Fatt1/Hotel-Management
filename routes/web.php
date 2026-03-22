@@ -236,11 +236,17 @@ Route::name('client.')->group(function () {
     // Payment page (Step 3) — receives guest info + booking data from checkout form
     Route::post('/booking/payment', [BookingCheckoutController::class, 'payment'])->name('booking.payment');
 
-    // Confirm — processes payment form, saves to session, redirects to confirmation
+    // Confirm — processes payment form, saves to DB, redirects to confirmation or MoMo
     Route::post('/booking/confirm', [BookingCheckoutController::class, 'confirm'])->name('booking.confirm');
+
+    // MoMo Return URL
+    Route::get('/booking/momo-return', [BookingCheckoutController::class, 'momoReturn'])->name('booking.momo-return');
 
     // Confirmation (Step 4) — shows booking confirmed page
     Route::get('/booking/confirmation', [BookingCheckoutController::class, 'confirmation'])->name('booking.confirmation');
+
+    // MoMo IPN Webhook (No CSRF via app.php)
+    Route::post('/api/payment/momo-ipn', [BookingCheckoutController::class, 'momoIpn']);
 });
 
 if (app()->environment('local')) {
