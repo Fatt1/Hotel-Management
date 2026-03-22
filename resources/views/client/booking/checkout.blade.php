@@ -19,7 +19,7 @@
        class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none opacity-25 grayscale-[20%]">
   <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,5,5,0.6)_0%,rgba(5,5,5,0.75)_100%)]"></div>
 
-  <div class="relative z-10 max-w-3xl mx-auto px-8 text-center">
+  <div class="relative z-10 max-w-3xl mx-auto px-4 sm:px-8 text-center">
     {{-- Step indicator --}}
     <div class="flex items-center justify-center gap-2 mb-4">
       <span class="w-2 h-2 rounded-full bg-green-400 inline-block"></span>
@@ -34,14 +34,14 @@
      MAIN CONTENT — 2 columns: form left, summary right
      ============================================================ --}}
 <div class="bg-[#f0f2f5] min-h-screen py-10">
-  <div class="max-w-6xl mx-auto px-8">
-    <div class="flex gap-7 items-start">
+  <div class="max-w-6xl mx-auto px-4 md:px-8">
+    <div class="flex flex-col lg:flex-row gap-7 items-start">
 
       {{-- ======================================================
            LEFT — Guest Information Form
            ====================================================== --}}
-      <div class="flex-1 bg-white rounded-2xl shadow-lg border border-gray-100 p-8 min-w-0">
-        <div class="flex items-center justify-between mb-6">
+      <div class="flex-1 bg-white rounded-2xl shadow-lg border border-gray-100 p-5 md:p-8 min-w-0">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-0 border-b border-gray-100 sm:border-none pb-4 sm:pb-0 mb-6">
           <h2 class="text-xl font-bold text-gray-900">Nhập thông tin của bạn</h2>
           <span class="text-xs text-gray-400">Các trường có dấu <span class="text-red-500">*</span> là bắt buộc</span>
         </div>
@@ -51,7 +51,7 @@
           <p class="text-sm font-semibold text-gray-700 mb-3">
             <i class="fas fa-circle-check text-blue-500 mr-2"></i>Xác thực email để tự điền thông tin
           </p>
-          <div class="flex gap-3">
+          <div class="flex flex-col sm:flex-row gap-3">
             <div class="relative flex-1">
               <i class="far fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
               <input type="email" id="emailVerify" placeholder="Nhập địa chỉ email của bạn"
@@ -59,7 +59,7 @@
                      class="w-full border border-gray-200 rounded-lg py-3 pl-10 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all">
             </div>
             <button type="button"
-                    class="px-5 py-3 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
+                    class="w-full sm:w-auto px-5 py-3 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
               Xác Thực
             </button>
           </div>
@@ -85,7 +85,7 @@
           <input type="hidden" name="email_verify" id="emailVerifyHidden" value="">
 
           {{-- First + Last Name --}}
-          <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
               <label class="block text-[11px] font-bold tracking-widest uppercase text-gray-500 mb-1.5">
                 Họ <span class="text-red-500">*</span>
@@ -163,7 +163,7 @@
       {{-- ======================================================
            RIGHT — Stay Summary Sidebar
            ====================================================== --}}
-      <div class="w-[340px] flex-shrink-0">
+      <div class="w-full lg:w-[340px] flex-shrink-0">
         <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
 
           {{-- Header --}}
@@ -277,7 +277,7 @@
           <div class="px-6 pb-6">
             <button id="checkoutBtn" disabled
                     onclick="if(!this.disabled){ document.getElementById('checkoutForm').submit(); }"
-                    class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold text-sm tracking-wider uppercase py-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
+                    class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold text-sm tracking-wider uppercase py-3.5 sm:py-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
               Tiếp Tục Thanh Toán <i class="fas fa-arrow-right text-xs"></i>
             </button>
             <div class="flex items-center justify-center gap-1.5 mt-3 text-[10px] text-gray-400">

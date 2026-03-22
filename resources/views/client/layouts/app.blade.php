@@ -15,24 +15,24 @@
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   @stack('styles')
 </head>
-<body class="bg-[#0a0a0a] font-['Inter'] text-[#e8e0d0]">
+<body class="bg-[#0a0a0a] font-['Inter'] text-[#e8e0d0] overflow-x-hidden w-full">
 
   {{-- Navbar --}}
   <nav class="fixed inset-x-0 top-0 z-50 border-b border-[#d4af37]/15 bg-[#0a0a0a]/95 backdrop-blur-sm">
-    <div class="mx-auto flex h-16 max-w-300 items-center justify-between px-8">
+    <div class="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 sm:px-8 relative z-50">
       {{-- Logo --}}
-      <a href="/" class="flex items-center gap-2 no-underline">
-        <span class="font-['Playfair_Display'] text-xl font-bold uppercase tracking-[0.15em] text-[#e8e0d0]">Urban Luxe</span>
+      <a href="/" class="flex items-center gap-2 no-underline flex-shrink-0">
+        <span class="font-['Playfair_Display'] text-lg sm:text-xl font-bold uppercase tracking-[0.15em] text-[#e8e0d0]">Urban Luxe</span>
       </a>
 
-      {{-- Nav Links --}}
+      {{-- Nav Links (Desktop) --}}
       @php
         $navRooms     = request()->routeIs('client.rooms.*');
         $navAmenities = request()->routeIs('client.amenities.*');
         $navDinings   = request()->routeIs('client.dinings.*');
         $navGallery   = request()->routeIs('client.gallery.*');
       @endphp
-      <div class="flex items-center gap-10">
+      <div class="hidden md:flex items-center gap-6 lg:gap-10">
         <a href="{{ route('client.rooms.index') }}"
            @class([
              'border-b pb-0.5 text-[0.7rem] font-semibold uppercase tracking-[0.15em] no-underline transition-colors',
@@ -62,8 +62,8 @@
            ])>Thư Viện</a>
       </div>
 
-      {{-- CTA Buttons --}}
-      <div class="flex items-center gap-4">
+      {{-- CTA Buttons & Mobile Toggle --}}
+      <div class="flex items-center gap-3 sm:gap-4 flex-shrink-0">
         @auth("customer")
           @php
             $customer = auth('customer')->user();
@@ -74,10 +74,10 @@
                 $initials .= 'U';
             }
           @endphp
-          <div class="group relative">
+          <div class="group relative hidden sm:block">
             <div class="relative inline-flex min-w-36.5 cursor-pointer items-center gap-[0.55rem] rounded-full border border-white/15 bg-white/10 py-[0.3rem] pl-[0.35rem] pr-[0.9rem] text-gray-100" aria-label="Tài khoản khách hàng">
               <span class="inline-flex size-[1.9rem] items-center justify-center rounded-full bg-[linear-gradient(145deg,#f2d4b2_0%,#e6ba8f_100%)] text-[0.72rem] font-bold tracking-[0.03em] text-[#2f3641]">{{ $initials }}</span>
-              <span class="text-[0.98rem] font-medium leading-none text-gray-50">{{ $fullName }}</span>
+              <span class="text-[0.98rem] font-medium leading-none text-gray-50 max-w-[80px] truncate">{{ $fullName }}</span>
               <span class="ml-auto text-[0.6rem] text-white/60 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180">▼</span>
             </div>
 
@@ -106,12 +106,43 @@
             </div>
           </div>
         @endauth
+
         @guest('customer')
-           <a href="{{ route('client.login') }}" class="text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-[#9a9080] no-underline transition-colors hover:text-[#e8e0d0]">Đăng Nhập</a>
+           <a href="{{ route('client.login') }}" class="hidden sm:block text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-[#9a9080] no-underline transition-colors hover:text-[#e8e0d0]">Đăng Nhập</a>
         @endguest
        
-        <a href="{{ route('client.rooms.index') }}" class="bg-[#d4af37] px-5 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-[#0a0a0a] no-underline transition-colors hover:bg-[#c9a227]">Đặt Phòng</a>
+        <a href="{{ route('client.rooms.index') }}" class="bg-[#d4af37] px-3 sm:px-5 py-2 text-[0.65rem] sm:text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-[#0a0a0a] no-underline transition-colors hover:bg-[#c9a227]">Đặt Phòng</a>
+
+        {{-- Mobile Hamburger Button --}}
+        <button id="mobileMenuBtn" onclick="document.getElementById('mobileMenu').classList.toggle('hidden'); document.getElementById('mobileMenu').classList.toggle('flex');" class="md:hidden flex items-center justify-center text-[#d4af37] text-xl ml-1 focus:outline-none">
+          <i class="fas fa-bars"></i>
+        </button>
       </div>
+    </div>
+
+    {{-- Mobile Dropdown Menu --}}
+    <div id="mobileMenu" class="absolute top-16 left-0 right-0 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-[#d4af37]/20 flex-col px-6 py-4 hidden md:hidden shadow-2xl z-40">
+      <a href="{{ route('client.rooms.index') }}" class="py-3 text-[#e8e0d0] text-sm font-semibold uppercase tracking-widest no-underline border-b border-white/5">Phòng</a>
+      <a href="{{ route('client.amenities.index') }}" class="py-3 text-[#e8e0d0] text-sm font-semibold uppercase tracking-widest no-underline border-b border-white/5">Tiện Ích</a>
+      <a href="{{ route('client.dinings.index') }}" class="py-3 text-[#e8e0d0] text-sm font-semibold uppercase tracking-widest no-underline border-b border-white/5">Ẩm Thực</a>
+      <a href="{{ route('client.gallery.index') }}" class="py-3 text-[#e8e0d0] text-sm font-semibold uppercase tracking-widest no-underline border-b border-white/5 mb-2">Thư Viện</a>
+      
+      @auth("customer")
+        @php
+          $customer = auth('customer')->user();
+          $fullName = trim($customer->full_name ?: 'Guest');
+        @endphp
+        <div class="py-3 text-[#d4af37] text-sm font-semibold tracking-wide">Xin chào, {{ $fullName }}</div>
+        <a href="#" class="py-2 text-[#9a9080] text-sm no-underline hover:text-white">Thông tin cá nhân</a>
+        <a href="#" class="py-2 text-[#9a9080] text-sm no-underline hover:text-white">Lịch đặt phòng</a>
+        <form method="POST" action="{{ route('client.logout') }}" class="mt-2">
+          @csrf
+          <button type="submit" class="text-[#ff6b6b] text-sm font-semibold">Đăng xuất</button>
+        </form>
+      @endauth
+      @guest('customer')
+        <a href="{{ route('client.login') }}" class="mt-2 inline-block bg-white/10 text-center rounded-lg px-4 py-3 text-[#e8e0d0] text-sm font-semibold uppercase tracking-widest no-underline w-full">Đăng Nhập Khách Hàng</a>
+      @endguest
     </div>
   </nav>
 
