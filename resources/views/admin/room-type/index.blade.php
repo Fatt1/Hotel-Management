@@ -31,7 +31,6 @@
               class="bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-600 outline-none focus:ring-2 focus:ring-blue-900/20">
         <option value="">Tất cả trạng thái</option>
         <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Đang hoạt động</option>
-        <option value="2" {{ request('status') === '2' ? 'selected' : '' }}>Sắp ra mắt</option>
         <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Không hoạt động</option>
       </select>
     </form>
@@ -80,16 +79,11 @@
             <td class="px-6 py-4 text-right font-bold text-blue-900">{{ number_format($room['hourly_price'], 0, ',', '.') }}đ</td>
             <td class="px-6 py-4 text-right font-bold text-blue-900">{{ number_format($room['daily_price'], 0, ',', '.') }}đ</td>
             <td class="px-6 py-4 text-center">
-              @php $status = $room['status'] ?? 0; @endphp
+              @php $status = (int) ($room['status'] ?? 0); @endphp
               @if($status === 1)
                 <span class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                   Đang hoạt động
-                </span>
-              @elseif($status === 2)
-                <span class="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold">
-                  <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                  Sắp ra mắt
                 </span>
               @else
                 <span class="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-xs font-bold">
@@ -97,8 +91,6 @@
                   Không hoạt động
                 </span>
               @endif
-
-              </span>
             </td>
             <td class="px-6 py-4">
               <div class="flex items-center justify-center gap-2">
@@ -108,7 +100,7 @@
                 <a href="{{ route('admin.room-types.edit', $room['id']) }}" class="p-2 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-all" title="Chỉnh sửa">
                   <span class="material-symbols-outlined">edit</span>
                 </a>
-                <form action="{{ route('admin.room-types.destroy', $room['id']) }}" method="POST" style="display:inline;" onclick="openDeleteModal(event, '{{ route('admin.room-types.destroy', $room['id']) }}', '{{ $room['name'] }}')">
+                <form action="{{ route('admin.room-types.destroy', $room['id']) }}" method="POST" style="display:inline;" onclick='openDeleteModal(event, @js(route("admin.room-types.destroy", $room["id"])), @js($room["name"]))'>
                   @csrf
                   @method('DELETE')
                   <button type="button" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Xóa">
@@ -142,81 +134,7 @@
   </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950" style="background-color: rgba(15, 23, 42, 0.1);">
-  <div class="bg-white rounded-2xl shadow-lg max-w-md w-full mx-4 overflow-hidden">
-    <!-- Content -->
-    <div class="p-8 text-center">
-      <!-- Icon Warning -->
-      <div class="mb-4 flex justify-center">
-        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-          <span class="material-symbols-outlined text-red-600 text-4xl">warning</span>
-        </div>
-      </div>
-
-      <!-- Title -->
-      <h2 class="text-xl font-bold text-slate-900 mb-3">Xác nhận xóa loại phòng</h2>
-
-      <!-- Description -->
-      <p class="text-slate-600 text-sm mb-6 leading-relaxed ">
-        Bạn có chắc chắn muốn xóa loại phòng <span id="deleteItemName" class="font-bold text-red-600">này</span> không? Mọi dữ liệu liên quan sẽ bị xóa vĩnh viễn và không thể hoàn tác.
-      </p>
-
-      <!-- Action Links -->
-      <div class="flex gap-2 mb-8 justify-center text-xs bg-slate-50 rounded-lg p-3">
-        <button type="button" onclick="closeDeleteModal()" class="px-3 py-1 text-slate-500 hover:text-slate-700 font-medium transition-colors">
-          XÓA/PHÒNG CẤN XÓA
-        </button>
-        <span class="text-slate-300">•</span>
-        <button type="button" onclick="confirmDelete()" class="px-3 py-1 text-blue-600 hover:text-blue-700 font-medium transition-colors">
-          PHÒNG ĐỘ PIXI
-        </button>
-      </div>
-    </div>
-
-    <!-- Footer Buttons -->
-    <div class="flex gap-3 p-6 bg-slate-50 border-t border-slate-100">
-      <button type="button" onclick="closeDeleteModal()" class="flex-1 px-4 py-3 border border-slate-300 rounded-lg font-bold text-slate-600 hover:bg-slate-100 transition-all">
-        Hủy
-      </button>
-      <button type="button" onclick="confirmDelete()" class="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-all">
-        Xác nhận xóa
-      </button>
-    </div>
-  </div>
-</div>
-
-<script>
-let deleteFormUrl = '';
-
-function openDeleteModal(event, url, roomName) {
-  event.preventDefault();
-  deleteFormUrl = url;
-  document.getElementById('deleteItemName').textContent = roomName;
-  document.getElementById('deleteModal').classList.remove('hidden');
-}
-
-function closeDeleteModal() {
-  document.getElementById('deleteModal').classList.add('hidden');
-  deleteFormUrl = '';
-}
-
-function confirmDelete() {
-  if (!deleteFormUrl) return;
-  
-  // Submit the hidden form
-  const hiddenForm = document.getElementById('deleteForm');
-  hiddenForm.action = deleteFormUrl;
-  hiddenForm.submit();
-}
-
-// Close modal when clicking outside
-document.getElementById('deleteModal')?.addEventListener('click', function(e) {
-  if (e.target === this) {
-    closeDeleteModal();
-  }
-});
-</script>
+@vite(['resources/js/admin/room-types/index.js'])
 
 <!-- Hidden Delete Form -->
 <form id="deleteForm" method="POST" style="display: none;">

@@ -30,6 +30,7 @@ class RoomType extends Model
         'child_quantity' => 'integer',
         'single_bed_quantity' => 'integer',
         'double_bed_quantity' => 'integer',
+        'is_active' => 'boolean',
         'width' => 'decimal:2',
         'height' => 'decimal:2',
         'hourly_price' => 'decimal:2',
@@ -43,7 +44,7 @@ class RoomType extends Model
 
     public function equipments(): BelongsToMany
     {
-        return $this->belongsToMany(Equipment::class, 'room_equipment')
+        return $this->belongsToMany(Equipment::class, 'room_equipments')
             ->withPivot('quantity');
     }
 

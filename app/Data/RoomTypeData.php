@@ -10,7 +10,6 @@ use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Numeric;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\StringType;
-use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Data;
 
 class RoomTypeData extends Data
@@ -81,7 +80,7 @@ class RoomTypeData extends Data
         #[Required]
         #[IntegerType]
         #[Min(0)]
-        #[Max(2)]
+        #[Max(1)]
         public int $is_active = 1,
     ) {}
 
