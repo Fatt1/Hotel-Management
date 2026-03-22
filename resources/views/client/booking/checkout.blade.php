@@ -55,15 +55,14 @@
             <div class="relative flex-1">
               <i class="far fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
               <input type="email" id="emailVerify" placeholder="Nhập địa chỉ email của bạn"
-                oninput="syncEmailForSubmit()"
                      class="w-full border border-gray-200 rounded-lg py-3 pl-10 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all">
             </div>
-            <button type="button"
+            <button type="button" id="verifyEmailBtn"
                     class="w-full sm:w-auto px-5 py-3 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
               Xác Thực
             </button>
           </div>
-          <p class="text-[11px] text-gray-400 mt-2 flex items-center gap-1.5">
+          <p id="verifyMessage" class="hidden text-[11px] text-red-500 mt-2 flex items-center gap-1.5">
             <i class="fas fa-circle-info text-[10px]"></i>
             Không tìm thấy tài khoản. Vui lòng điền thông tin bên dưới để tạo mới.
           </p>
@@ -92,7 +91,7 @@
               </label>
               <input type="text" name="last_name" id="lastNameInput" placeholder="vd. Nguyễn"
                      class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all"
-                     oninput="validateCheckout()" required>
+                     required>
             </div>
             <div>
               <label class="block text-[11px] font-bold tracking-widest uppercase text-gray-500 mb-1.5">
@@ -100,7 +99,7 @@
               </label>
               <input type="text" name="first_name" id="firstNameInput" placeholder="vd. Văn An"
                      class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all"
-                     oninput="validateCheckout()" required>
+                     required>
             </div>
           </div>
 
@@ -112,7 +111,7 @@
             <div class="relative">
               <select name="country" id="countryInput"
                       class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-700 bg-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all appearance-none"
-                      onchange="validateCheckout()" required>
+                      required>
                 <option value="">Chọn quốc gia của bạn</option>
                 <option value="VN" selected>Việt Nam</option>
                 <option value="US">Hoa Kỳ</option>
@@ -152,7 +151,7 @@
               </div>
               <input type="tel" name="phone" id="phoneInput" placeholder="(012) 345-6789"
                      class="flex-1 border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all"
-                     oninput="validateCheckout()" required>
+                     required>
 
             </div>
           </div>{{-- /phone --}}
@@ -310,25 +309,5 @@
 @endsection
 
 @push('scripts')
-<script>
-function syncEmailForSubmit() {
-  var emailInput = document.getElementById('emailVerify');
-  var hiddenInput = document.getElementById('emailVerifyHidden');
-  if (!emailInput || !hiddenInput) return;
-  hiddenInput.value = emailInput.value.trim();
-}
-
-function validateCheckout() {
-  var lastName  = document.getElementById('lastNameInput').value.trim();
-  var firstName = document.getElementById('firstNameInput').value.trim();
-  var country   = document.getElementById('countryInput').value;
-  var phone     = document.getElementById('phoneInput').value.trim();
-
-  var ok = lastName.length > 0 && firstName.length > 0 && country !== '' && phone.length >= 6;
-  document.getElementById('checkoutBtn').disabled = !ok;
-}
-// run on page load in case browser auto-fills
-document.addEventListener('DOMContentLoaded', validateCheckout);
-document.addEventListener('DOMContentLoaded', syncEmailForSubmit);
-</script>
+@vite('resources/js/client/checkout.js')
 @endpush

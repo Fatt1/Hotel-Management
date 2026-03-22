@@ -8,6 +8,7 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.js',
+                'resources/js/client/checkout.js',
                 'resources/js/admin/login.js',
                 'resources/js/admin/role-permission.js',
                 'resources/js/admin/bookings/create-booking.js',

@@ -7,6 +7,19 @@ export async function getCustomerByEmail(email) {
     return response.data;
 }
 
+export async function verifyClientEmail(email) {
+    try {
+        const response = await axios.post("/booking/verify-email", { email });
+        return response.data;
+    } catch (error) {
+        if (error.response && error.response.data) {
+            return error.response.data;
+        }
+        console.error("Lỗi khi xác thực email khách hàng:", error);
+        return { success: false, message: "Đã xảy ra lỗi kết nối." };
+    }
+}
+
 export async function getRoomTypes() {
     try {
         const response = await axios.get("/admin/room-types/all");
