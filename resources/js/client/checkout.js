@@ -2,7 +2,6 @@ import { verifyClientEmail } from "../api";
 
 document.addEventListener("DOMContentLoaded", () => {
     const emailVerifyInput = document.getElementById("emailVerify");
-    const emailVerifyHidden = document.getElementById("emailVerifyHidden");
     const verifyBtn = document.getElementById("verifyEmailBtn");
     const errorMessage = document.getElementById("verifyMessage");
 
@@ -19,8 +18,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const firstName = firstNameInput.value.trim();
         const country = countryInput.value;
         const phone = phoneInput.value.trim();
+        const email = emailVerifyInput ? emailVerifyInput.value.trim() : "";
+        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
         const ok =
+            emailOk &&
             lastName.length > 0 &&
             firstName.length > 0 &&
             country !== "" &&
@@ -29,9 +31,9 @@ document.addEventListener("DOMContentLoaded", () => {
         checkoutBtn.disabled = !ok;
     }
 
-    if (emailVerifyInput && emailVerifyHidden) {
+    if (emailVerifyInput) {
         emailVerifyInput.addEventListener("input", () => {
-            emailVerifyHidden.value = emailVerifyInput.value.trim();
+            validateCheckout();
         });
     }
 

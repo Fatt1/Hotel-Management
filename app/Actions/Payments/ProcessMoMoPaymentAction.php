@@ -3,6 +3,7 @@
 namespace App\Actions\Payments;
 
 use App\Models\Booking;
+use Illuminate\Support\Facades\Log;
 
 class ProcessMoMoPaymentAction
 {
@@ -16,15 +17,27 @@ class ProcessMoMoPaymentAction
         $partnerCode = env('MOMO_PARTNER_CODE', 'MOMOBKUN20180529');
         $accessKey   = env('MOMO_ACCESS_KEY', 'klm05TvNBzhg7h7j');
         $secretKey   = env('MOMO_SECRET_KEY', 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa');
-        $endpoint    = "https://test-payment.momo.vn/v2/gateway/api/create";
+        $endpoint    = env('MOMO_API_ENDPOINT', 'https://test-payment.momo.vn/v2/gateway/api/create');
         
         $ngrokUrl    = rtrim(env('NGROK_URL', url('/')), '/');
 
         $orderInfo   = "Thanh toan don dat phong " . $booking->id;
-        $amountStr   = (string) (int) $amount; // Khong co so thap phan
+
+        $amountToCharge = (int) $amount;
+        $testOverride = (int) env('MOMO_TEST_AMOUNT_OVERRIDE', 0);
+        if (app()->environment('local') && $testOverride > 0) {
+            $amountToCharge = $testOverride;
+            Log::info('MoMo amount override is active', [
+                'booking_id' => $booking->id,
+                'original_amount' => (int) $amount,
+                'override_amount' => $amountToCharge,
+            ]);
+        }
+
+        $amountStr   = (string) $amountToCharge; // Khong co so thap phan
         $orderId     = (string) $booking->id . '_' . time(); // Tránh lỗi OrderId is duplicated
-        $redirectUrl = $ngrokUrl . '/booking/momo-return';
-        $ipnUrl      = $ngrokUrl . '/api/payment/momo-ipn';
+        $redirectUrl = rtrim((string) env('MOMO_RETURN_URL', $ngrokUrl . '/booking/momo-return'), '/');
+        $ipnUrl      = rtrim((string) env('MOMO_IPN_URL', $ngrokUrl . '/api/payment/momo-ipn'), '/');
         $extraData   = "";
         
         $requestId   = time() . "";
@@ -60,6 +73,16 @@ class ProcessMoMoPaymentAction
             'signature'   => $signature
         ];
 
+        Log::info('MoMo create request', [
+            'booking_id' => $booking->id,
+            'partner_code' => $partnerCode,
+            'endpoint' => $endpoint,
+            'order_id' => $orderId,
+            'amount' => $amountStr,
+            'redirect_url' => $redirectUrl,
+            'ipn_url' => $ipnUrl,
+        ]);
+
         // Gửi cURL POST
         $ch = curl_init($endpoint);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
@@ -78,14 +101,18 @@ class ProcessMoMoPaymentAction
         curl_close($ch);
 
         if ($err) {
-            \Illuminate\Support\Facades\Log::error('MoMo cURL Error: ' . $err);
+            Log::error('MoMo cURL Error: ' . $err);
             return '';
         } else {
             $json = json_decode($response, true);
+            Log::info('MoMo create response', [
+                'booking_id' => $booking->id,
+                'response' => $json,
+            ]);
             if (isset($json['payUrl'])) {
                 return $json['payUrl'];
             }
-            \Illuminate\Support\Facades\Log::error('MoMo API Error Response: ' . $response);
+            Log::error('MoMo API Error Response: ' . $response);
         }
 
         return '';

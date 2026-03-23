@@ -9,6 +9,12 @@
 
 @section('content')
 
+@php
+  $isSuccess = $success ?? true;
+  $isPaidState = $isPaid ?? $isSuccess;
+  $statusMessage = $message ?? 'Dat phong cua ban da duoc xac nhan thanh cong.';
+@endphp
+
 {{-- ============================================================
      HERO — Booking Confirmed
      ============================================================ --}}
@@ -19,17 +25,17 @@
   <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,5,5,.55)_0%,rgba(5,5,5,.7)_100%)]"></div>
 
   <div class="relative z-10 max-w-2xl mx-auto px-8 text-center">
-    {{-- Green checkmark circle --}}
-    <div class="booking-anim-pop mx-auto mb-5 w-16 h-16 rounded-full bg-green-500 flex items-center justify-center shadow-lg shadow-green-500/30">
-      <i class="fas fa-check text-white text-2xl"></i>
+    {{-- Status circle --}}
+    <div class="booking-anim-pop mx-auto mb-5 w-16 h-16 rounded-full {{ $isSuccess ? 'bg-green-500 shadow-green-500/30' : 'bg-red-500 shadow-red-500/30' }} flex items-center justify-center shadow-lg">
+      <i class="fas {{ $isSuccess ? 'fa-check' : 'fa-xmark' }} text-white text-2xl"></i>
     </div>
 
     <div class="booking-anim-fadeup">
       <h1 class="font-['Playfair_Display'] text-4xl md:text-5xl font-bold text-white mb-3">
-        Đặt Phòng Thành Công!
+        {{ $isSuccess ? 'Dat Phong Thanh Cong!' : 'Giao Dich Chua Thanh Cong' }}
       </h1>
       <p class="text-stone-300/75 text-sm mb-6">
-        Chào mừng đến Urban Luxe. Đặt phòng của bạn đã được xác nhận thành công.
+        {{ $statusMessage }}
       </p>
 
       {{-- Booking ID pill --}}
@@ -98,11 +104,13 @@
         </div>
         <div class="px-7 py-5">
           <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-1.5">Trạng Thái</div>
-          <div class="inline-flex items-center gap-1.5 bg-green-50 text-green-700 border border-green-200 text-xs font-bold px-2.5 py-1 rounded-full">
-            <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span>
-            Đã Xác Nhận
+          <div class="inline-flex items-center gap-1.5 {{ $isSuccess ? 'bg-green-50 text-green-700 border-green-200' : 'bg-amber-50 text-amber-700 border-amber-200' }} border text-xs font-bold px-2.5 py-1 rounded-full">
+            <span class="w-1.5 h-1.5 rounded-full {{ $isSuccess ? 'bg-green-500' : 'bg-amber-500' }} inline-block"></span>
+            {{ $isSuccess ? 'Da Xac Nhan' : 'Cho Xu Ly' }}
           </div>
-          <div class="text-xs text-blue-600 font-semibold mt-1">Đã Thanh Toán</div>
+          <div class="text-xs {{ $isPaidState ? 'text-blue-600' : 'text-amber-600' }} font-semibold mt-1">
+            {{ $isPaidState ? 'Da Thanh Toan' : 'Chua Thanh Toan' }}
+          </div>
         </div>
       </div>
 
@@ -201,8 +209,8 @@
 
         {{-- Security note --}}
         <div class="flex items-center justify-center gap-2 mt-5 text-[11px] text-gray-400">
-          <i class="fas fa-circle-check text-green-400 text-sm"></i>
-          Giao dịch được xử lý bảo mật vào {{ $bookingData['confirmed_at'] }}
+          <i class="fas {{ $isSuccess ? 'fa-circle-check text-green-400' : 'fa-circle-info text-amber-500' }} text-sm"></i>
+          {{ $isSuccess ? 'Giao dich da duoc xu ly vao' : 'Giao dich chua thanh cong luc' }} {{ $bookingData['confirmed_at'] }}
         </div>
       </div>
 

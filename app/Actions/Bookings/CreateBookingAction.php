@@ -13,6 +13,7 @@ use App\Models\Room;
 use App\Models\Service;
 use App\Models\ServiceUsage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class CreateBookingAction
 {
@@ -81,8 +82,11 @@ class CreateBookingAction
             // 4. Tạo booking với tổng tiền đã tính
             // Lấy checkin/checkout từ booking_detail đầu tiên làm "master" dates cho booking
             $firstDetail = (array) $bookingData->booking_details[0];
-            
-            $booking = Booking::create([
+            $hasBookingCheckinDate = Schema::hasColumn('bookings', 'checkin_date');
+            $hasBookingCheckoutDate = Schema::hasColumn('bookings', 'checkout_date');
+            $hasBookingDetailRoomAmount = Schema::hasColumn('booking_details', 'room_amount');
+
+            $bookingPayload = [
                 'customer_id'          => $customer->id,
                 'booking_date'         => $bookingData->booking_date,
                 'status'               => $bookingData->status,
@@ -90,7 +94,17 @@ class CreateBookingAction
                 'total_room_amount'    => $totalRoomAmount,
                 'surcharge_amount'     => 0,
                 'final_amount'         => $totalRoomAmount + $totalServiceAmount,
-            ]);
+            ];
+
+            if ($hasBookingCheckinDate) {
+                $bookingPayload['checkin_date'] = $firstDetail['checkin_date'] ?? $bookingData->booking_date;
+            }
+
+            if ($hasBookingCheckoutDate) {
+                $bookingPayload['checkout_date'] = $firstDetail['checkout_date'] ?? $bookingData->booking_date;
+            }
+
+            $booking = Booking::create($bookingPayload);
 
             // 5. Tạo booking_details và service_usages
             foreach ($bookingData->booking_details as $detail) {
@@ -119,7 +133,7 @@ class CreateBookingAction
                 }
                 
                 // Tạo booking_detail
-                $bookingDetail = BookingDetail::create([
+                $bookingDetailPayload = [
                     'booking_id'       => $booking->id,
                     'room_id'          => $detail['room_id'],
                     'checkin_date'     => $detail['checkin_date'],
@@ -128,9 +142,14 @@ class CreateBookingAction
                     'hourly_price'     => $room?->roomType->hourly_price ?? 0,
                     'daily_price'      => $room?->roomType->daily_price ?? 0,
                     'service_amount'   => $serviceAmount,
-                    'room_amount'      => $roomAmount,
                     'surcharge_amount' => 0,
-                ]);
+                ];
+
+                if ($hasBookingDetailRoomAmount) {
+                    $bookingDetailPayload['room_amount'] = $roomAmount;
+                }
+
+                $bookingDetail = BookingDetail::create($bookingDetailPayload);
                 
                 // Tạo service_usages nếu có (LƯU GIÁ TỪ DB)
                 if (isset($detail['services']) && is_array($detail['services']) && count($detail['services']) > 0) {
