@@ -68,7 +68,7 @@
             <div class="flex flex-col sm:flex-row gap-3">
               <div class="relative flex-1">
                 <i class="far fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                <input type="email" id="emailVerify" name="email_verify" placeholder="Nhập địa chỉ email của bạn"
+                  <input type="email" id="emailVerify" name="email_verify" placeholder="Nhập địa chỉ email của bạn" required
                        class="w-full border border-gray-200 rounded-lg py-3 pl-10 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all">
               </div>
               <button type="button" id="verifyEmailBtn"

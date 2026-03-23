@@ -2,7 +2,6 @@ import { verifyClientEmail } from "../api";
 
 document.addEventListener("DOMContentLoaded", () => {
     const emailVerifyInput = document.getElementById("emailVerify");
-    const emailVerifyHidden = document.getElementById("emailVerifyHidden");
     const verifyBtn = document.getElementById("verifyEmailBtn");
     const errorMessage = document.getElementById("verifyMessage");
 
@@ -13,31 +12,43 @@ document.addEventListener("DOMContentLoaded", () => {
     const checkoutBtn = document.getElementById("checkoutBtn");
 
     function validateCheckout() {
-        if (!lastNameInput || !firstNameInput || !countryInput || !phoneInput || !checkoutBtn) return;
-        
+        if (
+            !lastNameInput ||
+            !firstNameInput ||
+            !countryInput ||
+            !phoneInput ||
+            !checkoutBtn
+        )
+            return;
+
         const lastName = lastNameInput.value.trim();
         const firstName = firstNameInput.value.trim();
         const country = countryInput.value;
         const phone = phoneInput.value.trim();
+        const email = emailVerifyInput ? emailVerifyInput.value.trim() : "";
+        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
         const ok =
+            emailOk &&
             lastName.length > 0 &&
             firstName.length > 0 &&
             country !== "" &&
             phone.length >= 6;
-        
+
         checkoutBtn.disabled = !ok;
     }
 
-    if (emailVerifyInput && emailVerifyHidden) {
+    if (emailVerifyInput) {
         emailVerifyInput.addEventListener("input", () => {
-            emailVerifyHidden.value = emailVerifyInput.value.trim();
+            validateCheckout();
         });
     }
 
     // Bind validation events
-    if (lastNameInput) lastNameInput.addEventListener("input", validateCheckout);
-    if (firstNameInput) firstNameInput.addEventListener("input", validateCheckout);
+    if (lastNameInput)
+        lastNameInput.addEventListener("input", validateCheckout);
+    if (firstNameInput)
+        firstNameInput.addEventListener("input", validateCheckout);
     if (countryInput) countryInput.addEventListener("change", validateCheckout);
     if (phoneInput) phoneInput.addEventListener("input", validateCheckout);
 
@@ -74,13 +85,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Auto-fill success, hide error message
                 if (errorMessage) errorMessage.classList.add("hidden");
 
-                if (lastNameInput) lastNameInput.value = response.data.last_name || "";
-                if (firstNameInput) firstNameInput.value = response.data.first_name || "";
+                if (lastNameInput)
+                    lastNameInput.value = response.data.last_name || "";
+                if (firstNameInput)
+                    firstNameInput.value = response.data.first_name || "";
                 if (phoneInput) phoneInput.value = response.data.phone || "";
-                
+
                 if (countryInput && response.data.country) {
                     const val = response.data.country;
-                    const item = document.querySelector(`.cp-item[data-value="${val}"]`);
+                    const item = document.querySelector(
+                        `.cp-item[data-value="${val}"]`,
+                    );
                     if (item) {
                         item.click();
                     } else {

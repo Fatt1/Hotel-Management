@@ -242,8 +242,8 @@ Route::name('client.')->group(function () {
     // Xác thực email khách hàng để tự điền form checkout. Trả về JSON.
     Route::post('/booking/verify-email', [BookingCheckoutController::class, 'verifyEmail'])->name('booking.verify-email');
 
-    // Payment page (Step 3) — receives guest info + booking data from checkout form
-    Route::post('/booking/payment', [BookingCheckoutController::class, 'payment'])->name('booking.payment');
+    // Payment page (Step 3) — accepts POST (from checkout) and GET (after validation/payment errors)
+    Route::match(['get', 'post'], '/booking/payment', [BookingCheckoutController::class, 'payment'])->name('booking.payment');
 
     // Confirm — processes payment form, saves to DB, redirects to confirmation or MoMo
     Route::post('/booking/confirm', [BookingCheckoutController::class, 'confirm'])->name('booking.confirm');

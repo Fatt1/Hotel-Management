@@ -32,6 +32,17 @@
      ============================================================ --}}
 <div class="bg-[#f0f2f5] min-h-screen py-10">
   <div class="max-w-6xl mx-auto px-8">
+    @if (session('error') || $errors->any())
+      <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        @if (session('error'))
+          <div>{{ session('error') }}</div>
+        @endif
+        @foreach ($errors->all() as $error)
+          <div>{{ $error }}</div>
+        @endforeach
+      </div>
+    @endif
+
     <div class="flex gap-7 items-start">
 
       {{-- ====================================================
