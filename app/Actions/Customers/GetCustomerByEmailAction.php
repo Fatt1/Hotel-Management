@@ -3,6 +3,7 @@
 namespace App\Actions\Customers;
 
 use App\Models\Customer;
+use Illuminate\Support\Facades\Validator;
 
 class GetCustomerByEmailAction
 {
@@ -10,4 +11,5 @@ class GetCustomerByEmailAction
     {
         return Customer::where('email', $email)->first();
     }
+    
 }
