@@ -26,7 +26,7 @@
                 <div class="flex flex-col gap-1">
                     <label class="text-sm font-semibold text-slate-500">Họ</label>
                     <div class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700">
-                        {{ $viewModel->customer()->first_name }}
+                        {{ $viewModel->customer()->last_name }}
                     </div>
                 </div>
 
@@ -40,7 +40,7 @@
                 <div class="flex flex-col gap-1">
                     <label class="text-sm font-semibold text-slate-500">Tên</label>
                     <div class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700">
-                        {{ $viewModel->customer()->last_name }}
+                        {{ $viewModel->customer()->first_name }}
                     </div>
                 </div>
 

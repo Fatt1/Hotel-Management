@@ -35,12 +35,6 @@ class CustomerAdminController extends Controller
 
     public function getByEmail(Request $request, GetCustomerByEmailAction $getCustomerByEmail)
     {
-        $request->validate([
-            'email' => 'required|email',
-        ], [
-            'email.required' => 'Email không được để trống.',
-            'email.email' => 'Email không hợp lệ.',
-        ]);
         $email = $request->input('email');
         try {
             $customer = $getCustomerByEmail->handle($email);
