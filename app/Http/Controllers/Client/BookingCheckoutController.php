@@ -173,140 +173,23 @@ class BookingCheckoutController extends Controller
     /**
      * Nhận form thanh toán, tạo booking reference, lưu session, redirect đến trang xác nhận.
      */
-    public function confirm(Request $request)
+    public function confirm(\App\Data\CreateBookingOnlineData $request, \App\Actions\Bookings\CreateBookingOnlineAction $action)
     {
-        $request->validate([
-            'email_verify' => ['required', 'email'],
-            'first_name' => ['required', 'string', 'max:100'],
-            'last_name' => ['required', 'string', 'max:100'],
-            'phone' => ['required', 'string', 'max:30'],
-        ], [
-            'email_verify.required' => 'Vui long nhap email de tiep tuc thanh toan.',
-            'email_verify.email' => 'Email khong dung dinh dang.',
-            'first_name.required' => 'Vui long nhap ten.',
-            'last_name.required' => 'Vui long nhap ho.',
-            'phone.required' => 'Vui long nhap so dien thoai.',
-        ]);
-
-        // Generate booking reference
-        $bookingRef = 'UL-' . strtoupper(substr(md5(uniqid()), 0, 8));
-
-        // Parse core data
-        $checkIn  = $request->input('check_in',  now()->format('Y-m-d'));
-        $checkOut = $request->input('check_out', now()->addDays(3)->format('Y-m-d'));
-        $adults   = max(1, (int) $request->input('adults', 2));
-        $children = max(0, (int) $request->input('children', 0));
-
         try {
-            $checkInDate  = Carbon::parse($checkIn);
-            $checkOutDate = Carbon::parse($checkOut);
-        } catch (\Throwable) {
-            $checkInDate  = now();
-            $checkOutDate = now()->addDays(3);
-        }
-        $nights = max(1, (int) $checkInDate->diffInDays($checkOutDate));
+            $booking = $action->execute($request);
 
-        $selectedRooms = [];
-        $subtotal = 0;
-        foreach ($request->all() as $key => $value) {
-            if (str_starts_with($key, 'qty_') && (int) $value > 0) {
-                $rtId = (int) substr($key, 4);
-                $rt   = RoomType::with(['images'])->find($rtId);
-                if ($rt) {
-                    $qty   = (int) $value;
-                    $price = (float) $rt->daily_price;
-                    $selectedRooms[] = [
-                        'id'         => $rt->id,
-                        'name'       => $rt->name,
-                        'price'      => $price,
-                        'image_url'  => $this->resolveImageUrl($rt->images->first()?->image_url),
-                        'width'      => $rt->width ?? 0,
-                        'qty'        => $qty,
-                        'line_total' => $price * $qty * $nights,
-                    ];
-                    $subtotal += $price * $qty * $nights;
-                }
-            }
-        }
-
-        $bookingData = [
-            'check_in'    => $checkInDate->format('Y-m-d H:i:s'),
-            'check_out'   => $checkOutDate->format('Y-m-d H:i:s'),
-            'adults'      => $adults,
-            'children'    => $children,
-            'nights'      => $nights,
-            'rooms'       => $selectedRooms,
-            'subtotal'    => $subtotal,
-            'guest_name'  => trim($request->input('first_name', '') . ' ' . $request->input('last_name', '')),
-            'guest_email' => trim((string) $request->input('email_verify', '')),
-            'guest_phone' => $request->input('phone', ''),
-            'payment'     => $request->input('payment_method', 'momo'),
-            'confirmed_at'=> now()->format('d/m/Y H:i'),
-        ];
-
-        // Lấy danh sách phòng đã kẹt lịch
-        $bookedRoomIds = BookingDetail::join('bookings', 'booking_details.booking_id', '=', 'bookings.id')
-            ->whereIn('bookings.status', ['Chờ xác nhận', 'Đã đặt', 'Đang ở'])
-            ->where('booking_details.checkin_date', '<', $checkOut)
-            ->where('booking_details.checkout_date', '>', $checkIn)
-            ->pluck('booking_details.room_id')
-            ->toArray();
-
-        // Tạo booking (và booking_details) trước, sau đó mới gọi MoMo
-        try {
-            $bookingDetailsPayload = [];
-
-            foreach ($selectedRooms as $roomData) {
-                // Tìm các phòng còn trống thuộc loại $roomData['id']
-                $availableRooms = \App\Models\Room::where('room_type_id', $roomData['id'])
-                    ->where('status', 'ready')
-                    ->whereNotIn('id', $bookedRoomIds)
-                    ->limit($roomData['qty'])
-                    ->get();
-
-                if ($availableRooms->count() < $roomData['qty']) {
-                    return back()->withInput()->with('error', 'Một số loại phòng bạn chọn hiện không đủ phòng trống. Xin hãy thử lại.');
-                }
-
-                foreach ($availableRooms as $availRoom) {
-                    $bookingDetailsPayload[] = [
-                        'room_id' => $availRoom->id,
-                        'checkin_date' => $bookingData['check_in'],
-                        'checkout_date' => $bookingData['check_out'],
-                        'services' => [],
-                    ];
-                }
-            }
-
-            $booking = app(CreateBookingAction::class)->execute(new BookingData(
-                email: $bookingData['guest_email'],
-                phone_number: $bookingData['guest_phone'],
-                first_name: $request->input('first_name', ''),
-                last_name: $request->input('last_name', ''),
-                country: $request->input('country', 'VN'),
-                booking_date: new \DateTime(),
-                booking_details: $bookingDetailsPayload,
-                status: 'Chờ xác nhận',
-                payment: null,
-            ));
-        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Đặt phòng thành công.',
+                'booking_id' => $booking->id
+            ]);
+        } catch (\Exception $e) {
             Log::error('DB Booking Create Error: ' . $e->getMessage());
-            return back()->withInput()->with('error', 'Loi khoi tao don hang. Vui long kiem tra lai thong tin va thu lai.');
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
         }
-
-        // Nếu là phương thức thanh toán MoMo thì tạo link redirect
-        if ($bookingData['payment'] === 'momo') {
-            $momoAction = app(ProcessMoMoPaymentAction::class);
-            $payUrl = $momoAction->execute($booking, $subtotal);
-
-            if (!empty($payUrl)) {
-                return redirect()->away($payUrl);
-            } else {
-                return back()->withInput()->with('error', 'Khong tao duoc lien ket thanh toan MoMo. Vui long kiem tra cau hinh MoMo/NGROK va thu lai.');
-            }
-        }
-
-        return redirect()->route('client.booking.confirmation')->with('success', 'Đặt phòng thành công (Chuyển khoản).');
     }
 
     /**
@@ -457,12 +340,65 @@ class BookingCheckoutController extends Controller
     /**
      * Hiển thị trang xác nhận đặt phòng thành công.
      */
-    public function confirmation()
+    public function confirmation(Request $request)
     {
         $bookingRef  = session('booking_ref');
         $bookingData = session('booking_data');
 
         if (! $bookingRef || ! $bookingData) {
+            // Check if there is a booking_id provided via Axios redirect
+            if ($request->has('booking_id')) {
+                $booking = Booking::with(['customer', 'bookingDetails.room.roomType.images', 'payments'])->find($request->input('booking_id'));
+                if ($booking) {
+                    $rooms = [];
+                    $subtotal = 0;
+                    $checkInDate = now();
+                    $checkOutDate = now()->addDay();
+
+                    if ($booking->bookingDetails->isNotEmpty()) {
+                        foreach ($booking->bookingDetails as $detail) {
+                            $lineTotal = (float) ($detail->room_amount ?? 0);
+                            if ($lineTotal <= 0) {
+                                $lineTotal = (float) (($detail->daily_price ?? 0) * max(1, Carbon::parse($detail->checkin_date)->diffInDays(Carbon::parse($detail->checkout_date))));
+                            }
+
+                            $subtotal += $lineTotal;
+                            $rooms[] = [
+                                'name' => $detail->room?->roomType?->name ?? ('Phong #' . $detail->room_id),
+                                'qty' => 1,
+                                'line_total' => $lineTotal,
+                                'width' => $detail->room?->roomType?->width ?? 0,
+                                'image_url' => $detail->room?->roomType?->images?->first()?->image_url ?? '',
+                            ];
+                        }
+
+                        $checkInDate = Carbon::parse($booking->bookingDetails->min('checkin_date'));
+                        $checkOutDate = Carbon::parse($booking->bookingDetails->max('checkout_date'));
+                    }
+
+                    $bookingRef = 'UL-' . str_pad((string) $booking->id, 6, '0', STR_PAD_LEFT);
+                    $bookingData = [
+                        'check_in' => $checkInDate->format('Y-m-d H:i:s'),
+                        'check_out' => $checkOutDate->format('Y-m-d H:i:s'),
+                        'adults' => 2,
+                        'children' => 0,
+                        'nights' => max(1, $checkInDate->diffInDays($checkOutDate)),
+                        'rooms' => $rooms,
+                        'subtotal' => $subtotal,
+                        'guest_name' => trim(($booking->customer?->first_name ?? '') . ' ' . ($booking->customer?->last_name ?? '')),
+                        'guest_email' => $booking->customer?->email ?? '',
+                        'confirmed_at' => $booking->created_at ? $booking->created_at->format('d/m/Y H:i') : now()->format('d/m/Y H:i'),
+                    ];
+
+                    $success = true;
+                    $isPaid = true;
+                    $message = 'Đặt phòng và thanh toán thành công!';
+
+                    return view('client.booking.confirmation', compact(
+                        'bookingRef', 'bookingData', 'checkInDate', 'checkOutDate', 'success', 'isPaid', 'message'
+                    ));
+                }
+            }
             return redirect()->route('client.rooms.index');
         }
 
@@ -474,7 +410,11 @@ class BookingCheckoutController extends Controller
             $checkOutDate = now()->addDays(3);
         }
 
-        return view('client.booking.confirmation', compact('bookingRef', 'bookingData', 'checkInDate', 'checkOutDate'));
+        $success = session('success') ? true : false;
+        if (!isset($isPaid)) $isPaid = true;
+        if (!isset($message)) $message = 'Đặt phòng thành công.';
+
+        return view('client.booking.confirmation', compact('bookingRef', 'bookingData', 'checkInDate', 'checkOutDate', 'success', 'isPaid', 'message'));
     }
 
     /**
