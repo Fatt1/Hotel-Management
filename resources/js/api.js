@@ -87,6 +87,26 @@ export async function getAllServicesApi() {
     }
 }
 
+export async function getRoomById(roomId) {
+    try {
+        const response = await axios.get(`/admin/rooms/${roomId}`);
+        return response.data?.data ?? null;
+    } catch (error) {
+        console.error("Lỗi khi lấy thông tin phòng:", error);
+        throw error;
+    }
+}
+
+export async function cleanRoomApi(roomId) {
+    try {
+        const response = await axios.put(`/admin/rooms/${roomId}/clean`);
+        return response.data;
+    } catch (error) {
+        console.error("Lỗi khi làm sạch phòng:", error);
+        throw error;
+    }
+}
+
 export async function calculateCheckoutPayment(bookingId, roomIds) {
     try {
         const response = await axios.post("/admin/bookings/calculate-payment", {

@@ -3,6 +3,8 @@
 namespace App\Actions\Bookings;
 
 use App\Enums\PolicyType;
+use App\Enums\RoomStatus;
+use App\Actions\Rooms\UpdateRoomStatusAction;
 use App\Models\Booking;
 use App\Models\BookingDetail;
 use App\Models\SurchargePolicy;
@@ -19,7 +21,10 @@ class CheckoutBookingAction
     private int $standardCheckoutMinute;
     private int $roundingTime;
 
-    public function __construct(private RecalculateBookingAmountsAction $recalculateBookingAmountsAction)
+    public function __construct(
+        private RecalculateBookingAmountsAction $recalculateBookingAmountsAction,
+        private UpdateRoomStatusAction $updateRoomStatusAction,
+    )
     {
         // Load cấu hình ở runtime vì PHP const không hỗ trợ query DB.
         [$this->standardCheckinHour, $this->standardCheckinMinute] = $this->parseSettingTime(
@@ -34,8 +39,11 @@ class CheckoutBookingAction
     public function execute(array $bookingDetailIds, $bookingId): void
     {
         DB::transaction(function () use ($bookingDetailIds, $bookingId) {
-        $booking = Booking::with('bookingDetails')->findOrFail($bookingId);
-        $bookingDetails = BookingDetail::with(['room', 'serviceUsages'])->whereIn('id', $bookingDetailIds)->get();
+        $booking = Booking::findOrFail($bookingId);
+        $bookingDetails = BookingDetail::with(['room', 'serviceUsages'])
+            ->where('booking_id', $bookingId)
+            ->whereIn('id', $bookingDetailIds)
+            ->get();
         
         $now = Carbon::now();
         $surchargePolicies = SurchargePolicy::all();
@@ -54,6 +62,9 @@ class CheckoutBookingAction
                 'room_amount' => $roomAmount,
                 'surcharge_amount' => $totalSurcharge,
             ]);
+
+            // Checkout thành công -> chuyển phòng sang trạng thái cần dọn (dirty)
+            $this->updateRoomStatusAction->execute((int) $detail->room_id, RoomStatus::CLEANING->value);
         }
         
         // ─── 8. Kiểm tra xem tất cả phòng đã checkout chưa ────────────────
