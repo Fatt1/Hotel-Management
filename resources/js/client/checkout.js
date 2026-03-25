@@ -94,21 +94,41 @@ document.addEventListener("DOMContentLoaded", () => {
                     lastNameInput.value = response.data.last_name || "";
                     if (response.data.last_name) {
                         lastNameInput.readOnly = true;
-                        lastNameInput.classList.add('bg-gray-100', 'cursor-not-allowed', 'border-gray-300', 'text-gray-500');
+                        lastNameInput.classList.add(
+                            "bg-gray-100",
+                            "cursor-not-allowed",
+                            "border-gray-300",
+                            "text-gray-500",
+                        );
                     } else {
                         lastNameInput.readOnly = false;
-                        lastNameInput.classList.remove('bg-gray-100', 'cursor-not-allowed', 'border-gray-300', 'text-gray-500');
+                        lastNameInput.classList.remove(
+                            "bg-gray-100",
+                            "cursor-not-allowed",
+                            "border-gray-300",
+                            "text-gray-500",
+                        );
                     }
                 }
-                
+
                 if (firstNameInput) {
                     firstNameInput.value = response.data.first_name || "";
                     if (response.data.first_name) {
                         firstNameInput.readOnly = true;
-                        firstNameInput.classList.add('bg-gray-100', 'cursor-not-allowed', 'border-gray-300', 'text-gray-500');
+                        firstNameInput.classList.add(
+                            "bg-gray-100",
+                            "cursor-not-allowed",
+                            "border-gray-300",
+                            "text-gray-500",
+                        );
                     } else {
                         firstNameInput.readOnly = false;
-                        firstNameInput.classList.remove('bg-gray-100', 'cursor-not-allowed', 'border-gray-300', 'text-gray-500');
+                        firstNameInput.classList.remove(
+                            "bg-gray-100",
+                            "cursor-not-allowed",
+                            "border-gray-300",
+                            "text-gray-500",
+                        );
                     }
                 }
 
@@ -116,18 +136,38 @@ document.addEventListener("DOMContentLoaded", () => {
                     phoneInput.value = response.data.phone || "";
                     if (response.data.phone) {
                         phoneInput.readOnly = true;
-                        phoneInput.classList.add('bg-gray-100', 'cursor-not-allowed', 'border-gray-300', 'text-gray-500');
+                        phoneInput.classList.add(
+                            "bg-gray-100",
+                            "cursor-not-allowed",
+                            "border-gray-300",
+                            "text-gray-500",
+                        );
                         // also disable phone_code
-                        const phoneCode = document.querySelector('select[name="phone_code"]');
+                        const phoneCode = document.querySelector(
+                            'select[name="phone_code"]',
+                        );
                         if (phoneCode) {
-                            phoneCode.parentElement.classList.add('pointer-events-none', 'opacity-80');
+                            phoneCode.parentElement.classList.add(
+                                "pointer-events-none",
+                                "opacity-80",
+                            );
                         }
                     } else {
                         phoneInput.readOnly = false;
-                        phoneInput.classList.remove('bg-gray-100', 'cursor-not-allowed', 'border-gray-300', 'text-gray-500');
-                        const phoneCode = document.querySelector('select[name="phone_code"]');
+                        phoneInput.classList.remove(
+                            "bg-gray-100",
+                            "cursor-not-allowed",
+                            "border-gray-300",
+                            "text-gray-500",
+                        );
+                        const phoneCode = document.querySelector(
+                            'select[name="phone_code"]',
+                        );
                         if (phoneCode) {
-                            phoneCode.parentElement.classList.remove('pointer-events-none', 'opacity-80');
+                            phoneCode.parentElement.classList.remove(
+                                "pointer-events-none",
+                                "opacity-80",
+                            );
                         }
                     }
                 }
@@ -142,11 +182,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     } else {
                         countryInput.value = val;
                     }
-                    countryInput.closest('.relative').classList.add('pointer-events-none', 'opacity-80');
-                    
+                    countryInput
+                        .closest(".relative")
+                        .classList.add("pointer-events-none", "opacity-80");
+
                     // Add hidden input so that disabled select still submits correctly, actually we only used pointer-events-none so it will still submit.
                 } else if (countryInput) {
-                    countryInput.closest('.relative').classList.remove('pointer-events-none', 'opacity-80');
+                    countryInput
+                        .closest(".relative")
+                        .classList.remove("pointer-events-none", "opacity-80");
                 }
 
                 validateCheckout();
@@ -162,24 +206,47 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (lastNameInput) {
                     lastNameInput.value = "";
                     lastNameInput.readOnly = false;
-                    lastNameInput.classList.remove('bg-gray-100', 'cursor-not-allowed', 'border-gray-300', 'text-gray-500');
+                    lastNameInput.classList.remove(
+                        "bg-gray-100",
+                        "cursor-not-allowed",
+                        "border-gray-300",
+                        "text-gray-500",
+                    );
                 }
                 if (firstNameInput) {
                     firstNameInput.value = "";
                     firstNameInput.readOnly = false;
-                    firstNameInput.classList.remove('bg-gray-100', 'cursor-not-allowed', 'border-gray-300', 'text-gray-500');
+                    firstNameInput.classList.remove(
+                        "bg-gray-100",
+                        "cursor-not-allowed",
+                        "border-gray-300",
+                        "text-gray-500",
+                    );
                 }
                 if (phoneInput) {
                     phoneInput.value = "";
                     phoneInput.readOnly = false;
-                    phoneInput.classList.remove('bg-gray-100', 'cursor-not-allowed', 'border-gray-300', 'text-gray-500');
-                    const phoneCode = document.querySelector('select[name="phone_code"]');
-                    if (phoneCode) phoneCode.parentElement.classList.remove('pointer-events-none', 'opacity-80');
+                    phoneInput.classList.remove(
+                        "bg-gray-100",
+                        "cursor-not-allowed",
+                        "border-gray-300",
+                        "text-gray-500",
+                    );
+                    const phoneCode = document.querySelector(
+                        'select[name="phone_code"]',
+                    );
+                    if (phoneCode)
+                        phoneCode.parentElement.classList.remove(
+                            "pointer-events-none",
+                            "opacity-80",
+                        );
                 }
                 if (countryInput) {
-                    countryInput.closest('.relative').classList.remove('pointer-events-none', 'opacity-80');
+                    countryInput
+                        .closest(".relative")
+                        .classList.remove("pointer-events-none", "opacity-80");
                 }
-                
+
                 validateCheckout();
             }
         });
