@@ -155,7 +155,7 @@
           <span class="text-base">👤</span>
           <span>Hồ Sơ</span>
         </a>
-        <a href="#"
+        <a href="{{ route('client.bookings.index') }}"
            class="sidebar-link flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#9a9080] no-underline transition-all hover:bg-white/5 hover:text-[#e8e0d0]">
           <span class="text-base">🎟</span>
           <span>Lịch Đặt Phòng</span>

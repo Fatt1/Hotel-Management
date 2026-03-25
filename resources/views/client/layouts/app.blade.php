@@ -89,7 +89,7 @@
                 <span>Thông tin cá nhân</span>
               </a>
 
-              <a href="#" class="flex items-center gap-[0.65rem] rounded-[10px] px-2 py-[0.58rem] text-[0.98rem] text-gray-200 no-underline transition-colors hover:bg-white/5" aria-disabled="true">
+              <a href="{{ route('client.bookings.index') }}" class="flex items-center gap-[0.65rem] rounded-[10px] px-2 py-[0.58rem] text-[0.98rem] text-gray-200 no-underline transition-colors hover:bg-white/5">
                 <span class="w-4 text-center text-[0.86rem] text-[#5ea1ff]">🎟</span>
                 <span>Lịch đặt phòng</span>
               </a>
@@ -134,7 +134,7 @@
         @endphp
         <div class="py-3 text-[#d4af37] text-sm font-semibold tracking-wide">Xin chào, {{ $fullName }}</div>
         <a href="{{ route('client.profile') }}" class="py-2 text-[#9a9080] text-sm no-underline hover:text-white">Thông tin cá nhân</a>
-        <a href="#" class="py-2 text-[#9a9080] text-sm no-underline hover:text-white">Lịch đặt phòng</a>
+        <a href="{{ route('client.bookings.index') }}" class="py-2 text-[#9a9080] text-sm no-underline hover:text-white">Lịch đặt phòng</a>
         <form method="POST" action="{{ route('client.logout') }}" class="mt-2">
           @csrf
           <button type="submit" class="text-[#ff6b6b] text-sm font-semibold">Đăng xuất</button>
