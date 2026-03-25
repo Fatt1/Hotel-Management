@@ -438,7 +438,7 @@ class BookingCheckoutController extends Controller
                 'data' => [
                     'first_name' => $customer->first_name,
                     'last_name'  => $customer->last_name,
-                    'phone'      => $customer->phone,
+                    'phone'      => $customer->phone_number,
                     'country'    => $customer->country ?? '',
                 ]
             ]);

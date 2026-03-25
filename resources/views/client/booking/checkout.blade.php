@@ -9,6 +9,21 @@
 
 @section('content')
 
+@php
+  $prefillPhoneRaw = trim((string) ($customer->phone_number ?? ''));
+  $prefillPhoneCode = '+84';
+  $prefillPhoneLocal = $prefillPhoneRaw;
+  $supportedPhoneCodes = ['+84', '+1', '+81', '+82', '+65', '+61', '+44'];
+
+  foreach ($supportedPhoneCodes as $code) {
+    if ($prefillPhoneRaw !== '' && str_starts_with($prefillPhoneRaw, $code)) {
+      $prefillPhoneCode = $code;
+      $prefillPhoneLocal = substr($prefillPhoneRaw, strlen($code));
+      break;
+    }
+  }
+@endphp
+
 {{-- ============================================================
      HERO – dark city background with step indicator
      ============================================================ --}}
@@ -133,23 +148,23 @@
               Số điện thoại <span class="text-red-500">*</span>
             </label>
             <div class="flex gap-2">
-              <div class="relative {{ !empty($customer->phone) ? 'pointer-events-none opacity-80' : '' }}">
+              <div class="relative {{ !empty($customer->phone_number) ? 'pointer-events-none opacity-80' : '' }}">
                 <select name="phone_code"
-                        class="border border-gray-200 rounded-lg py-3 pl-3 pr-8 text-sm text-gray-700 bg-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all appearance-none {{ !empty($customer->phone) ? 'bg-gray-100 border-gray-300 text-gray-500' : '' }}">
-                  <option value="+84" selected>🇻🇳 +84</option>
-                  <option value="+1">🇺🇸 +1</option>
-                  <option value="+81">🇯🇵 +81</option>
-                  <option value="+82">🇰🇷 +82</option>
-                  <option value="+65">🇸🇬 +65</option>
-                  <option value="+61">🇦🇺 +61</option>
-                  <option value="+44">🇬🇧 +44</option>
+                        class="border border-gray-200 rounded-lg py-3 pl-3 pr-8 text-sm text-gray-700 bg-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all appearance-none {{ !empty($customer->phone_number) ? 'bg-gray-100 border-gray-300 text-gray-500' : '' }}">
+                  <option value="+84" {{ $prefillPhoneCode === '+84' ? 'selected' : '' }}>🇻🇳 +84</option>
+                  <option value="+1" {{ $prefillPhoneCode === '+1' ? 'selected' : '' }}>🇺🇸 +1</option>
+                  <option value="+81" {{ $prefillPhoneCode === '+81' ? 'selected' : '' }}>🇯🇵 +81</option>
+                  <option value="+82" {{ $prefillPhoneCode === '+82' ? 'selected' : '' }}>🇰🇷 +82</option>
+                  <option value="+65" {{ $prefillPhoneCode === '+65' ? 'selected' : '' }}>🇸🇬 +65</option>
+                  <option value="+61" {{ $prefillPhoneCode === '+61' ? 'selected' : '' }}>🇦🇺 +61</option>
+                  <option value="+44" {{ $prefillPhoneCode === '+44' ? 'selected' : '' }}>🇬🇧 +44</option>
                 </select>
                 <i class="fas fa-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
               </div>
               <input type="tel" name="phone" id="phoneInput" placeholder="(012) 345-6789"
-                     value="{{ $customer->phone ?? '' }}"
-                     {{ !empty($customer->phone) ? 'readonly' : '' }}
-                     class="flex-1 border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all {{ !empty($customer->phone) ? 'bg-gray-100 cursor-not-allowed border-gray-300 text-gray-500' : '' }}"
+                     value="{{ $prefillPhoneLocal }}"
+                {{ !empty($customer->phone_number) ? 'readonly' : '' }}
+                class="flex-1 border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all {{ !empty($customer->phone_number) ? 'bg-gray-100 cursor-not-allowed border-gray-300 text-gray-500' : '' }}"
                      required>
 
             </div>

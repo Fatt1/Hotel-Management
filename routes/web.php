@@ -23,6 +23,7 @@ use App\Http\Controllers\Client\DiningController;
 use App\Http\Controllers\Client\GalleryController;
 use App\Http\Controllers\Client\RoomController;
 use App\Http\Controllers\Client\ProfileController;
+use App\Http\Controllers\Client\ClientBookingController;
 use App\Mail\BookingSuccessMail;
 use App\Http\Controllers\RoomAdminController;
 use Illuminate\Support\Facades\Mail;
@@ -213,6 +214,10 @@ Route::middleware('auth:customer')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('client.logout');
     Route::get('/profile', [ProfileController::class, 'show'])->name('client.profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('client.profile.update');
+
+    Route::get('/profile/bookings', [ClientBookingController::class, 'index'])->name('client.bookings.index');
+    Route::put('/profile/bookings/{id}/dates', [ClientBookingController::class, 'updateDates'])->name('client.bookings.update-dates');
+    Route::post('/profile/bookings/{id}/cancel', [ClientBookingController::class, 'cancel'])->name('client.bookings.cancel');
 });
 
 Route::name('client.')->group(function () {
