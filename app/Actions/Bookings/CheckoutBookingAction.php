@@ -75,10 +75,11 @@ class CheckoutBookingAction
     private function calculateSurchargeAmount($detail, Carbon $now, Collection $surchargePolicies): float
     {
         $checkinDate = Carbon::parse($detail->checkin_date);
-        $checkoutDate = $now->copy();
+        $actualCheckoutDate = $now->copy();
+        $scheduledCheckoutDate = Carbon::parse($detail->checkout_date);
         
         $standardCheckin = $checkinDate->copy()->setTime($this->standardCheckinHour, $this->standardCheckinMinute, 0);
-        $standardCheckout = $checkoutDate->copy()->setTime($this->standardCheckoutHour, $this->standardCheckoutMinute, 0);
+        $standardCheckout = $scheduledCheckoutDate->copy()->setTime($this->standardCheckoutHour, $this->standardCheckoutMinute, 0);
 
         // Chỉ tính check-in sớm khi giờ vào thực tế trước giờ check-in chuẩn.
         $checkinEarlyMinutes = max(0, $checkinDate->diffInMinutes($standardCheckin, false));
@@ -87,7 +88,7 @@ class CheckoutBookingAction
         // Tính checkout muộn dựa trên thời điểm checkout thực tế (now).
         // ROUNDING_TIME là ngưỡng phút để làm tròn lên 1 giờ kế tiếp.
         // Ví dụ ROUNDING_TIME=15: trễ 15p => 1h, trễ 2h15 => 3h.
-        $checkoutLateMinutes = max(0, $standardCheckout->diffInMinutes($checkoutDate, false));
+        $checkoutLateMinutes = max(0, $standardCheckout->diffInMinutes($actualCheckoutDate, false));
         $roundingThresholdMinutes = max(0, min(59, $this->roundingTime));
         $lateWholeHours = intdiv($checkoutLateMinutes, 60);
         $lateRemainderMinutes = $checkoutLateMinutes % 60;

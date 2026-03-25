@@ -114,6 +114,18 @@
                             <td class="table-cell text-right">
                                 <div
                                     class="flex items-center justify-end gap-1 ">
+                                    @if ($booking->status === 'Đang ở')
+                                        <a href="{{ route('admin.bookings.checkout', $booking->id) }}"
+                                            class="action-btn text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                                            title="Checkout">
+                                            <span class="material-symbols-outlined">logout</span>
+                                        </a>
+                                    @endif
+                                    <a href="{{ route('admin.bookings.print-invoice', $booking->id) }}" target="_blank" rel="noopener"
+                                        class="action-btn text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                                        title="In hóa đơn">
+                                        <span class="material-symbols-outlined">print</span>
+                                    </a>
                                     <a href="{{ route('admin.bookings.edit', $booking->id) }}" class="action-btn text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                                         title="Xem chi tiết">
                                         <span class="material-symbols-outlined">visibility</span>

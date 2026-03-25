@@ -60,6 +60,13 @@ class BookingAdminController extends Controller
         return view("admin.bookings.show", compact('booking'));
     }
 
+    public function printInvoice($id, GetBookingByIdAction $getBookingByIdAction)
+    {
+        $booking = $getBookingByIdAction->execute($id);
+
+        return view('admin.bookings.invoice-print', compact('booking'));
+    }
+
     public function checkoutConfirm($id, GetBookingByIdAction $getBookingByIdAction)
     {
         $booking = $getBookingByIdAction->execute($id);
