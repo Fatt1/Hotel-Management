@@ -106,7 +106,7 @@
           <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-1.5">Trạng Thái</div>
           <div class="inline-flex items-center gap-1.5 {{ $isSuccess ? 'bg-green-50 text-green-700 border-green-200' : 'bg-amber-50 text-amber-700 border-amber-200' }} border text-xs font-bold px-2.5 py-1 rounded-full">
             <span class="w-1.5 h-1.5 rounded-full {{ $isSuccess ? 'bg-green-500' : 'bg-amber-500' }} inline-block"></span>
-            {{ $isSuccess ? 'Da Xac Nhan' : 'Cho Xu Ly' }}
+            {{ $isSuccess ? 'Đã đặt' : 'Chờ xử lý' }}
           </div>
           <div class="text-xs {{ $isPaidState ? 'text-blue-600' : 'text-amber-600' }} font-semibold mt-1">
             {{ $isPaidState ? 'Da Thanh Toan' : 'Chua Thanh Toan' }}

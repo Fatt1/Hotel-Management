@@ -10,6 +10,47 @@ document.addEventListener("DOMContentLoaded", () => {
     const phoneInput = document.getElementById("phoneInput");
     const countryInput = document.getElementById("countryInput");
     const checkoutBtn = document.getElementById("checkoutBtn");
+    const phoneCodeSelect = document.querySelector('select[name="phone_code"]');
+
+    const supportedPhoneCodes = [
+        "+84",
+        "+1",
+        "+81",
+        "+82",
+        "+65",
+        "+61",
+        "+44",
+    ];
+
+    function parsePhone(phoneRaw) {
+        const raw = String(phoneRaw || "")
+            .trim()
+            .replace(/\s+/g, "");
+        if (!raw) {
+            return { code: "+84", number: "" };
+        }
+
+        for (const code of supportedPhoneCodes) {
+            if (raw.startsWith(code)) {
+                return {
+                    code,
+                    number: raw.slice(code.length),
+                };
+            }
+        }
+
+        return { code: "+84", number: raw };
+    }
+
+    function setPhoneFields(phoneRaw) {
+        const { code, number } = parsePhone(phoneRaw);
+        if (phoneCodeSelect) {
+            phoneCodeSelect.value = code;
+        }
+        if (phoneInput) {
+            phoneInput.value = number;
+        }
+    }
 
     function validateCheckout() {
         if (
@@ -82,6 +123,9 @@ document.addEventListener("DOMContentLoaded", () => {
             verifyBtn.classList.remove("opacity-70");
 
             if (response && response.success) {
+                const phoneValue =
+                    response?.data?.phone || response?.data?.phone_number || "";
+
                 // Auto-fill success, hide error message
                 if (errorMessage) {
                     errorMessage.classList.remove("hidden");
@@ -133,8 +177,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 if (phoneInput) {
-                    phoneInput.value = response.data.phone || "";
-                    if (response.data.phone) {
+                    setPhoneFields(phoneValue);
+                    if (phoneValue) {
                         phoneInput.readOnly = true;
                         phoneInput.classList.add(
                             "bg-gray-100",
@@ -143,11 +187,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             "text-gray-500",
                         );
                         // also disable phone_code
-                        const phoneCode = document.querySelector(
-                            'select[name="phone_code"]',
-                        );
-                        if (phoneCode) {
-                            phoneCode.parentElement.classList.add(
+                        if (phoneCodeSelect) {
+                            phoneCodeSelect.parentElement.classList.add(
                                 "pointer-events-none",
                                 "opacity-80",
                             );
@@ -160,11 +201,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             "border-gray-300",
                             "text-gray-500",
                         );
-                        const phoneCode = document.querySelector(
-                            'select[name="phone_code"]',
-                        );
-                        if (phoneCode) {
-                            phoneCode.parentElement.classList.remove(
+                        if (phoneCodeSelect) {
+                            phoneCodeSelect.parentElement.classList.remove(
                                 "pointer-events-none",
                                 "opacity-80",
                             );
@@ -232,14 +270,13 @@ document.addEventListener("DOMContentLoaded", () => {
                         "border-gray-300",
                         "text-gray-500",
                     );
-                    const phoneCode = document.querySelector(
-                        'select[name="phone_code"]',
-                    );
-                    if (phoneCode)
-                        phoneCode.parentElement.classList.remove(
+                    if (phoneCodeSelect) {
+                        phoneCodeSelect.value = "+84";
+                        phoneCodeSelect.parentElement.classList.remove(
                             "pointer-events-none",
                             "opacity-80",
                         );
+                    }
                 }
                 if (countryInput) {
                     countryInput
