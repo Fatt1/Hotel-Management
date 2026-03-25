@@ -16,9 +16,17 @@ class CheckinBookingAction
             if ($booking->status !== 'Đã đặt') {
                 throw new \Exception("Chỉ có thể check-in cho booking đang ở trạng thái 'Đã đặt'.");
             }
-            
-            $booking->status = 'Đang ở';
-            $booking->save();
+
+            $now = now();
+
+            // Bulk update để tránh N query khi booking có nhiều phòng
+            $booking->bookingDetails()->update([
+                'checkin_date' => $now,
+            ]);
+
+            $booking->update([
+                'status' => 'Đang ở',
+            ]);
         });
     }
 }
