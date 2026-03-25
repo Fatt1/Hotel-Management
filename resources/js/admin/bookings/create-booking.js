@@ -34,8 +34,14 @@ window.addEventListener('DOMContentLoaded', () => {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function refresh() {
-    renderRoomList({ onRemoveRoom: refresh, onServicesUpdated: refresh });
+    renderRoomList({ onRemoveRoom: handleRemoveRoom, onServicesUpdated: refresh });
     renderPayment();
+}
+
+function handleRemoveRoom(roomId) {
+    state.selectedRooms = state.selectedRooms.filter(r => Number(r.id) !== Number(roomId));
+    delete state.roomServices[roomId];
+    refresh();
 }
 
 async function handleAddRoomClick() {
