@@ -11,6 +11,9 @@ enum Module: string
     case DASHBOARD = 'dashboard';
     case BOOKINGS = 'bookings';
     case CUSTOMERS = 'customers';
+
+    case ROOM_TYPES = 'room_types';
+    
     case LAYOUTS = 'layouts';
     case STAFFS = 'staffs';
     case EDIT_LAYOUTS = 'edit_layouts';
@@ -35,6 +38,7 @@ enum Module: string
             self::CUSTOMERS => "Quản lý khách hàng",
             self::STAFFS => "Quản lý nhân viên",
             self::ROLE => "Quản lý vai trò",
+            self::ROOM_TYPES => "Quản lý loại phòng",
             self::EQUIPMENT_CATEGORIES => "Danh mục thiết bị",
             self::EQUIPMENTS => "Quản lý thiết bị",
             self::MAINTENANCE_TICKETS => "Quản lý sửa chữa",
@@ -63,6 +67,7 @@ enum Module: string
             self::SERVICES => [ActionType::VIEW, ActionType::CREATE, ActionType::EDIT, ActionType::DELETE],
             self::SERVICE_CATEGORIES => [ActionType::VIEW, ActionType::CREATE, ActionType::EDIT, ActionType::DELETE],
             self::AMENITIES => [ActionType::VIEW, ActionType::CREATE, ActionType::EDIT, ActionType::DELETE],
+            self::ROOM_TYPES => [ActionType::VIEW, ActionType::CREATE, ActionType::EDIT, ActionType::DELETE],
             self::STATISTICS => [ActionType::VIEW],
         };
     }
@@ -74,6 +79,7 @@ enum Module: string
             self::LAYOUTS,
             self::EDIT_LAYOUTS,
             self::BOOKINGS,
+            self::ROOM_TYPES,
         ];
     }
 
@@ -84,7 +90,7 @@ enum Module: string
             self::SERVICES,
             self::SERVICE_CATEGORIES,
             self::AMENITIES,
-
+           
         ];
     }
 

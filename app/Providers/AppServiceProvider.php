@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
             if(!($user instanceof Staff)) {
                 return null; // Không can thiệp vào các model khác
             }
-            if(!str_contains($ability, ".")) return false;
+            if(!str_contains($ability, ".")) return null;
             [$function, $action] = explode(".", $ability, 2);
             return $user->canAction($function, $action);
         });
