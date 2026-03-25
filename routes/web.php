@@ -76,6 +76,7 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::put('bookings/{id}/rooms/{roomId}/dates', [BookingAdminController::class, 'updateRoomDates'])->name('admin.bookings.update-room-dates');
     Route::post('bookings/{id}/rooms/{roomId}/services', [BookingAdminController::class, 'addOrUpdateService'])->name('admin.bookings.add-service');
     Route::delete('bookings/{id}/rooms/{roomId}/services/{serviceId}', [BookingAdminController::class, 'removeService'])->name('admin.bookings.remove-service');
+    Route::get('bookings/{id}/invoice', [BookingAdminController::class, 'printInvoice'])->name('admin.bookings.print-invoice');
     Route::get('bookings/{id}', [BookingAdminController::class, 'show'])->name('admin.bookings.show');
     // Room Type routes
     Route::get('room-types/all', [RoomTypeAdminController::class, 'getAll'])->name('admin.room-types.all');
