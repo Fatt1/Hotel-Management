@@ -37,9 +37,13 @@ class CustomerAdminController extends Controller
     public function getByEmail(CustomerEmailRequest $request, GetCustomerByEmailAction $getCustomerByEmail)
     {
         try {
-            return response()->json($getCustomerByEmail->handle($request->input('email')), 200);
+            $customer = $getCustomerByEmail->handle($request->input('email'));
+            if (!$customer) {
+                return response()->json(['message' => 'Khách hàng không tồn tại'], 404);
+            }
+            return response()->json($customer, 200);
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
+            return response()->json(['message' => $e->getMessage()], 404);
         }
     }
 

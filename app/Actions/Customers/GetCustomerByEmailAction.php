@@ -6,12 +6,12 @@ use App\Models\Customer;
 
 class GetCustomerByEmailAction
 {
-    public function handle(string $email): Customer
+    public function handle(string $email): Customer | null
     {
         $customer = Customer::where('email', $email)->first();
 
         if (!$customer) {
-            throw new \Exception('Khách hàng không tồn tại');
+            return null;
         }
 
         return $customer;
