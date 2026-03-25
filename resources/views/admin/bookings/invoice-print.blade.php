@@ -296,7 +296,7 @@
             <div class="top">
                 <div class="hotel">
                     <h1>URBAN LUXE HOTEL</h1>
-                    <p>123 a Vong Ven Bien, Quan Son Tra</p>
+                    <p>123a Vong Ven Bien, Quan Son Tra</p>
                     <p>TP. Da Nang, Viet Nam</p>
                     <p>Tel: +84 236 123 4567</p>
                 </div>
@@ -337,17 +337,23 @@
                             @php
                                 $serviceLines = $detail->serviceUsages;
                                 $serviceAmount = (float) $serviceLines->sum(fn($usage) => $usage->quantity * $usage->unit_price);
-                                $lineTotal = (float) $detail->room_amount + $serviceAmount;
+                                $roomSurcharge = (float) $detail->surcharge_amount;
+                                $lineTotal = (float) $detail->room_amount + $serviceAmount + $roomSurcharge;
                             @endphp
                             <tr>
                                 <td>
                                     <div class="desc-title">Phong {{ $detail->room->name }} - {{ $detail->room->roomType->name }}</div>
                                     <div class="sub-lines">
+                                        <div>- Check-in: {{ $detail->checkin_date ? $detail->checkin_date->format('d/m/Y H:i') : 'N/A' }}</div>
+                                        <div>- Check-out: {{ $detail->checkout_date ? $detail->checkout_date->format('d/m/Y H:i') : 'N/A' }}</div>
                                         @forelse ($serviceLines as $usage)
                                             <div>- {{ $usage->service->name }} ({{ $usage->quantity }} x {{ number_format($usage->unit_price, 0, ',', '.') }}d)</div>
                                         @empty
                                             <div>- Khong co dich vu su dung</div>
                                         @endforelse
+                                        @if ($roomSurcharge > 0)
+                                            <div>- Phu phi: {{ number_format($roomSurcharge, 0, ',', '.') }}d</div>
+                                        @endif
                                     </div>
                                 </td>
                                 <td class="money">{{ number_format($detail->daily_price, 0, ',', '.') }}d</td>
