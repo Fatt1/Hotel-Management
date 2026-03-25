@@ -91,10 +91,10 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
         'update' => 'admin.room-types.update',
         'destroy' => 'admin.room-types.destroy',
     ])
-        ->middlewareFor(['index', 'show'], 'can:settings.view')
-        ->middlewareFor(['create', 'store'], 'can:settings.edit')
-        ->middlewareFor(['edit', 'update'], 'can:settings.edit')
-        ->middlewareFor(['destroy'], 'can:settings.edit');
+        ->middlewareFor(['index', 'show'], 'can:room_types.view')
+        ->middlewareFor(['create', 'store'], 'can:room_types.edit')
+        ->middlewareFor(['edit', 'update'], 'can:room_types.edit')
+        ->middlewareFor(['destroy'], 'can:room_types.edit');
     
     Route::get('/rooms/available', [RoomAdminController::class, 'getAvailableRooms'])->middleware('can:bookings.view')->name('admin.rooms.available');
 
