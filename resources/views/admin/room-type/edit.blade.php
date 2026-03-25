@@ -128,14 +128,14 @@
             <div class="space-y-4">
               <div>
                 <label class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2 block">Giá giờ (VNĐ) <span class="text-red-500">*</span></label>
-                <input type="number" name="hourly_price" value="{{ old('hourly_price', $viewModel->pricing()['hourly_price']) }}" placeholder="200000" step="0.01" min="0" max="999999.99" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('hourly_price') border-red-500 @enderror">
+                <input type="number" name="hourly_price" value="{{ old('hourly_price', $viewModel->pricing()['hourly_price']) }}" placeholder="200000" step="0.01" min="0" max="99999999" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('hourly_price') border-red-500 @enderror">
                 @error('hourly_price')
                   <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
               </div>
               <div>
                 <label class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2 block">Giá ngày (VNĐ) <span class="text-red-500">*</span></label>
-                <input type="number" name="daily_price" value="{{ old('daily_price', $viewModel->pricing()['daily_price']) }}" placeholder="1500000" step="0.01" min="0" max="999999.99" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('daily_price') border-red-500 @enderror">
+                <input type="number" name="daily_price" value="{{ old('daily_price', $viewModel->pricing()['daily_price']) }}" placeholder="1500000" step="0.01" min="0" max="99999999" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900 @error('daily_price') border-red-500 @enderror">
                 @error('daily_price')
                   <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
