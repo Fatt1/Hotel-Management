@@ -68,7 +68,7 @@ class ClientBookingController extends Controller
         }
 
         $pastBookings = $pastBookingsQuery
-            ->paginate(3, ['*'], 'history_page')
+            ->paginate(5, ['*'], 'history_page')
             ->withQueryString();
 
         return view('client.profile.bookings', [
