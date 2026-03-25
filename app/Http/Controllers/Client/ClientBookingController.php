@@ -20,37 +20,56 @@ class ClientBookingController extends Controller
     {
         /** @var Customer $customer */
         $customer = Auth::guard('customer')->user();
+        $now = Carbon::now();
 
-        $bookings = Booking::query()
+        $upcomingBookings = Booking::query()
             ->where('customer_id', $customer->id)
-            ->with([
-                'bookingDetails.room.roomType',
-            ])
+            ->whereNotIn('status', ['Hủy', 'Không đến', 'Hoàn tất'])
+            ->where(function ($query) use ($now): void {
+                $query->whereNull('checkout_date')->orWhere('checkout_date', '>=', $now);
+            })
+            ->with(['bookingDetails.room.roomType'])
             ->orderByDesc('booking_date')
             ->get();
 
-        $now = Carbon::now();
-
-        $upcomingBookings = $bookings->filter(function (Booking $booking) use ($now): bool {
-            if (in_array($booking->status, ['Hủy', 'Không đến', 'Hoàn tất'], true)) {
-                return false;
-            }
-
-            if ($booking->checkout_date instanceof Carbon) {
-                return $booking->checkout_date->greaterThanOrEqualTo($now);
-            }
-
-            return true;
-        })->values();
-
-        $pastBookings = $bookings->reject(function (Booking $booking) use ($upcomingBookings): bool {
-            return $upcomingBookings->contains('id', $booking->id);
-        })->values();
+        $pastBookings = Booking::query()
+            ->where('customer_id', $customer->id)
+            ->where(function ($query) use ($now): void {
+                $query
+                    ->whereIn('status', ['Hủy', 'Không đến', 'Hoàn tất'])
+                    ->orWhere(function ($subQuery) use ($now): void {
+                        $subQuery
+                            ->whereNotNull('checkout_date')
+                            ->where('checkout_date', '<', $now);
+                    });
+            })
+            ->with(['bookingDetails.room.roomType'])
+            ->orderByDesc('booking_date')
+            ->paginate(3, ['*'], 'history_page')
+            ->withQueryString();
 
         return view('client.profile.bookings', [
             'customer' => $customer,
             'upcomingBookings' => $upcomingBookings,
             'pastBookings' => $pastBookings,
+        ]);
+    }
+
+    public function details(int $id)
+    {
+        $booking = $this->getOwnedBooking($id);
+
+        $booking->load([
+            'bookingDetails.room.roomType',
+            'bookingDetails.serviceUsages.service',
+        ]);
+
+        $html = view('client.profile.partials.history-booking-details', [
+            'booking' => $booking,
+        ])->render();
+
+        return response()->json([
+            'html' => $html,
         ]);
     }
 

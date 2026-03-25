@@ -68,7 +68,7 @@
 <section class="profile-hero relative h-52 pt-16 flex flex-col items-center justify-center text-center">
   <p class="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-[#d4af37] mb-2">● THÀNH VIÊN</p>
   <h1 class="font-['Playfair_Display'] text-3xl sm:text-4xl font-bold text-[#e8e0d0]">Lịch Đặt Phòng</h1>
-  <p class="mt-2 text-[0.8rem] text-[#9a9080]">Xem lịch sử đặt phòng, quản lý và đánh giá kỳ nghỉ của bạn.</p>
+  <p class="mt-2 text-[0.8rem] text-[#9a9080]">Xem lịch sử đặt phòng và quản lý kỳ nghỉ của bạn.</p>
 </section>
 
 @if(session('success'))
@@ -120,7 +120,7 @@
       <div class="rounded-2xl border border-white/8 bg-white/3 p-6 sm:p-8 space-y-8">
         <div class="mb-1 flex items-center justify-between">
           <h2 class="font-['Playfair_Display'] text-xl font-semibold text-[#e8e0d0]">Lịch Đặt Phòng Của Tôi</h2>
-          <span class="text-[0.72rem] text-[#6b6050]">Xem chi tiết, quản lý lịch và đánh giá</span>
+          <span class="text-[0.72rem] text-[#6b6050]">Xem chi tiết và quản lý lịch đặt phòng</span>
         </div>
 
         <div>
@@ -132,16 +132,14 @@
           @php
             $checkin = $booking->checkin_date ?? optional($booking->bookingDetails->sortBy('checkin_date')->first())->checkin_date;
             $checkout = $booking->checkout_date ?? optional($booking->bookingDetails->sortByDesc('checkout_date')->first())->checkout_date;
-            $primaryDetail = $booking->bookingDetails->first();
-            $roomName = optional(optional($primaryDetail)->room)->name ?? 'Phòng chưa xác định';
-            $roomType = optional(optional(optional($primaryDetail)->room)->roomType)->name ?? '';
+            $reservationCode = 'RES-' . str_pad((string) $booking->id, 7, '0', STR_PAD_LEFT);
           @endphp
           <article class="booking-card p-4 sm:p-5 mb-4" id="booking-{{ $booking->id }}">
             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
               <div>
-                <p class="text-xs uppercase tracking-[0.16em] text-[#9a9080]">Booking #{{ $booking->id }}</p>
-                <h3 class="text-lg font-semibold text-[#e8e0d0]">{{ $roomName }}</h3>
-                <p class="text-sm text-[#9a9080]">{{ $roomType }}</p>
+                <p class="text-xs uppercase tracking-[0.16em] text-[#9a9080]">Mã đặt phòng</p>
+                <h3 class="text-lg font-semibold text-[#e8e0d0]">#{{ $reservationCode }}</h3>
+                <p class="text-sm text-[#9a9080]">Ngày đặt: {{ $booking->booking_date?->format('d/m/Y H:i') ?? '-' }}</p>
               </div>
               <div class="text-left sm:text-right">
                 <p class="text-[0.7rem] uppercase tracking-[0.16em] text-[#9a9080]">Tổng tiền</p>
@@ -156,27 +154,20 @@
             </div>
 
             <div class="mt-4 flex flex-wrap gap-2">
-              <button class="btn-primary" type="button" onclick="toggleBookingDetails('booking-details-{{ $booking->id }}')">Xem chi tiết</button>
+              <button
+                class="btn-primary"
+                type="button"
+                onclick="loadBookingDetails({{ $booking->id }}, '{{ route('client.bookings.details', $booking->id) }}', 'booking-details-{{ $booking->id }}')"
+              >
+                Xem chi tiết
+              </button>
               @if($booking->status === 'Đã đặt')
                 <button class="btn-secondary" type="button" onclick="toggleBookingDetails('manage-booking-{{ $booking->id }}')">Quản lý booking</button>
               @endif
             </div>
 
             <div id="booking-details-{{ $booking->id }}" class="hidden mt-4 rounded-xl border border-white/8 bg-black/20 p-4">
-              <h4 class="text-sm font-semibold text-[#e8e0d0] mb-2">Chi tiết booking</h4>
-              <div class="space-y-2 text-sm text-[#c7bca9]">
-                <p>Mã booking: #{{ $booking->id }}</p>
-                <p>Ngày đặt: {{ $booking->booking_date?->format('d/m/Y H:i') ?? '-' }}</p>
-                <p>Số phòng: {{ $booking->bookingDetails->count() }}</p>
-              </div>
-              <div class="mt-3 divide-y divide-white/10 border border-white/8 rounded-lg overflow-hidden">
-                @foreach($booking->bookingDetails as $detail)
-                  <div class="p-3 text-sm text-[#d5ccbc] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                    <span>{{ $detail->room->name ?? 'N/A' }} - {{ $detail->room->roomType->name ?? 'N/A' }}</span>
-                    <span>{{ $detail->checkin_date?->format('d/m/Y') }} → {{ $detail->checkout_date?->format('d/m/Y') }}</span>
-                  </div>
-                @endforeach
-              </div>
+              <div class="text-[#9a9080]">Nhấn "Xem chi tiết" để tải dữ liệu.</div>
             </div>
 
             @if($booking->status === 'Đã đặt')
@@ -220,15 +211,13 @@
           @php
             $checkin = $booking->checkin_date ?? optional($booking->bookingDetails->sortBy('checkin_date')->first())->checkin_date;
             $checkout = $booking->checkout_date ?? optional($booking->bookingDetails->sortByDesc('checkout_date')->first())->checkout_date;
-            $primaryDetail = $booking->bookingDetails->first();
-            $roomName = optional(optional($primaryDetail)->room)->name ?? 'Phòng chưa xác định';
-            $roomType = optional(optional(optional($primaryDetail)->room)->roomType)->name ?? '';
+            $reservationCode = 'RES-' . str_pad((string) $booking->id, 7, '0', STR_PAD_LEFT);
           @endphp
           <article class="booking-card p-4 sm:p-5 mb-4">
             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
               <div>
-                <h3 class="text-base font-semibold text-[#e8e0d0]">{{ $roomName }}</h3>
-                <p class="text-sm text-[#9a9080]">{{ $roomType }}</p>
+                <h3 class="text-base font-semibold text-[#e8e0d0]">#{{ $reservationCode }}</h3>
+                <p class="text-sm text-[#9a9080]">Ngày đặt: {{ $booking->booking_date?->format('d/m/Y H:i') ?? '-' }}</p>
                 <p class="mt-1 text-xs text-[#9a9080]">{{ $checkin?->format('d/m/Y') ?? '-' }} - {{ $checkout?->format('d/m/Y') ?? '-' }}</p>
               </div>
               <div class="text-left sm:text-right">
@@ -238,15 +227,17 @@
             </div>
 
             <div class="mt-3 flex flex-wrap gap-2">
-              <button class="btn-secondary" type="button" onclick="toggleBookingDetails('history-details-{{ $booking->id }}')">Xem chi tiết booking</button>
+              <button
+                class="btn-secondary"
+                type="button"
+                onclick="loadBookingDetails({{ $booking->id }}, '{{ route('client.bookings.details', $booking->id) }}', 'history-details-{{ $booking->id }}')"
+              >
+                Xem chi tiết booking
+              </button>
             </div>
 
             <div id="history-details-{{ $booking->id }}" class="hidden mt-4 rounded-xl border border-white/8 bg-black/20 p-4 text-sm text-[#d5ccbc]">
-              <p>Mã booking: #{{ $booking->id }}</p>
-              <p>Ngày đặt: {{ $booking->booking_date?->format('d/m/Y H:i') ?? '-' }}</p>
-              <p>Tổng phòng: {{ number_format((float) $booking->total_room_amount, 0, ',', '.') }}đ</p>
-              <p>Tổng dịch vụ: {{ number_format((float) $booking->total_service_amount, 0, ',', '.') }}đ</p>
-              <p>Phụ thu: {{ number_format((float) $booking->surcharge_amount, 0, ',', '.') }}đ</p>
+              <div class="text-[#9a9080]">Nhấn "Xem chi tiết booking" để tải dữ liệu.</div>
             </div>
           </article>
         @empty
@@ -254,6 +245,12 @@
             Chưa có lịch sử booking.
           </div>
         @endforelse
+
+        @if($pastBookings->hasPages())
+          <div class="mt-6">
+            {{ $pastBookings->links() }}
+          </div>
+        @endif
       </div>
       </div>
     </div>
@@ -269,6 +266,40 @@
       return;
     }
     element.classList.toggle('hidden');
+  }
+
+  async function loadBookingDetails(bookingId, detailsUrl, containerId) {
+    var detailsContainer = document.getElementById(containerId);
+
+    if (!detailsContainer) {
+      return;
+    }
+
+    if (!detailsContainer.classList.contains('hidden')) {
+      detailsContainer.classList.add('hidden');
+      return;
+    }
+
+    detailsContainer.classList.remove('hidden');
+    detailsContainer.innerHTML = '<div class="text-[#9a9080]">Đang tải chi tiết booking...</div>';
+
+    try {
+      var response = await fetch(detailsUrl, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Request failed');
+      }
+
+      var payload = await response.json();
+      detailsContainer.innerHTML = payload.html || '<div class="text-[#9a9080]">Không có dữ liệu chi tiết.</div>';
+    } catch (error) {
+      detailsContainer.innerHTML = '<div class="text-[#ff8a8a]">Không thể tải chi tiết booking. Vui lòng thử lại.</div>';
+    }
   }
 </script>
 @endpush

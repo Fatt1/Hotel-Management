@@ -216,6 +216,7 @@ Route::middleware('auth:customer')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('client.profile.update');
 
     Route::get('/profile/bookings', [ClientBookingController::class, 'index'])->name('client.bookings.index');
+    Route::get('/profile/bookings/{id}/details', [ClientBookingController::class, 'details'])->name('client.bookings.details');
     Route::put('/profile/bookings/{id}/dates', [ClientBookingController::class, 'updateDates'])->name('client.bookings.update-dates');
     Route::post('/profile/bookings/{id}/cancel', [ClientBookingController::class, 'cancel'])->name('client.bookings.cancel');
 });
