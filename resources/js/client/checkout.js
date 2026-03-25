@@ -10,6 +10,47 @@ document.addEventListener("DOMContentLoaded", () => {
     const phoneInput = document.getElementById("phoneInput");
     const countryInput = document.getElementById("countryInput");
     const checkoutBtn = document.getElementById("checkoutBtn");
+    const phoneCodeSelect = document.querySelector('select[name="phone_code"]');
+
+    const supportedPhoneCodes = [
+        "+84",
+        "+1",
+        "+81",
+        "+82",
+        "+65",
+        "+61",
+        "+44",
+    ];
+
+    function parsePhone(phoneRaw) {
+        const raw = String(phoneRaw || "")
+            .trim()
+            .replace(/\s+/g, "");
+        if (!raw) {
+            return { code: "+84", number: "" };
+        }
+
+        for (const code of supportedPhoneCodes) {
+            if (raw.startsWith(code)) {
+                return {
+                    code,
+                    number: raw.slice(code.length),
+                };
+            }
+        }
+
+        return { code: "+84", number: raw };
+    }
+
+    function setPhoneFields(phoneRaw) {
+        const { code, number } = parsePhone(phoneRaw);
+        if (phoneCodeSelect) {
+            phoneCodeSelect.value = code;
+        }
+        if (phoneInput) {
+            phoneInput.value = number;
+        }
+    }
 
     function validateCheckout() {
         if (
@@ -82,14 +123,92 @@ document.addEventListener("DOMContentLoaded", () => {
             verifyBtn.classList.remove("opacity-70");
 
             if (response && response.success) {
-                // Auto-fill success, hide error message
-                if (errorMessage) errorMessage.classList.add("hidden");
+                const phoneValue =
+                    response?.data?.phone || response?.data?.phone_number || "";
 
-                if (lastNameInput)
+                // Auto-fill success, hide error message
+                if (errorMessage) {
+                    errorMessage.classList.remove("hidden");
+                    errorMessage.classList.remove("text-red-500");
+                    errorMessage.classList.add("text-green-600");
+                    errorMessage.innerHTML = `<i class="fas fa-check-circle text-[10px]"></i> Đã tìm thấy tài khoản. Thông tin đã được điền.`;
+                }
+
+                if (lastNameInput) {
                     lastNameInput.value = response.data.last_name || "";
-                if (firstNameInput)
+                    if (response.data.last_name) {
+                        lastNameInput.readOnly = true;
+                        lastNameInput.classList.add(
+                            "bg-gray-100",
+                            "cursor-not-allowed",
+                            "border-gray-300",
+                            "text-gray-500",
+                        );
+                    } else {
+                        lastNameInput.readOnly = false;
+                        lastNameInput.classList.remove(
+                            "bg-gray-100",
+                            "cursor-not-allowed",
+                            "border-gray-300",
+                            "text-gray-500",
+                        );
+                    }
+                }
+
+                if (firstNameInput) {
                     firstNameInput.value = response.data.first_name || "";
-                if (phoneInput) phoneInput.value = response.data.phone || "";
+                    if (response.data.first_name) {
+                        firstNameInput.readOnly = true;
+                        firstNameInput.classList.add(
+                            "bg-gray-100",
+                            "cursor-not-allowed",
+                            "border-gray-300",
+                            "text-gray-500",
+                        );
+                    } else {
+                        firstNameInput.readOnly = false;
+                        firstNameInput.classList.remove(
+                            "bg-gray-100",
+                            "cursor-not-allowed",
+                            "border-gray-300",
+                            "text-gray-500",
+                        );
+                    }
+                }
+
+                if (phoneInput) {
+                    setPhoneFields(phoneValue);
+                    if (phoneValue) {
+                        phoneInput.readOnly = true;
+                        phoneInput.classList.add(
+                            "bg-gray-100",
+                            "cursor-not-allowed",
+                            "border-gray-300",
+                            "text-gray-500",
+                        );
+                        // also disable phone_code
+                        if (phoneCodeSelect) {
+                            phoneCodeSelect.parentElement.classList.add(
+                                "pointer-events-none",
+                                "opacity-80",
+                            );
+                        }
+                    } else {
+                        phoneInput.readOnly = false;
+                        phoneInput.classList.remove(
+                            "bg-gray-100",
+                            "cursor-not-allowed",
+                            "border-gray-300",
+                            "text-gray-500",
+                        );
+                        if (phoneCodeSelect) {
+                            phoneCodeSelect.parentElement.classList.remove(
+                                "pointer-events-none",
+                                "opacity-80",
+                            );
+                        }
+                    }
+                }
 
                 if (countryInput && response.data.country) {
                     const val = response.data.country;
@@ -101,15 +220,71 @@ document.addEventListener("DOMContentLoaded", () => {
                     } else {
                         countryInput.value = val;
                     }
+                    countryInput
+                        .closest(".relative")
+                        .classList.add("pointer-events-none", "opacity-80");
+
+                    // Add hidden input so that disabled select still submits correctly, actually we only used pointer-events-none so it will still submit.
+                } else if (countryInput) {
+                    countryInput
+                        .closest(".relative")
+                        .classList.remove("pointer-events-none", "opacity-80");
                 }
 
                 validateCheckout();
             } else {
-                // Show error message
+                // Not found -> Unlock all fields so user can type
                 if (errorMessage) {
                     errorMessage.classList.remove("hidden");
+                    errorMessage.classList.remove("text-green-600");
+                    errorMessage.classList.add("text-red-500");
                     errorMessage.innerHTML = `<i class="fas fa-circle-info text-[10px]"></i> ${response.message || "Không tìm thấy tài khoản."}`;
                 }
+
+                if (lastNameInput) {
+                    lastNameInput.value = "";
+                    lastNameInput.readOnly = false;
+                    lastNameInput.classList.remove(
+                        "bg-gray-100",
+                        "cursor-not-allowed",
+                        "border-gray-300",
+                        "text-gray-500",
+                    );
+                }
+                if (firstNameInput) {
+                    firstNameInput.value = "";
+                    firstNameInput.readOnly = false;
+                    firstNameInput.classList.remove(
+                        "bg-gray-100",
+                        "cursor-not-allowed",
+                        "border-gray-300",
+                        "text-gray-500",
+                    );
+                }
+                if (phoneInput) {
+                    phoneInput.value = "";
+                    phoneInput.readOnly = false;
+                    phoneInput.classList.remove(
+                        "bg-gray-100",
+                        "cursor-not-allowed",
+                        "border-gray-300",
+                        "text-gray-500",
+                    );
+                    if (phoneCodeSelect) {
+                        phoneCodeSelect.value = "+84";
+                        phoneCodeSelect.parentElement.classList.remove(
+                            "pointer-events-none",
+                            "opacity-80",
+                        );
+                    }
+                }
+                if (countryInput) {
+                    countryInput
+                        .closest(".relative")
+                        .classList.remove("pointer-events-none", "opacity-80");
+                }
+
+                validateCheckout();
             }
         });
     }

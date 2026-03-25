@@ -84,12 +84,12 @@
             <div class="invisible absolute left-[-0.8rem] top-[calc(100%+0.75rem)] z-80 w-50 -translate-y-1.5 rounded-[14px] border border-white/10 bg-[linear-gradient(180deg,rgba(28,36,56,0.97)_0%,rgba(23,30,47,0.98)_100%)] px-[0.6rem] py-3 opacity-0 shadow-[0_18px_36px_rgba(0,0,0,0.42)] transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
               <p class="mb-[0.55rem] px-2 text-[0.72rem] uppercase tracking-[0.06em] text-[#8f96a8]">Tài khoản</p>
 
-              <a href="#" class="flex items-center gap-[0.65rem] rounded-[10px] px-2 py-[0.58rem] text-[0.98rem] text-gray-200 no-underline transition-colors hover:bg-white/5" aria-disabled="true">
+              <a href="{{ route('client.profile') }}" class="flex items-center gap-[0.65rem] rounded-[10px] px-2 py-[0.58rem] text-[0.98rem] text-gray-200 no-underline transition-colors hover:bg-white/5">
                 <span class="w-4 text-center text-[0.86rem] text-[#5ea1ff]">👤</span>
                 <span>Thông tin cá nhân</span>
               </a>
 
-              <a href="#" class="flex items-center gap-[0.65rem] rounded-[10px] px-2 py-[0.58rem] text-[0.98rem] text-gray-200 no-underline transition-colors hover:bg-white/5" aria-disabled="true">
+              <a href="{{ route('client.bookings.index') }}" class="flex items-center gap-[0.65rem] rounded-[10px] px-2 py-[0.58rem] text-[0.98rem] text-gray-200 no-underline transition-colors hover:bg-white/5">
                 <span class="w-4 text-center text-[0.86rem] text-[#5ea1ff]">🎟</span>
                 <span>Lịch đặt phòng</span>
               </a>
@@ -133,8 +133,8 @@
           $fullName = trim($customer->full_name ?: 'Guest');
         @endphp
         <div class="py-3 text-[#d4af37] text-sm font-semibold tracking-wide">Xin chào, {{ $fullName }}</div>
-        <a href="#" class="py-2 text-[#9a9080] text-sm no-underline hover:text-white">Thông tin cá nhân</a>
-        <a href="#" class="py-2 text-[#9a9080] text-sm no-underline hover:text-white">Lịch đặt phòng</a>
+        <a href="{{ route('client.profile') }}" class="py-2 text-[#9a9080] text-sm no-underline hover:text-white">Thông tin cá nhân</a>
+        <a href="{{ route('client.bookings.index') }}" class="py-2 text-[#9a9080] text-sm no-underline hover:text-white">Lịch đặt phòng</a>
         <form method="POST" action="{{ route('client.logout') }}" class="mt-2">
           @csrf
           <button type="submit" class="text-[#ff6b6b] text-sm font-semibold">Đăng xuất</button>

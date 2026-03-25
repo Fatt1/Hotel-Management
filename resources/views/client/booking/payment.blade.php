@@ -213,21 +213,18 @@
 
           {{-- CTA --}}
           <div class="px-6 pb-6">
-            {{-- Hidden form that submits all booking data to confirm route --}}
-            <form id="confirmForm" method="POST" action="{{ route('client.booking.confirm') }}" class="hidden">
-              @csrf
-              {{-- Pass all booking inputs through --}}
+            {{-- Hidden form that stores all booking data --}}
+            <form id="confirmForm" class="hidden">
               @foreach($allInputs as $key => $val)
                 <input type="hidden" name="{{ $key }}" value="{{ $val }}">
               @endforeach
-              <input type="hidden" id="paymentMethodInput" name="payment_method" value="momo">
             </form>
 
             <button id="payBtn" disabled
-                    onclick="if(!this.disabled){ document.getElementById('confirmForm').submit(); }"
-                    class="w-full bg-[#A50064] hover:bg-[#8A0053] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold text-sm tracking-wider uppercase py-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
+                    onclick="if(!this.disabled){ processPayment(); }"
+                    class="w-full bg-[#A50064] hover:bg-[#8A0053] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold text-sm tracking-wider uppercase py-4 rounded-xl flex items-center justify-center gap-2 transition-colors relative">
               <i id="payIcon" class="fas fa-wallet text-sm text-white"></i>
-              <span id="payLabel">Thanh Toán Bằng MoMo</span>
+              <span id="payLabel">Xác Nhận & Thanh Toán</span>
             </button>
             <div class="flex items-center justify-center gap-1.5 mt-3 text-[10px] text-gray-400">
               <i class="fas fa-lock text-gray-300"></i>
@@ -276,6 +273,87 @@
 function updatePayBtn() {
   var agreed = document.getElementById('agreeTerms').checked;
   document.getElementById('payBtn').disabled = !agreed;
+}
+
+// ── Xử lý thanh toán qua API thay vì Form Submit ──
+async function processPayment() {
+  const btn = document.getElementById('payBtn');
+  const label = document.getElementById('payLabel');
+  const icon = document.getElementById('payIcon');
+  
+  // Hiệu ứng Loading
+  btn.disabled = true;
+  label.innerText = 'Đang Xử Lý...';
+  icon.className = 'fas fa-circle-notch fa-spin text-sm text-white';
+
+  try {
+    const form = document.getElementById('confirmForm');
+    const formData = new FormData(form);
+    const bookingDetails = [];
+
+    // Lọc các field kiểu qty_{id} và tạo array cho API
+    for (let [key, value] of formData.entries()) {
+        if (key.startsWith('qty_') && parseInt(value) > 0) {
+            let rtId = key.replace('qty_', '');
+            bookingDetails.push({
+                room_type_id: parseInt(rtId),
+                quantity: parseInt(value)
+            });
+        }
+    }
+
+    const phoneCode = String(formData.get('phone_code') || '+84').trim();
+    const phoneValue = String(formData.get('phone') || '').trim().replace(/\s+/g, '');
+    const fullPhoneNumber = phoneValue.startsWith('+')
+      ? phoneValue
+      : `${phoneCode}${phoneValue.replace(/^0+/, '')}`;
+
+    const payload = {
+        email: formData.get('email_verify'),
+        phone_number: fullPhoneNumber,
+        first_name: formData.get('first_name'),
+        last_name: formData.get('last_name'),
+        country: formData.get('country') || 'VN',
+        booking_date: new Date().toISOString().split('T')[0],
+        checkin_date: formData.get('check_in'),
+        checkout_date: formData.get('check_out'),
+        status: 'Đã đặt',
+        booking_details: bookingDetails
+    };
+
+    // Gọi lên backend - Dùng fetch thuần cho Blade
+    const response = await fetch("{{ route('client.booking.confirm') }}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+        // Chuyển luôn sang trang thành công (bùm)
+        window.location.href = "{{ route('client.booking.confirmation') }}?booking_id=" + data.booking_id;
+    } else {
+        alert(data.message || 'Có lỗi xảy ra, vui lòng thử lại.');
+        resetBtn();
+    }
+  } catch (error) {
+    console.error('Lỗi khi gọi API:', error);
+    alert('Không thể kết nối đến máy chủ, vui lòng thử lại sau.');
+    resetBtn();
+  }
+}
+
+function resetBtn() {
+    const btn = document.getElementById('payBtn');
+    const label = document.getElementById('payLabel');
+    const icon = document.getElementById('payIcon');
+    btn.disabled = false;
+    label.innerText = 'Xác Nhận & Thanh Toán';
+    icon.className = 'fas fa-wallet text-sm text-white';
 }
 </script>
 @endpush

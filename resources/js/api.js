@@ -44,7 +44,10 @@ export async function createBooking(payload) {
 
 export async function updateBooking(bookingId, payload) {
     try {
-        const response = await axios.put(`/admin/bookings/${bookingId}`, payload);
+        const response = await axios.put(
+            `/admin/bookings/${bookingId}`,
+            payload,
+        );
         return response.data;
     } catch (error) {
         console.error("Error updating booking:", error);
@@ -84,6 +87,26 @@ export async function getAllServicesApi() {
     }
 }
 
+export async function getRoomById(roomId) {
+    try {
+        const response = await axios.get(`/admin/rooms/${roomId}`);
+        return response.data?.data ?? null;
+    } catch (error) {
+        console.error("Lỗi khi lấy thông tin phòng:", error);
+        throw error;
+    }
+}
+
+export async function cleanRoomApi(roomId) {
+    try {
+        const response = await axios.put(`/admin/rooms/${roomId}/clean`);
+        return response.data;
+    } catch (error) {
+        console.error("Lỗi khi làm sạch phòng:", error);
+        throw error;
+    }
+}
+
 export async function calculateCheckoutPayment(bookingId, roomIds) {
     try {
         const response = await axios.post("/admin/bookings/calculate-payment", {
@@ -97,13 +120,19 @@ export async function calculateCheckoutPayment(bookingId, roomIds) {
     }
 }
 
-export async function recordPayment(bookingId, { amount, paymentMethod, paymentType }) {
+export async function recordPayment(
+    bookingId,
+    { amount, paymentMethod, paymentType },
+) {
     try {
-        const response = await axios.post(`/admin/bookings/${bookingId}/record-payment`, {
-            amount,
-            payment_method: paymentMethod,
-            payment_type: paymentType,
-        });
+        const response = await axios.post(
+            `/admin/bookings/${bookingId}/record-payment`,
+            {
+                amount,
+                payment_method: paymentMethod,
+                payment_type: paymentType,
+            },
+        );
         return response.data;
     } catch (error) {
         console.error("Lỗi khi ghi nhận thanh toán:", error);
@@ -111,31 +140,35 @@ export async function recordPayment(bookingId, { amount, paymentMethod, paymentT
     }
 }
 
-export async function checkout(id, bookingDetailIds){
-    try{
-        response = await axios.post(`/admin/bookings/${id}/checkout`, 
-        {
-            booking_detail_ids: bookingDetailIds
+export async function checkout(id, bookingDetailIds) {
+    try {
+        response = await axios.post(`/admin/bookings/${id}/checkout`, {
+            booking_detail_ids: bookingDetailIds,
         });
-         return response.data;
-     
-    }
-    catch(error){
+        return response.data;
+    } catch (error) {
         console.error("Lỗi khi checkout:", error);
     }
-   
 }
 
 /**
  * Add room to booking (edit mode)
  */
-export async function addRoomToBooking(bookingId, roomId, checkinDate, checkoutDate) {
+export async function addRoomToBooking(
+    bookingId,
+    roomId,
+    checkinDate,
+    checkoutDate,
+) {
     try {
-        const response = await axios.post(`/admin/bookings/${bookingId}/rooms`, {
-            room_id: roomId,
-            checkin_date: checkinDate,
-            checkout_date: checkoutDate,
-        });
+        const response = await axios.post(
+            `/admin/bookings/${bookingId}/rooms`,
+            {
+                room_id: roomId,
+                checkin_date: checkinDate,
+                checkout_date: checkoutDate,
+            },
+        );
         return response.data;
     } catch (error) {
         console.error("Lỗi khi thêm phòng:", error);
@@ -148,7 +181,9 @@ export async function addRoomToBooking(bookingId, roomId, checkinDate, checkoutD
  */
 export async function removeRoomFromBooking(bookingId, roomId) {
     try {
-        const response = await axios.delete(`/admin/bookings/${bookingId}/rooms/${roomId}`);
+        const response = await axios.delete(
+            `/admin/bookings/${bookingId}/rooms/${roomId}`,
+        );
         return response.data;
     } catch (error) {
         console.error("Lỗi khi xóa phòng:", error);
@@ -159,12 +194,20 @@ export async function removeRoomFromBooking(bookingId, roomId) {
 /**
  * Add or update service for a room in booking (edit mode)
  */
-export async function addOrUpdateServiceInBooking(bookingId, roomId, serviceId, quantity) {
+export async function addOrUpdateServiceInBooking(
+    bookingId,
+    roomId,
+    serviceId,
+    quantity,
+) {
     try {
-        const response = await axios.post(`/admin/bookings/${bookingId}/rooms/${roomId}/services`, {
-            service_id: serviceId,
-            quantity: quantity,
-        });
+        const response = await axios.post(
+            `/admin/bookings/${bookingId}/rooms/${roomId}/services`,
+            {
+                service_id: serviceId,
+                quantity: quantity,
+            },
+        );
         return response.data;
     } catch (error) {
         console.error("Lỗi khi thêm/cập nhật dịch vụ:", error);
@@ -177,7 +220,9 @@ export async function addOrUpdateServiceInBooking(bookingId, roomId, serviceId, 
  */
 export async function removeServiceFromBooking(bookingId, roomId, serviceId) {
     try {
-        const response = await axios.delete(`/admin/bookings/${bookingId}/rooms/${roomId}/services/${serviceId}`);
+        const response = await axios.delete(
+            `/admin/bookings/${bookingId}/rooms/${roomId}/services/${serviceId}`,
+        );
         return response.data;
     } catch (error) {
         console.error("Lỗi khi xóa dịch vụ:", error);
@@ -188,15 +233,39 @@ export async function removeServiceFromBooking(bookingId, roomId, serviceId) {
 /**
  * Update room dates in booking (edit mode)
  */
-export async function updateRoomDates(bookingId, roomId, checkinDate, checkoutDate) {
+export async function updateRoomDates(
+    bookingId,
+    roomId,
+    checkinDate,
+    checkoutDate,
+) {
     try {
-        const response = await axios.put(`/admin/bookings/${bookingId}/rooms/${roomId}/dates`, {
-            checkin_date: checkinDate,
-            checkout_date: checkoutDate,
-        });
+        const response = await axios.put(
+            `/admin/bookings/${bookingId}/rooms/${roomId}/dates`,
+            {
+                checkin_date: checkinDate,
+                checkout_date: checkoutDate,
+            },
+        );
         return response.data;
     } catch (error) {
         console.error("Lỗi khi cập nhật ngày:", error);
+        throw error;
+    }
+}
+
+/**
+ * Call client confirm booking to submit online booking without momo
+ */
+export async function createBookingOnline(payload) {
+    try {
+        const response = await axios.post("/booking/confirm", payload);
+        return response.data;
+    } catch (error) {
+        console.error("Lỗi khi tạo booking online:", error);
+        if (error.response && error.response.data) {
+            throw error.response.data; // ném validation errors ra ngoài
+        }
         throw error;
     }
 }

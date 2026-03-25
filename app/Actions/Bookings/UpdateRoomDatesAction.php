@@ -39,15 +39,33 @@ class UpdateRoomDatesAction
             if ($booking->status === 'Đang ở') {
                 $checkinDate = new DateTime($bookingDetail->checkin_date);
                 $checkoutDate = new DateTime($data['checkout_date']);
+
+                if ($checkoutDate <= $checkinDate) {
+                    throw new \Exception('Ngày checkout phải lớn hơn ngày checkin');
+                }
+
+                if ($this->hasOverlappingBookingDetail($roomId, $bookingDetail->id, $checkinDate, $checkoutDate)) {
+                    throw new \Exception('Phòng đã có booking trùng lịch trong khoảng thời gian này');
+                }
+
                 $chargedDays = $this->calculateChargedDays($checkinDate, $checkoutDate);
 
                 $updatePayload = [
                     'checkout_date' => $data['checkout_date'],
                     'room_amount' => $room->roomType->daily_price * $chargedDays,
                 ];
-            } else {
+            } else if( $booking->status === 'Đã đặt') {
                 $checkinDate = new DateTime($data['checkin_date']);
                 $checkoutDate = new DateTime($data['checkout_date']);
+
+                if ($checkoutDate <= $checkinDate) {
+                    throw new \Exception('Ngày checkout phải lớn hơn ngày checkin');
+                }
+
+                if ($this->hasOverlappingBookingDetail($roomId, $bookingDetail->id, $checkinDate, $checkoutDate)) {
+                    throw new \Exception('Phòng đã có booking trùng lịch trong khoảng thời gian này');
+                }
+
                 $chargedDays = $this->calculateChargedDays($checkinDate, $checkoutDate);
 
                 // Otherwise, allow updating both dates
@@ -72,5 +90,21 @@ class UpdateRoomDatesAction
         $seconds = max($checkoutDate->getTimestamp() - $checkinDate->getTimestamp(), 0);
 
         return max((int) ceil($seconds / 86400), 1);
+    }
+
+    private function hasOverlappingBookingDetail(
+        int $roomId,
+        int $excludeBookingDetailId,
+        DateTime $newCheckin,
+        DateTime $newCheckout,
+    ): bool {
+        return BookingDetail::query()
+            ->join('bookings', 'booking_details.booking_id', '=', 'bookings.id')
+            ->where('booking_details.room_id', $roomId)
+            ->where('booking_details.id', '!=', $excludeBookingDetailId)
+            ->whereIn('bookings.status', ['Đã đặt', 'Đang ở'])
+            ->where('booking_details.checkin_date', '<', $newCheckout->format('Y-m-d H:i:s'))
+            ->where('booking_details.checkout_date', '>', $newCheckin->format('Y-m-d H:i:s'))
+            ->exists();
     }
 }

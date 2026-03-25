@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Data;
 
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 class SystemSettingsData extends Data
 {
@@ -28,7 +29,7 @@ class SystemSettingsData extends Data
         ];
     }
 
-    public static function rules(): array
+    public static function rules(ValidationContext|null $context = null): array
     {
         return [
             'checkin_time' => ['required', 'date_format:H:i,H:i:s'],

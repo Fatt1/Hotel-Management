@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Data;
 
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 class SurchargePoliciesData extends Data
 {
@@ -33,7 +34,7 @@ class SurchargePoliciesData extends Data
         ];
     }
 
-    public static function rules(): array
+    public static function rules(ValidationContext|null $context = null): array
     {
         return [
             'checkin_early' => ['nullable', 'array'],

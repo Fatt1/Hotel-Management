@@ -74,7 +74,7 @@ function renderInvoice(data) {
             <span class="truncate">Phòng ${r.room_name} (${r.room_type})</span>
             <span class="font-medium text-gray-800 whitespace-nowrap ml-2">${fmt(r.room_amount)}</span>
         </div>
-        <div class="text-xs text-gray-500">${r.days ? "Số ngày: " + r.days : "Số giờ: " + r.hours_stayed}</div>`
+        <div class="text-xs text-gray-500">Thời gian ở: ${formatStayDuration(r)}</div>`
     ).join("");
     document.getElementById("total-room-charge").textContent = fmt(data.total_room_amount);
 
@@ -123,6 +123,41 @@ function formatHours(hours){
     const h = Math.floor(hours);
     const m = Math.round((hours - h) * 60);
     return `${h} giờ ${m > 0 ? " " + m + " phút" : ""}`;
+}
+
+function formatStayDuration(room) {
+    const ms = getStayMs(room);
+    if (ms <= 0) return "0 phút";
+
+    const totalMinutes = Math.floor(ms / 60000);
+    const days = Math.floor(totalMinutes / (24 * 60));
+    const remainingMinutes = totalMinutes % (24 * 60);
+    const hours = Math.floor(remainingMinutes / 60);
+    const minutes = remainingMinutes % 60;
+
+    const parts = [];
+    if (days > 0) parts.push(`${days} ngày`);
+    if (hours > 0) parts.push(`${hours} giờ`);
+    if (minutes > 0) parts.push(`${minutes} phút`);
+
+    return parts.length ? parts.join(" ") : "0 phút";
+}
+
+function getStayMs(room) {
+    const checkinMs = Date.parse(room.checkin_date);
+    const actualCheckoutMs = Date.parse(room.actual_checkout || room.checkout_date);
+
+    if (!Number.isFinite(checkinMs) || !Number.isFinite(actualCheckoutMs)) {
+        if (typeof room.hours_stayed === "number" && Number.isFinite(room.hours_stayed)) {
+            return Math.max(0, room.hours_stayed * 60 * 60 * 1000);
+        }
+        if (typeof room.days === "number" && Number.isFinite(room.days)) {
+            return Math.max(0, room.days * 24 * 60 * 60 * 1000);
+        }
+        return 0;
+    }
+
+    return Math.max(0, actualCheckoutMs - checkinMs);
 }
 
 // ===== Còn lại =====

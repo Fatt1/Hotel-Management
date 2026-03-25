@@ -147,6 +147,8 @@ class CalculateCheckoutPaymentAction
             }
             $amount = (float) $detail->hourly_price * $chargedHours;
         } else {
+            $seconds = max($this->now->getTimestamp() - $checkinDate->getTimestamp(), 0);
+            $days = max((int) ceil($seconds / 86400), 1);
             $amount = $detail->room_amount;
         }
 

@@ -7,7 +7,10 @@ use App\Actions\Floors\DeleteFloorAction;
 use App\Actions\Floors\UpdateFloorAction;
 use App\Actions\Rooms\CreateRoomAction;
 use App\Actions\Rooms\DeleteRoomAction;
+use App\Actions\Rooms\GetRoomAction;
 use App\Actions\Rooms\UpdateRoomAction;
+use App\Actions\Rooms\UpdateRoomStatusAction;
+use App\Enums\RoomStatus;
 use App\Http\Controllers\Controller;
 use App\ViewModels\RoomDiagramViewModel;
 use Illuminate\Http\JsonResponse;
@@ -162,6 +165,35 @@ class RoomDiagramAdminController extends Controller
         }
     }
 
+    public function getRoomById(int $id, GetRoomAction $action): JsonResponse
+    {
+        try {
+            $room = $action->handle($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $room->id,
+                    'name' => $room->name,
+                    'status' => $room->status,
+                    'floor_id' => $room->floor_id,
+                    'room_type_id' => $room->room_type_id,
+                    'room_type' => [
+                        'id' => $room->roomType?->id,
+                        'name' => $room->roomType?->name,
+                        'daily_price' => (float) ($room->roomType?->daily_price ?? 0),
+                        'hourly_price' => (float) ($room->roomType?->hourly_price ?? 0),
+                    ],
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
     /**
      * Cập nhật phòng
      */
@@ -208,6 +240,60 @@ class RoomDiagramAdminController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Xóa phòng thành công',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
+     * Cập nhật trạng thái phòng
+     */
+    public function updateRoomStatus(Request $request, int $id, UpdateRoomStatusAction $action): JsonResponse
+    {
+        try {
+            $request->validate([
+                'status' => 'required|string|in:ready,maintenance,cleaning',
+            ]);
+
+            $room = $action->execute($id, (string) $request->input('status'));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật trạng thái phòng thành công',
+                'data' => [
+                    'id' => $room->id,
+                    'name' => $room->name,
+                    'status' => $room->status,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
+     * Đánh dấu phòng đã dọn xong (dirty -> ready)
+     */
+    public function cleanRoom(int $id, UpdateRoomStatusAction $action): JsonResponse
+    {
+        try {
+            $room = $action->execute($id, RoomStatus::READY->value);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Phòng đã được đánh dấu sạch.',
+                'data' => [
+                    'id' => $room->id,
+                    'name' => $room->name,
+                    'status' => $room->status,
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json([

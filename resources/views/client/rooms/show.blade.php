@@ -199,7 +199,7 @@
               @foreach($amenities as $am)
                 <div class="flex items-center gap-3 py-2 border-b border-gray-50 last:border-b-0">
                   <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                    <i class="fas {{ $am->icon ?: 'fa-circle-check' }} text-blue-500 text-xs"></i>
+                    <span class="material-symbols-outlined text-blue-500 text-base leading-none">{{ $am->icon ?: 'check_circle' }}</span>
                   </div>
                   <span class="text-sm text-gray-700 font-medium">{{ $am->name }}</span>
                 </div>

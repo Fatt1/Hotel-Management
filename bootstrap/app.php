@@ -24,7 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if($request->is('admin/*')) {
                 return route('admin.login');
             }
-            return route('login');
+            return route('client.login');
         });
         $middleware->validateCsrfTokens(except: [
             'api/payment/momo-ipn',
