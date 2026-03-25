@@ -2,6 +2,7 @@
   $filters = $customerStatisticsData['filters'];
   $kpi = $customerStatisticsData['kpi'];
   $loyalCustomers = $customerStatisticsData['loyal_customers'];
+  $loyalCustomersTotal = $customerStatisticsData['loyal_customers_total'] ?? 0;
 @endphp
 
 <article class="bg-white border border-slate-200 rounded-2xl p-5 mb-6">
@@ -67,9 +68,13 @@
   <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between gap-3">
     <div>
       <h2 class="text-2xl font-black text-slate-900">Khách hàng thân thiết (Loyal Customers)</h2>
-      <p class="text-sm text-slate-500">Danh sách khách có lượt quay lại và chi tiêu cao trong kỳ</p>
+      <p class="text-sm text-slate-500">
+        Danh sách khách có lượt quay lại và chi tiêu cao trong kỳ
+        @if ($loyalCustomersTotal > 0)
+          ({{ number_format($loyalCustomersTotal, 0, ',', '.') }} khách)
+        @endif
+      </p>
     </div>
-    <span class="text-sm font-semibold text-blue-700">Xem tất cả</span>
   </div>
 
   <div class="overflow-x-auto">
@@ -106,4 +111,10 @@
       </tbody>
     </table>
   </div>
+
+  @if ($loyalCustomers instanceof \Illuminate\Pagination\LengthAwarePaginator)
+    <div class="px-5 py-4 border-t border-slate-200">
+      {{ $loyalCustomers->links('vendor.pagination.custom') }}
+    </div>
+  @endif
 </article>

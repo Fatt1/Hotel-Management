@@ -6,7 +6,6 @@ use App\Enums\RoomStatus;
 use App\Models\Booking;
 use App\Models\BookingDetail;
 use App\Models\Room;
-use App\Models\RoomType;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -25,27 +24,8 @@ class GetRoomPerformanceStatisticsAction
         $periodEnd = $referenceDate->copy()->endOfMonth()->endOfDay();
         $periodEndExclusive = $periodEnd->copy()->addSecond();
 
-        $roomTypeFilter = $request->input('room_type_id', 'all');
-        $bookingStatusFilter = $request->input('booking_status', 'all');
-
-        $roomTypeOptions = RoomType::query()
-            ->orderBy('name')
-            ->get(['id', 'name', 'code'])
-            ->map(fn (RoomType $type) => [
-                'id' => (string) $type->id,
-                'label' => trim(($type->code ? "{$type->code} - " : '') . $type->name),
-            ])
-            ->values()
-            ->all();
-
-        $bookingStatusOptions = Booking::query()
-            ->select('status')
-            ->whereNotNull('status')
-            ->distinct()
-            ->orderBy('status')
-            ->pluck('status')
-            ->values()
-            ->all();
+        $roomTypeFilter = 'all';
+        $bookingStatusFilter = 'all';
 
         $totalRoomsQuery = Room::query();
         if ($roomTypeFilter !== 'all') {
@@ -125,10 +105,6 @@ class GetRoomPerformanceStatisticsAction
         return [
             'filters' => [
                 'date' => $referenceDate->format('Y-m-d'),
-                'room_type_id' => (string) $roomTypeFilter,
-                'booking_status' => $bookingStatusFilter,
-                'room_types' => $roomTypeOptions,
-                'booking_statuses' => $bookingStatusOptions,
             ],
             'kpi' => [
                 [

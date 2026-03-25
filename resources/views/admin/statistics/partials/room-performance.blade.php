@@ -8,39 +8,17 @@
 
 <article class="bg-white border border-slate-200 rounded-2xl p-5 mb-6">
   <form action="{{ route('admin.statistics.room-performance') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-    <div>
+    <div class="md:col-span-2">
       <label class="block text-xs font-bold text-slate-500 mb-1">Khoảng thời gian</label>
       <input type="date" name="date" value="{{ $filters['date'] }}"
         class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:border-orange-500 outline-none">
     </div>
 
-    <div>
-      <label class="block text-xs font-bold text-slate-500 mb-1">Loại phòng</label>
-      <select name="room_type_id" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:border-orange-500 outline-none">
-        <option value="all" {{ $filters['room_type_id'] === 'all' ? 'selected' : '' }}>Tất cả loại phòng</option>
-        @foreach ($filters['room_types'] as $roomType)
-          <option value="{{ $roomType['id'] }}" {{ $filters['room_type_id'] === $roomType['id'] ? 'selected' : '' }}>
-            {{ $roomType['label'] }}
-          </option>
-        @endforeach
-      </select>
+    <div class="md:col-span-2 md:justify-self-end">
+      <button type="submit" class="bg-blue-700 text-white font-bold text-sm px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors h-[42px] min-w-[130px]">
+        Lọc dữ liệu
+      </button>
     </div>
-
-    <div>
-      <label class="block text-xs font-bold text-slate-500 mb-1">Trạng thái đặt phòng</label>
-      <select name="booking_status" class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:border-orange-500 outline-none">
-        <option value="all" {{ $filters['booking_status'] === 'all' ? 'selected' : '' }}>Tất cả trạng thái</option>
-        @foreach ($filters['booking_statuses'] as $status)
-          <option value="{{ $status }}" {{ $filters['booking_status'] === $status ? 'selected' : '' }}>
-            {{ $status }}
-          </option>
-        @endforeach
-      </select>
-    </div>
-
-    <button type="submit" class="bg-blue-700 text-white font-bold text-sm px-6 py-2 rounded-lg hover:bg-blue-800 transition-colors h-[42px]">
-      Lọc dữ liệu
-    </button>
   </form>
 </article>
 

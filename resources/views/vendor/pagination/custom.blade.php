@@ -1,8 +1,8 @@
 @php
-    $pageSizeOptions = [10, 25, 50, 100];
+    $pageSizeOptions = [5, 10, 25, 50, 100];
     $currentPageSize = (int) request()->query('page_size', $paginator->perPage());
     if (!in_array($currentPageSize, $pageSizeOptions, true)) {
-        $currentPageSize = 10;
+        $currentPageSize = (int) $paginator->perPage();
     }
 
     $query = request()->query();

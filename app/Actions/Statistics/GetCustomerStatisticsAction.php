@@ -7,10 +7,13 @@ use App\Models\Customer;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class GetCustomerStatisticsAction
 {
     private const CANCELLED_STATUSES = ['Hủy', 'Đã hủy', 'Không đến'];
+    private const LOYAL_CUSTOMERS_PER_PAGE = 5;
+    private const PAGE_SIZE_OPTIONS = [5, 10, 25, 50, 100];
 
     public function execute(Request $request): array
     {
@@ -22,6 +25,11 @@ class GetCustomerStatisticsAction
         $periodEnd = $referenceDate->copy()->endOfMonth()->endOfDay();
 
         $countryFilter = (string) $request->input('country', 'all');
+
+        $requestedPageSize = (int) $request->input('page_size', self::LOYAL_CUSTOMERS_PER_PAGE);
+        $pageSize = in_array($requestedPageSize, self::PAGE_SIZE_OPTIONS, true)
+            ? $requestedPageSize
+            : self::LOYAL_CUSTOMERS_PER_PAGE;
 
         $countryOptions = Customer::query()
             ->whereNotNull('country')
@@ -52,13 +60,19 @@ class GetCustomerStatisticsAction
             $averageRating
         );
 
-        $loyalCustomers = $this->buildLoyalCustomers($periodStart, $periodEnd, $countryFilter);
+        $loyalCustomersResult = $this->buildLoyalCustomers(
+            $periodStart,
+            $periodEnd,
+            $countryFilter,
+            $pageSize
+        );
 
         return [
             'filters' => [
                 'date' => $referenceDate->format('Y-m-d'),
                 'country' => $countryFilter,
                 'countries' => $countryOptions,
+                'page_size' => $pageSize,
             ],
             'kpi' => [
                 [
@@ -88,7 +102,8 @@ class GetCustomerStatisticsAction
                     'meta' => 'Ước lượng theo tỷ lệ hoàn tất',
                 ],
             ],
-            'loyal_customers' => $loyalCustomers,
+            'loyal_customers' => $loyalCustomersResult['items'],
+            'loyal_customers_total' => $loyalCustomersResult['total'],
         ];
     }
 
@@ -200,18 +215,23 @@ class GetCustomerStatisticsAction
         ];
     }
 
-    private function buildLoyalCustomers(Carbon $start, Carbon $end, string $countryFilter): array
+    private function buildLoyalCustomers(
+        Carbon $start,
+        Carbon $end,
+        string $countryFilter,
+        int $pageSize
+    ): array
     {
-        $query = Booking::query()
+        $baseQuery = Booking::query()
             ->join('customers', 'customers.id', '=', 'bookings.customer_id')
             ->whereBetween('bookings.booking_date', [$start, $end])
             ->whereNotIn('bookings.status', self::CANCELLED_STATUSES);
 
         if ($countryFilter !== 'all') {
-            $query->where('customers.country', $countryFilter);
+            $baseQuery->where('customers.country', $countryFilter);
         }
 
-        $rows = $query
+        $query = (clone $baseQuery)
             ->groupBy('customers.id', 'customers.first_name', 'customers.last_name', 'customers.email')
             ->selectRaw('customers.id as customer_id')
             ->selectRaw('customers.first_name as first_name')
@@ -220,25 +240,32 @@ class GetCustomerStatisticsAction
             ->selectRaw('COUNT(bookings.id) as visits_count')
             ->selectRaw('SUM(bookings.final_amount) as total_spent')
             ->orderByDesc('visits_count')
-            ->orderByDesc('total_spent')
-            ->limit(8)
-            ->get();
+            ->orderByDesc('total_spent');
 
-        return $rows
-            ->map(static function ($row): array {
-                $fullName = trim($row->first_name . ' ' . $row->last_name);
-                $avatarSeed = strtoupper(substr($row->first_name ?? 'K', 0, 1) . substr($row->last_name ?? 'H', 0, 1));
+        /** @var LengthAwarePaginator $paginator */
+        $paginator = $query->paginate($pageSize)->withQueryString();
+        $paginator->setCollection(
+            $paginator->getCollection()->map(fn ($row) => $this->mapLoyalCustomerRow($row))
+        );
 
-                return [
-                    'name' => $fullName !== '' ? $fullName : 'Khách hàng',
-                    'email' => (string) ($row->email ?? ''),
-                    'avatar_seed' => $avatarSeed,
-                    'visits_count' => (int) $row->visits_count,
-                    'total_spent' => (float) $row->total_spent,
-                ];
-            })
-            ->values()
-            ->all();
+        return [
+            'items' => $paginator,
+            'total' => $paginator->total(),
+        ];
+    }
+
+    private function mapLoyalCustomerRow(object $row): array
+    {
+        $fullName = trim(($row->first_name ?? '') . ' ' . ($row->last_name ?? ''));
+        $avatarSeed = strtoupper(substr($row->first_name ?? 'K', 0, 1) . substr($row->last_name ?? 'H', 0, 1));
+
+        return [
+            'name' => $fullName !== '' ? $fullName : 'Khách hàng',
+            'email' => (string) ($row->email ?? ''),
+            'avatar_seed' => $avatarSeed,
+            'visits_count' => (int) $row->visits_count,
+            'total_spent' => (float) $row->total_spent,
+        ];
     }
 
     private function percentChange(float|int $currentValue, float|int $previousValue): float
