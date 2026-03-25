@@ -26,6 +26,9 @@ class GetAvailableRoomsAction
             ->pluck('booking_details.room_id');
 
         return Room::where('status', RoomStatus::READY)
+            ->whereHas('roomType', function ($query) {
+                $query->where('is_active', 1);
+            })
             ->whereNotIn('id', $bookedRoomIds)
             ->when($roomTypeId, function ($query) use ($roomTypeId) {
                 $query->where('room_type_id', $roomTypeId);

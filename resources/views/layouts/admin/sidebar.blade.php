@@ -12,11 +12,6 @@
     </div>
   </div>
   <nav class="flex-1 overflow-y-auto px-4 pb-8 space-y-0.5 custom-scrollbar">
-    <a class="{{ request()->routeIs("admin.dashboard") ? 'sidebar-item-active' : 'sidebar-item' }}"
-      href="{{ route("admin.dashboard") }}">
-      <span class="material-symbols-outlined">dashboard</span>
-      <span>Tổng quan</span>
-    </a>
     <div class="sidebar-group-label">VẬN HÀNH</div>
     @can('layouts.view')
     <a class="{{ request()->routeIs("admin.layout-rooms.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.layout-rooms.index') }}">
@@ -30,17 +25,22 @@
       <span>Chỉnh sửa sơ đồ phòng</span>
     </a>
     @endcan
+
+    @can('room_types.view')
+    <a class="{{ request()->routeIs("admin.room-types.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.room-types.index') }}">
+      <span class="material-symbols-outlined">category</span>
+      <span>Quản lý loại phòng</span>
+    </a>
+    @endcan
+
     @can('bookings.view')
     <a class="{{ request()->routeIs("admin.bookings.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route("admin.bookings.index") }}">
       <span class="material-symbols-outlined">calendar_month</span>
       <span>Quản lý đặt lịch</span>
     </a>
     @endcan
-    <div class="sidebar-group-label">QUẢN LÝ PHÒNG</div>
-    <a class="{{ request()->routeIs("admin.room-types.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.room-types.index') }}">
-      <span class="material-symbols-outlined">category</span>
-      <span>Quản lý loại phòng</span>
-    </a>
+   
+ 
     <div class="sidebar-group-label">QUẢN LÝ TÀI SẢN</div>
     @can('equipments.view')
     <a class="{{ request()->routeIs("admin.equipments.*") ? 'sidebar-item-active' : 'sidebar-item' }}" href="{{ route('admin.equipments.index') }}">

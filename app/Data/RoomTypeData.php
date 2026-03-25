@@ -64,13 +64,13 @@ class RoomTypeData extends Data
         #[Required]
         #[Numeric]
         #[Min(0)]
-        #[Max(1000000000)]
+        #[Max(99999999)]
         public float $hourly_price,
 
         #[Required]
         #[Numeric]
         #[Min(0)]
-        #[Max(1000000000)]
+        #[Max(99999999)]
         public float $daily_price,
 
         #[StringType]
@@ -111,9 +111,11 @@ class RoomTypeData extends Data
             'hourly_price.required' => 'Giá theo giờ là bắt buộc',
             'hourly_price.numeric' => 'Giá theo giờ phải là số',
             'hourly_price.min' => 'Giá theo giờ không được âm',
+            'hourly_price.max' => 'Giá theo giờ phải nhỏ hơn hoặc bằng 99,999,999.99 VNĐ',
             'daily_price.required' => 'Giá theo ngày là bắt buộc',
             'daily_price.numeric' => 'Giá theo ngày phải là số',
             'daily_price.min' => 'Giá theo ngày không được âm',
+            'daily_price.max' => 'Giá theo ngày phải nhỏ hơn hoặc bằng 99,999,999.99 VNĐ',
             'is_active.required' => 'Trạng thái là bắt buộc',
         ];
     }

@@ -11,6 +11,7 @@ use App\Actions\Customers\GetCustomerByIdAction;
 use App\Actions\Customers\UpdateCustomerAction;
 use App\Data\CustomerData;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\CustomerEmailRequest;
 use App\ViewModels\CustomerViewModel;
 use Exception;
 use Illuminate\Http\Request;
@@ -33,24 +34,16 @@ class CustomerAdminController extends Controller
         ]);
     }
 
-    public function getByEmail(Request $request, GetCustomerByEmailAction $getCustomerByEmail)
+    public function getByEmail(CustomerEmailRequest $request, GetCustomerByEmailAction $getCustomerByEmail)
     {
-        $request->validate([
-            'email' => 'required|email',
-        ], [
-            'email.required' => 'Email không được để trống.',
-            'email.email' => 'Email không hợp lệ.',
-        ]);
-        $email = $request->input('email');
         try {
-            $customer = $getCustomerByEmail->handle($email);
-            if ($customer) {
-                return response()->json($customer, 200);
-            } else {
+            $customer = $getCustomerByEmail->handle($request->input('email'));
+            if (!$customer) {
                 return response()->json(['message' => 'Khách hàng không tồn tại'], 404);
             }
+            return response()->json($customer, 200);
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
+            return response()->json(['message' => $e->getMessage()], 404);
         }
     }
 

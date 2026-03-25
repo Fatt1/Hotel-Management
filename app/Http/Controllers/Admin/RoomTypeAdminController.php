@@ -27,7 +27,8 @@ class RoomTypeAdminController extends Controller
         return view('admin.room-type.index', compact('roomTypes'));
     }
     public function getAll(GetRoomTypeListAction $action) {
-        $roomTypes = $action->execute();
+        $filters = ['is_active' => 1];
+        $roomTypes = $action->execute($filters);
         return response()->json($roomTypes, 200);
     }
 

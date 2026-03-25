@@ -4,6 +4,7 @@ namespace App\Actions\Bookings;
 
 use App\Data\CreateBookingOnlineData;
 use App\Data\BookingData;
+use App\Mail\BookingSuccessMail;
 use App\Models\Room;
 use App\Models\BookingDetail;
 use App\Models\Booking;
@@ -11,6 +12,7 @@ use App\Models\SystemSetting;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class CreateBookingOnlineAction
 {
@@ -90,6 +92,7 @@ class CreateBookingOnlineAction
             );
 
             $booking = $this->createBookingAction->execute($bookingData);
+           
 
             return $booking;
         });
