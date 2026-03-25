@@ -302,9 +302,15 @@ async function processPayment() {
         }
     }
 
+    const phoneCode = String(formData.get('phone_code') || '+84').trim();
+    const phoneValue = String(formData.get('phone') || '').trim().replace(/\s+/g, '');
+    const fullPhoneNumber = phoneValue.startsWith('+')
+      ? phoneValue
+      : `${phoneCode}${phoneValue.replace(/^0+/, '')}`;
+
     const payload = {
         email: formData.get('email_verify'),
-        phone_number: formData.get('phone'),
+        phone_number: fullPhoneNumber,
         first_name: formData.get('first_name'),
         last_name: formData.get('last_name'),
         country: formData.get('country') || 'VN',
