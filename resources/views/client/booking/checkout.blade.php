@@ -69,16 +69,18 @@
               <div class="relative flex-1">
                 <i class="far fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
                   <input type="email" id="emailVerify" name="email_verify" placeholder="Nhập địa chỉ email của bạn" required
-                       class="w-full border border-gray-200 rounded-lg py-3 pl-10 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all">
+                       value="{{ $customer->email ?? '' }}"
+                       {{ $customer ? 'readonly' : '' }}
+                       class="w-full border border-gray-200 rounded-lg py-3 pl-10 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all {{ $customer ? 'bg-gray-100 cursor-not-allowed border-gray-300 text-gray-500' : '' }}">
               </div>
-              <button type="button" id="verifyEmailBtn"
-                      class="w-full sm:w-auto px-5 py-3 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
-                Xác Thực
+              <button type="button" id="verifyEmailBtn" {{ $customer ? 'disabled' : '' }}
+                      class="w-full sm:w-auto px-5 py-3 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed">
+                {{ $customer ? 'Đã Xác Thực' : 'Xác Thực' }}
               </button>
             </div>
-            <p id="verifyMessage" class="hidden text-[11px] text-red-500 mt-2 flex items-center gap-1.5">
-              <i class="fas fa-circle-info text-[10px]"></i>
-              Không tìm thấy tài khoản. Vui lòng điền thông tin bên dưới để tạo mới.
+            <p id="verifyMessage" class="{{ $customer ? '' : 'hidden' }} text-[11px] {{ $customer ? 'text-green-600' : 'text-red-500' }} mt-2 flex items-center gap-1.5">
+              <i class="fas {{ $customer ? 'fa-check-circle' : 'fa-circle-info' }} text-[10px]"></i>
+              {{ $customer ? 'Bạn đang đăng nhập. Thông tin đã được tự động điền.' : 'Không tìm thấy tài khoản. Vui lòng điền thông tin bên dưới để tạo mới.' }}
             </p>
           </div>
 
@@ -89,7 +91,9 @@
                 Họ <span class="text-red-500">*</span>
               </label>
               <input type="text" name="last_name" id="lastNameInput" placeholder="vd. Nguyễn"
-                     class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all"
+                     value="{{ $customer->last_name ?? '' }}"
+                     {{ !empty($customer->last_name) ? 'readonly' : '' }}
+                     class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all {{ !empty($customer->last_name) ? 'bg-gray-100 cursor-not-allowed border-gray-300 text-gray-500' : '' }}"
                      required>
             </div>
             <div>
@@ -97,24 +101,26 @@
                 Tên <span class="text-red-500">*</span>
               </label>
               <input type="text" name="first_name" id="firstNameInput" placeholder="vd. Văn An"
-                     class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all"
+                     value="{{ $customer->first_name ?? '' }}"
+                     {{ !empty($customer->first_name) ? 'readonly' : '' }}
+                     class="w-full border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all {{ !empty($customer->first_name) ? 'bg-gray-100 cursor-not-allowed border-gray-300 text-gray-500' : '' }}"
                      required>
             </div>
           </div>
 
           {{-- Country --}}
-          <div class="mb-4">
+          <div class="mb-4 relative">
             <label class="block text-[11px] font-bold tracking-widest uppercase text-gray-500 mb-1.5">
               Quốc gia / Khu vực <span class="text-red-500">*</span>
             </label>
-            <div class="relative">
+            <div class="relative {{ !empty($customer->country) ? 'pointer-events-none opacity-80' : '' }}">
                 @php
                   $clientAuthVM = new \App\ViewModels\ClientAuthViewModel();
                 @endphp
                 @include('admin.customers._country_picker', [
                     'inputName' => 'country',
                     'inputId' => 'countryInput',
-                    'selectedValue' => 'Việt Nam',
+                    'selectedValue' => $customer->country ?? 'Việt Nam',
                     'pickerCountries' => $clientAuthVM->countries(),
                     'placeholder' => 'Chọn quốc gia của bạn'
                 ])
@@ -127,9 +133,9 @@
               Số điện thoại <span class="text-red-500">*</span>
             </label>
             <div class="flex gap-2">
-              <div class="relative">
+              <div class="relative {{ !empty($customer->phone) ? 'pointer-events-none opacity-80' : '' }}">
                 <select name="phone_code"
-                        class="border border-gray-200 rounded-lg py-3 pl-3 pr-8 text-sm text-gray-700 bg-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all appearance-none">
+                        class="border border-gray-200 rounded-lg py-3 pl-3 pr-8 text-sm text-gray-700 bg-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all appearance-none {{ !empty($customer->phone) ? 'bg-gray-100 border-gray-300 text-gray-500' : '' }}">
                   <option value="+84" selected>🇻🇳 +84</option>
                   <option value="+1">🇺🇸 +1</option>
                   <option value="+81">🇯🇵 +81</option>
@@ -141,7 +147,9 @@
                 <i class="fas fa-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
               </div>
               <input type="tel" name="phone" id="phoneInput" placeholder="(012) 345-6789"
-                     class="flex-1 border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all"
+                     value="{{ $customer->phone ?? '' }}"
+                     {{ !empty($customer->phone) ? 'readonly' : '' }}
+                     class="flex-1 border border-gray-200 rounded-lg py-3 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all {{ !empty($customer->phone) ? 'bg-gray-100 cursor-not-allowed border-gray-300 text-gray-500' : '' }}"
                      required>
 
             </div>

@@ -81,10 +81,13 @@ class BookingCheckoutController extends Controller
             ])->with('error', 'Vui lòng chọn ít nhất một phòng trước khi đặt.');
         }
 
+        // Lấy thông tin khách hàng đang đăng nhập nếu có
+        $customer = \Illuminate\Support\Facades\Auth::guard('customer')->user();
+
         return view('client.booking.checkout', compact(
             'selectedRooms', 'subtotal',
             'checkIn', 'checkOut', 'checkInDate', 'checkOutDate',
-            'adults', 'children', 'roomsCount', 'nights'
+            'adults', 'children', 'roomsCount', 'nights', 'customer'
         ));
     }
 
