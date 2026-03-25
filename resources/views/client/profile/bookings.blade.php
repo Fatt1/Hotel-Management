@@ -248,7 +248,7 @@
 
         @if($pastBookings->hasPages())
           <div class="mt-6">
-            {{ $pastBookings->links() }}
+            {{ $pastBookings->links('vendor.pagination.client-dark') }}
           </div>
         @endif
       </div>

@@ -3,86 +3,38 @@
 namespace App\Http\Controllers\Client;
 
 use App\Actions\Bookings\CancelBookingAction;
-use App\Actions\Bookings\RecalculateBookingAmountsAction;
+use App\Actions\Bookings\GetClientBookingsAction;
+use App\Actions\Bookings\GetClientOwnedBookingAction;
+use App\Actions\Bookings\UpdateClientBookingDatesAction;
 use App\Http\Controllers\Controller;
-use App\Models\Booking;
-use App\Models\BookingDetail;
 use App\Models\Customer;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class ClientBookingController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, GetClientBookingsAction $getClientBookingsAction)
     {
         /** @var Customer $customer */
         $customer = Auth::guard('customer')->user();
-        $now = Carbon::now();
 
-        $hasBookingCheckoutDate = Schema::hasColumn('bookings', 'checkout_date');
-        $detailCheckoutSql = "(SELECT MAX(bd.checkout_date) FROM booking_details bd WHERE bd.booking_id = bookings.id)";
-
-        $upcomingBookingsQuery = Booking::query()
-            ->where('customer_id', $customer->id)
-            ->whereNotIn('status', ['Hủy', 'Không đến', 'Hoàn tất'])
-            ->with(['bookingDetails.room.roomType'])
-            ->orderByDesc('booking_date');
-
-        if ($hasBookingCheckoutDate) {
-            $upcomingBookingsQuery->where(function ($query) use ($now): void {
-                $query
-                    ->whereNull('bookings.checkout_date')
-                    ->orWhere('bookings.checkout_date', '>=', $now);
-            });
-        } else {
-            $upcomingBookingsQuery->whereRaw("({$detailCheckoutSql} IS NULL OR {$detailCheckoutSql} >= ?)", [$now]);
-        }
-
-        $upcomingBookings = $upcomingBookingsQuery->get();
-
-        $pastBookingsQuery = Booking::query()
-            ->where('customer_id', $customer->id)
-            ->with(['bookingDetails.room.roomType'])
-            ->orderByDesc('booking_date');
-
-        if ($hasBookingCheckoutDate) {
-            $pastBookingsQuery->where(function ($query) use ($now): void {
-                $query
-                    ->whereIn('status', ['Hủy', 'Không đến', 'Hoàn tất'])
-                    ->orWhere(function ($subQuery) use ($now): void {
-                        $subQuery
-                            ->whereNotNull('bookings.checkout_date')
-                            ->where('bookings.checkout_date', '<', $now);
-                    });
-            });
-        } else {
-            $pastBookingsQuery->where(function ($query) use ($now, $detailCheckoutSql): void {
-                $query
-                    ->whereIn('status', ['Hủy', 'Không đến', 'Hoàn tất'])
-                    ->orWhereRaw("({$detailCheckoutSql} IS NOT NULL AND {$detailCheckoutSql} < ?)", [$now]);
-            });
-        }
-
-        $pastBookings = $pastBookingsQuery
-            ->paginate(3, ['*'], 'history_page')
-            ->withQueryString();
+        $bookingData = $getClientBookingsAction->execute($customer->id, 5);
 
         return view('client.profile.bookings', [
             'customer' => $customer,
-            'upcomingBookings' => $upcomingBookings,
-            'pastBookings' => $pastBookings,
+            'upcomingBookings' => $bookingData['upcomingBookings'],
+            'pastBookings' => $bookingData['pastBookings'],
         ]);
     }
 
-    public function details(int $id)
+    public function details(int $id, GetClientOwnedBookingAction $getClientOwnedBookingAction)
     {
-        $booking = $this->getOwnedBooking($id);
+        /** @var Customer $customer */
+        $customer = Auth::guard('customer')->user();
 
-        $booking->load([
+        $booking = $getClientOwnedBookingAction->execute($customer->id, $id, [
             'bookingDetails.room.roomType',
             'bookingDetails.serviceUsages.service',
         ]);
@@ -99,7 +51,7 @@ class ClientBookingController extends Controller
     public function updateDates(
         Request $request,
         int $id,
-        RecalculateBookingAmountsAction $recalculateBookingAmountsAction
+        UpdateClientBookingDatesAction $updateClientBookingDatesAction
     ): RedirectResponse {
         $validated = $request->validate([
             'checkin_date' => ['required', 'date_format:Y-m-d'],
@@ -110,11 +62,8 @@ class ClientBookingController extends Controller
             'checkout_date.after' => 'Ngày trả phòng phải sau ngày nhận phòng.',
         ]);
 
-        $booking = $this->getOwnedBooking($id);
-
-        if ($booking->status !== 'Đã đặt') {
-            return back()->with('error', 'Booking này không thể đổi ngày ở trạng thái hiện tại.');
-        }
+        /** @var Customer $customer */
+        $customer = Auth::guard('customer')->user();
 
         $newCheckin = Carbon::createFromFormat('Y-m-d', $validated['checkin_date'])->startOfDay();
         $newCheckout = Carbon::createFromFormat('Y-m-d', $validated['checkout_date'])->startOfDay();
@@ -123,67 +72,27 @@ class ClientBookingController extends Controller
             return back()->with('error', 'Ngày nhận phòng mới phải từ hôm nay trở đi.');
         }
 
-        $booking->loadMissing('bookingDetails');
-
-        if ($booking->bookingDetails->isEmpty()) {
-            return back()->with('error', 'Booking chưa có phòng, không thể đổi ngày.');
+        try {
+            $updateClientBookingDatesAction->execute($customer->id, $id, $newCheckin, $newCheckout);
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        foreach ($booking->bookingDetails as $detail) {
-            $hasConflict = BookingDetail::query()
-                ->where('room_id', $detail->room_id)
-                ->where('booking_id', '!=', $booking->id)
-                ->whereHas('booking', function ($query): void {
-                    $query->whereNotIn('status', ['Hủy', 'Không đến']);
-                })
-                ->where(function ($query) use ($newCheckin, $newCheckout): void {
-                    $query
-                        ->where('checkin_date', '<', $newCheckout)
-                        ->where('checkout_date', '>', $newCheckin);
-                })
-                ->exists();
-
-            if ($hasConflict) {
-                return back()->with('error', 'Có phòng không còn trống trong khoảng thời gian mới. Vui lòng chọn ngày khác.');
-            }
-        }
-
-        DB::transaction(function () use ($booking, $newCheckin, $newCheckout, $recalculateBookingAmountsAction): void {
-            $chargedDays = max((int) ceil($newCheckin->diffInSeconds($newCheckout) / 86400), 1);
-
-            foreach ($booking->bookingDetails as $detail) {
-                $detail->update([
-                    'checkin_date' => $newCheckin,
-                    'checkout_date' => $newCheckout,
-                    'room_amount' => (float) $detail->daily_price * $chargedDays,
-                ]);
-            }
-
-            $bookingPayload = [];
-
-            if (Schema::hasColumn('bookings', 'checkin_date')) {
-                $bookingPayload['checkin_date'] = $newCheckin;
-            }
-
-            if (Schema::hasColumn('bookings', 'checkout_date')) {
-                $bookingPayload['checkout_date'] = $newCheckout;
-            }
-
-            if (!empty($bookingPayload)) {
-                $booking->update($bookingPayload);
-            }
-
-            $recalculateBookingAmountsAction->execute($booking->id);
-        });
 
         return redirect()
             ->route('client.bookings.index')
             ->with('success', 'Đã cập nhật thời gian check-in/check-out thành công.');
     }
 
-    public function cancel(int $id, CancelBookingAction $cancelBookingAction): RedirectResponse
+    public function cancel(
+        int $id,
+        CancelBookingAction $cancelBookingAction,
+        GetClientOwnedBookingAction $getClientOwnedBookingAction
+    ): RedirectResponse
     {
-        $booking = $this->getOwnedBooking($id);
+        /** @var Customer $customer */
+        $customer = Auth::guard('customer')->user();
+
+        $booking = $getClientOwnedBookingAction->execute($customer->id, $id);
 
         try {
             $cancelBookingAction->execute($booking->id);
@@ -194,16 +103,5 @@ class ClientBookingController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
-    }
-
-    private function getOwnedBooking(int $bookingId): Booking
-    {
-        /** @var Customer $customer */
-        $customer = Auth::guard('customer')->user();
-
-        return Booking::query()
-            ->where('customer_id', $customer->id)
-            ->where('id', $bookingId)
-            ->firstOrFail();
     }
 }
