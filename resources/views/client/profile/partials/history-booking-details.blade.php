@@ -1,5 +1,5 @@
 @php
-  $reservationCode = 'RES-' . str_pad((string) $booking->id, 7, '0', STR_PAD_LEFT);
+  $reservationCode = 'UL-' . str_pad((string) $booking->id, 6, '0', STR_PAD_LEFT);
 @endphp
 
 <div class="space-y-2 text-sm text-[#d5ccbc]">

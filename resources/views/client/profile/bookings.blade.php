@@ -132,7 +132,7 @@
           @php
             $checkin = $booking->checkin_date ?? optional($booking->bookingDetails->sortBy('checkin_date')->first())->checkin_date;
             $checkout = $booking->checkout_date ?? optional($booking->bookingDetails->sortByDesc('checkout_date')->first())->checkout_date;
-            $reservationCode = 'RES-' . str_pad((string) $booking->id, 7, '0', STR_PAD_LEFT);
+            $reservationCode = 'UL-' . str_pad((string) $booking->id, 6, '0', STR_PAD_LEFT);
           @endphp
           <article class="booking-card p-4 sm:p-5 mb-4" id="booking-{{ $booking->id }}">
             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
@@ -211,7 +211,7 @@
           @php
             $checkin = $booking->checkin_date ?? optional($booking->bookingDetails->sortBy('checkin_date')->first())->checkin_date;
             $checkout = $booking->checkout_date ?? optional($booking->bookingDetails->sortByDesc('checkout_date')->first())->checkout_date;
-            $reservationCode = 'RES-' . str_pad((string) $booking->id, 7, '0', STR_PAD_LEFT);
+            $reservationCode = 'UL-' . str_pad((string) $booking->id, 6, '0', STR_PAD_LEFT);
           @endphp
           <article class="booking-card p-4 sm:p-5 mb-4">
             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
