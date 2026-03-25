@@ -12,10 +12,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const checkoutBtn = document.getElementById("checkoutBtn");
     const phoneCodeSelect = document.querySelector('select[name="phone_code"]');
 
-    const supportedPhoneCodes = ["+84", "+1", "+81", "+82", "+65", "+61", "+44"];
+    const supportedPhoneCodes = [
+        "+84",
+        "+1",
+        "+81",
+        "+82",
+        "+65",
+        "+61",
+        "+44",
+    ];
 
     function parsePhone(phoneRaw) {
-        const raw = String(phoneRaw || "").trim().replace(/\s+/g, "");
+        const raw = String(phoneRaw || "")
+            .trim()
+            .replace(/\s+/g, "");
         if (!raw) {
             return { code: "+84", number: "" };
         }
