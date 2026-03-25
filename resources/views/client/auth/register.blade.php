@@ -81,12 +81,15 @@
                             <input
                                 id="phone_number"
                                 name="phone_number"
-                                type="text"
+                                type="tel"
                                 value="{{ old('phone_number') }}"
+                                inputmode="numeric"
+                                maxlength="10"
                                 class="w-full h-11 rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 @error('phone_number') border-red-400 @enderror"
-                                placeholder="+84 9xx xxx xxx"
+                                placeholder="0xxxxxxxxx"
                             >
-                            @error('phone_number') <p class="mt-1 text-xs text-red-300">{{ $message }}</p> @enderror
+                            <p id="phone_number_client_error" class="mt-1 text-xs text-red-500 hidden">Số điện thoại phải gồm đúng 10 chữ số.</p>
+                            @error('phone_number') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
@@ -128,4 +131,36 @@
         </div>
     </div>
 </body>
+<script>
+    (function () {
+        var phoneInput = document.getElementById('phone_number');
+        var phoneError = document.getElementById('phone_number_client_error');
+
+        if (!phoneInput || !phoneError) {
+            return;
+        }
+
+        function validatePhone() {
+            var value = String(phoneInput.value || '').trim();
+            var isValid = /^[0-9]{10}$/.test(value);
+
+            if (value.length === 0 || isValid) {
+                phoneError.classList.add('hidden');
+                phoneInput.classList.remove('border-red-400');
+                return true;
+            }
+
+            phoneError.classList.remove('hidden');
+            phoneInput.classList.add('border-red-400');
+            return false;
+        }
+
+        phoneInput.addEventListener('input', validatePhone);
+        phoneInput.form?.addEventListener('submit', function (event) {
+            if (!validatePhone()) {
+                event.preventDefault();
+            }
+        });
+    })();
+</script>
 </html>

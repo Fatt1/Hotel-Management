@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Actions\Statistics\GetOverviewStatisticsAction;
+use App\Actions\Statistics\GetCustomerStatisticsAction;
 use App\Actions\Statistics\GetRevenueStatisticsAction;
+use App\Actions\Statistics\GetRoomPerformanceStatisticsAction;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -34,19 +36,21 @@ class StatisticsAdminController extends Controller
         ]);
     }
 
-    public function roomPerformance()
+    public function roomPerformance(Request $request, GetRoomPerformanceStatisticsAction $action)
     {
         return view('admin.statistics.index', [
             'section' => 'room-performance',
             'sectionLabels' => self::SECTION_LABELS,
+            'roomPerformanceData' => $action->execute($request),
         ]);
     }
 
-    public function customers()
+    public function customers(Request $request, GetCustomerStatisticsAction $action)
     {
         return view('admin.statistics.index', [
             'section' => 'customers',
             'sectionLabels' => self::SECTION_LABELS,
+            'customerStatisticsData' => $action->execute($request),
         ]);
     }
 }

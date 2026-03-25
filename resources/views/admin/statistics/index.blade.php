@@ -210,6 +210,10 @@
       @endpush
     @elseif ($section === 'revenue' && isset($revenueData))
       @include('admin.statistics.partials.revenue')
+    @elseif ($section === 'room-performance' && isset($roomPerformanceData))
+      @include('admin.statistics.partials.room-performance')
+    @elseif ($section === 'customers' && isset($customerStatisticsData))
+      @include('admin.statistics.partials.customers')
     @else
       <article class="bg-white border border-slate-200 rounded-2xl p-10 text-center">
         <h2 class="text-2xl font-black text-slate-900">{{ $sectionLabels[$section] }}</h2>

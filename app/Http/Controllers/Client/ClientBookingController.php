@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ClientBookingController extends Controller
 {
@@ -22,29 +23,51 @@ class ClientBookingController extends Controller
         $customer = Auth::guard('customer')->user();
         $now = Carbon::now();
 
-        $upcomingBookings = Booking::query()
+        $hasBookingCheckoutDate = Schema::hasColumn('bookings', 'checkout_date');
+        $detailCheckoutSql = "(SELECT MAX(bd.checkout_date) FROM booking_details bd WHERE bd.booking_id = bookings.id)";
+
+        $upcomingBookingsQuery = Booking::query()
             ->where('customer_id', $customer->id)
             ->whereNotIn('status', ['Hủy', 'Không đến', 'Hoàn tất'])
-            ->where(function ($query) use ($now): void {
-                $query->whereNull('checkout_date')->orWhere('checkout_date', '>=', $now);
-            })
             ->with(['bookingDetails.room.roomType'])
-            ->orderByDesc('booking_date')
-            ->get();
+            ->orderByDesc('booking_date');
 
-        $pastBookings = Booking::query()
+        if ($hasBookingCheckoutDate) {
+            $upcomingBookingsQuery->where(function ($query) use ($now): void {
+                $query
+                    ->whereNull('bookings.checkout_date')
+                    ->orWhere('bookings.checkout_date', '>=', $now);
+            });
+        } else {
+            $upcomingBookingsQuery->whereRaw("({$detailCheckoutSql} IS NULL OR {$detailCheckoutSql} >= ?)", [$now]);
+        }
+
+        $upcomingBookings = $upcomingBookingsQuery->get();
+
+        $pastBookingsQuery = Booking::query()
             ->where('customer_id', $customer->id)
-            ->where(function ($query) use ($now): void {
+            ->with(['bookingDetails.room.roomType'])
+            ->orderByDesc('booking_date');
+
+        if ($hasBookingCheckoutDate) {
+            $pastBookingsQuery->where(function ($query) use ($now): void {
                 $query
                     ->whereIn('status', ['Hủy', 'Không đến', 'Hoàn tất'])
                     ->orWhere(function ($subQuery) use ($now): void {
                         $subQuery
-                            ->whereNotNull('checkout_date')
-                            ->where('checkout_date', '<', $now);
+                            ->whereNotNull('bookings.checkout_date')
+                            ->where('bookings.checkout_date', '<', $now);
                     });
-            })
-            ->with(['bookingDetails.room.roomType'])
-            ->orderByDesc('booking_date')
+            });
+        } else {
+            $pastBookingsQuery->where(function ($query) use ($now, $detailCheckoutSql): void {
+                $query
+                    ->whereIn('status', ['Hủy', 'Không đến', 'Hoàn tất'])
+                    ->orWhereRaw("({$detailCheckoutSql} IS NOT NULL AND {$detailCheckoutSql} < ?)", [$now]);
+            });
+        }
+
+        $pastBookings = $pastBookingsQuery
             ->paginate(3, ['*'], 'history_page')
             ->withQueryString();
 
@@ -136,10 +159,19 @@ class ClientBookingController extends Controller
                 ]);
             }
 
-            $booking->update([
-                'checkin_date' => $newCheckin,
-                'checkout_date' => $newCheckout,
-            ]);
+            $bookingPayload = [];
+
+            if (Schema::hasColumn('bookings', 'checkin_date')) {
+                $bookingPayload['checkin_date'] = $newCheckin;
+            }
+
+            if (Schema::hasColumn('bookings', 'checkout_date')) {
+                $bookingPayload['checkout_date'] = $newCheckout;
+            }
+
+            if (!empty($bookingPayload)) {
+                $booking->update($bookingPayload);
+            }
 
             $recalculateBookingAmountsAction->execute($booking->id);
         });
