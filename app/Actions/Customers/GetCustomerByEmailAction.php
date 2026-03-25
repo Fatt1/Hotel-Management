@@ -3,13 +3,17 @@
 namespace App\Actions\Customers;
 
 use App\Models\Customer;
-use Illuminate\Support\Facades\Validator;
 
 class GetCustomerByEmailAction
 {
-    public function handle(string $email): ?Customer
+    public function handle(string $email): Customer
     {
-        return Customer::where('email', $email)->first();
+        $customer = Customer::where('email', $email)->first();
+
+        if (!$customer) {
+            throw new \Exception('Khách hàng không tồn tại');
+        }
+
+        return $customer;
     }
-    
 }

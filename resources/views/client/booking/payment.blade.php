@@ -55,14 +55,24 @@
           <h2 class="text-lg font-bold text-gray-900 mb-1">Phương Thức Thanh Toán</h2>
           <p class="text-xs text-gray-400 mb-6">Tất cả giao dịch đều được mã hoá và bảo mật.</p>
 
-          {{-- 1 tab (MoMo Only) --}}
-          <div class="mb-6 grid grid-cols-1">
+          {{-- Tabs --}}
+          <div class="mb-6 grid grid-cols-2 gap-4">
 
-            {{-- MoMo --}}
-            <div class="method-tab active border-2 border-pink-500 bg-pink-50/50 p-4 rounded-xl text-center cursor-default">
+            {{-- MoMo Tab --}}
+            <div id="tab-momo" onclick="switchMethod('momo')" class="method-tab active border-2 border-pink-500 bg-pink-50/50 p-4 rounded-xl text-center cursor-pointer transition-all">
               <div class="flex flex-col items-center justify-center">
                 <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo" class="h-10 mb-2 object-contain block">
                 <div class="tab-label text-sm text-gray-800 font-bold">Thanh Toán Bằng Ví MoMo</div>
+              </div>
+            </div>
+
+            {{-- Credit Card Tab --}}
+            <div id="tab-cc" onclick="switchMethod('cc')" class="method-tab border-2 border-gray-100 bg-white hover:border-blue-500 p-4 rounded-xl text-center cursor-pointer transition-all">
+              <div class="flex flex-col items-center justify-center">
+                <div class="h-10 mb-2 flex items-center justify-center">
+                  <i class="fas fa-credit-card text-3xl text-blue-600"></i>
+                </div>
+                <div class="tab-label text-sm text-gray-800 font-bold">Credit Card</div>
               </div>
             </div>
 
@@ -89,6 +99,74 @@
                  </div>
               </div>
             </div>
+          </div>
+
+          {{-- ── Panel: Credit Card ── --}}
+          <div id="panel-cc" class="payment-panel hidden mt-2">
+            <!-- Form mock for credit card -->
+            <div class="space-y-5">
+              <!-- Card Number -->
+              <div>
+                <label class="block text-xs font-bold text-gray-700 tracking-wider uppercase mb-2">Số Thẻ <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="far fa-credit-card text-gray-400"></i>
+                  </div>
+                  <input type="text" placeholder="0000 0000 0000 0000" class="block w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-medium text-gray-900 placeholder-gray-400 outline-none transition-all">
+                  <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                    <i class="fas fa-lock text-green-500 text-sm"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Exp & CVV -->
+              <div class="grid grid-cols-2 gap-5">
+                <div>
+                  <label class="block text-xs font-bold text-gray-700 tracking-wider uppercase mb-2">Ngày Hết Hạn <span class="text-red-500">*</span></label>
+                  <input type="text" placeholder="MM / YY" class="block w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-medium text-gray-900 placeholder-gray-400 outline-none transition-all">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-gray-700 tracking-wider uppercase mb-2">CVV / CVC <span class="text-red-500">*</span></label>
+                  <div class="relative">
+                    <input type="text" placeholder="123" class="block w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-medium text-gray-900 placeholder-gray-400 outline-none transition-all">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-help">
+                      <i class="far fa-question-circle text-gray-400"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cardholder Name -->
+              <div>
+                <label class="block text-xs font-bold text-gray-700 tracking-wider uppercase mb-2">Tên Chủ Thẻ <span class="text-red-500">*</span></label>
+                <input type="text" placeholder="Tên in trên thẻ" class="block w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-medium text-gray-900 placeholder-gray-400 outline-none transition-all">
+              </div>
+
+              <!-- Save card -->
+              <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 flex items-start gap-3 mt-2">
+                <input type="checkbox" id="saveCard" class="mt-0.5 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                <div>
+                  <label for="saveCard" class="text-sm font-bold text-gray-800 cursor-pointer">Lưu thông tin thẻ cho lần sau</label>
+                  <p class="text-xs text-gray-500 mt-1">Thông tin thẻ được lưu trữ an toàn. Chúng tôi không lưu mã CVV.</p>
+                </div>
+              </div>
+            </div>
+            
+            {{-- Billing Address mock --}}
+            <div class="mt-8 border-t border-gray-100 pt-6">
+              <h3 class="text-base font-bold text-gray-900 mb-4">Địa Chỉ Hoá Đơn</h3>
+              <div class="flex items-center gap-6">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="billing" checked class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer">
+                  <span class="text-sm text-gray-700 font-medium">Giống thông tin người đặt</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="billing" class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer">
+                  <span class="text-sm text-gray-700 font-medium">Sử dụng địa chỉ khác</span>
+                </label>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -269,6 +347,24 @@
 
 @push('scripts')
 <script>
+// ── Switch Tabs ──
+function switchMethod(method) {
+  // Reset all tabs
+  document.getElementById('tab-momo').className = 'method-tab border-2 border-gray-100 bg-white hover:border-pink-500 p-4 rounded-xl text-center cursor-pointer transition-all';
+  document.getElementById('tab-cc').className = 'method-tab border-2 border-gray-100 bg-white hover:border-blue-500 p-4 rounded-xl text-center cursor-pointer transition-all';
+  
+  // Set active tab and panel
+  if (method === 'momo') {
+    document.getElementById('tab-momo').className = 'method-tab active border-2 border-pink-500 bg-pink-50/50 p-4 rounded-xl text-center cursor-pointer transition-all';
+    document.getElementById('panel-momo').classList.remove('hidden');
+    document.getElementById('panel-cc').classList.add('hidden');
+  } else {
+    document.getElementById('tab-cc').className = 'method-tab active border-2 border-blue-500 bg-blue-50/50 p-4 rounded-xl text-center cursor-pointer transition-all';
+    document.getElementById('panel-cc').classList.remove('hidden');
+    document.getElementById('panel-momo').classList.add('hidden');
+  }
+}
+
 // ── Terms checkbox validation toggles button ──
 function updatePayBtn() {
   var agreed = document.getElementById('agreeTerms').checked;

@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Client;
 use App\Actions\Auths\LoginAction;
 use App\Actions\Auths\SendOtpEmailAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Client\RegisterCustomerRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Actions\Customers\AddCustomerAction;
@@ -91,9 +92,10 @@ class AuthController extends Controller
     /**
      * Handle client registration.
      */
-    public function storeRegister(CustomerData $data, AddCustomerAction $action)
+    public function storeRegister(RegisterCustomerRequest $request, AddCustomerAction $action)
     {
         try {
+            $data = CustomerData::from($request->validated());
             $action->handle($data);
 
             return redirect()
