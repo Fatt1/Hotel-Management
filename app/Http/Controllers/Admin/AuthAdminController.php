@@ -20,7 +20,7 @@ class AuthAdminController extends Controller
         ];
         if(Auth::guard('staff')->attempt($credentials)) {
             session()->regenerateToken();
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('admin.layout-rooms.index');
         } else {
             return back()
             ->withErrors(['login_error' => 'Thông tin đăng nhập không chính xác'])
