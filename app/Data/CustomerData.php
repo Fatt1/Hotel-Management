@@ -22,6 +22,7 @@ class CustomerData extends Data
             'last_name.required' => 'Vui lòng nhập họ',
             'first_name.required' => 'Vui lòng nhập tên',
             'phone_number.required' => 'Vui lòng nhập số điện thoại',
+            'phone_number.regex' => 'Số điện thoại phải gồm đúng 10 chữ số',
             'country.required' => 'Vui lòng nhập quốc gia',
             'email.required' => 'Vui lòng nhập email',
             'email.email' => 'Email không hợp lệ',
@@ -36,7 +37,7 @@ class CustomerData extends Data
         return [
             'last_name' => 'required|string|max:255',
             'first_name' => 'required|string|max:255',
-            'phone_number' => 'required|string|max:20',
+            'phone_number' => ['required', 'regex:/^[0-9]{10}$/'],
             'country' => 'required|string|max:255',
             'email' => [
                 'required',

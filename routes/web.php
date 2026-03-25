@@ -107,6 +107,9 @@ Route::prefix('admin')->middleware(["auth:staff", "admin"])->group(function () {
     Route::delete('floors/{id}', [RoomDiagramAdminController::class, 'destroyFloor'])->name('admin.floors.destroy');
     
     // Room API routes
+    Route::get('rooms/{id}', [RoomDiagramAdminController::class, 'getRoomById'])->name('admin.rooms.show');
+    Route::patch('rooms/{id}/status', [RoomDiagramAdminController::class, 'updateRoomStatus'])->name('admin.rooms.update-status');
+    Route::put('rooms/{id}/clean', [RoomDiagramAdminController::class, 'cleanRoom'])->name('admin.rooms.clean');
     Route::post('rooms', [RoomDiagramAdminController::class, 'storeRoom'])->name('admin.rooms.store');
     Route::put('rooms/{id}', [RoomDiagramAdminController::class, 'updateRoom'])->name('admin.rooms.update');
     Route::delete('rooms/{id}', [RoomDiagramAdminController::class, 'destroyRoom'])->name('admin.rooms.destroy');
@@ -216,6 +219,7 @@ Route::middleware('auth:customer')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('client.profile.update');
 
     Route::get('/profile/bookings', [ClientBookingController::class, 'index'])->name('client.bookings.index');
+    Route::get('/profile/bookings/{id}/details', [ClientBookingController::class, 'details'])->name('client.bookings.details');
     Route::put('/profile/bookings/{id}/dates', [ClientBookingController::class, 'updateDates'])->name('client.bookings.update-dates');
     Route::post('/profile/bookings/{id}/cancel', [ClientBookingController::class, 'cancel'])->name('client.bookings.cancel');
 });

@@ -33,7 +33,7 @@ class GetAvailableRoomsAction
             ->when($floorId, function ($query) use ($floorId) {
                 $query->where('floor_id', $floorId);
             })
-            ->with(['roomType', 'floor'])
+            ->with(['roomType', 'floor', ])
             ->get();
     }
 }

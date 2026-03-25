@@ -318,7 +318,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.45; cursor: p
               <div class="mt-3 flex flex-wrap gap-x-3 gap-y-1">
                 @foreach($showAms as $am)
                   <div class="flex items-center gap-1.5">
-                    <i class="fas {{ $am->icon ?: 'fa-circle-check' }} text-[10px] text-gray-400"></i>
+                    <span class="material-symbols-outlined text-[14px] text-gray-400 leading-none">{{ $am->icon ?: 'check_circle' }}</span>
                     <span class="text-xs text-gray-600">{{ $am->name }}</span>
                   </div>
                 @endforeach
@@ -415,7 +415,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.45; cursor: p
             <div class="pt-0.5">
               @forelse($showAms as $am)
                 <div class="flex items-center gap-2 mb-1.5">
-                  <i class="fas {{ $am->icon ?: 'fa-circle-check' }} text-[11px] text-gray-400 w-3.5"></i>
+                  <span class="material-symbols-outlined text-[14px] text-gray-400 leading-none">{{ $am->icon ?: 'check_circle' }}</span>
                   <span class="text-xs text-gray-600">{{ $am->name }}</span>
                 </div>
               @empty

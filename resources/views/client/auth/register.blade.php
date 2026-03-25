@@ -81,10 +81,13 @@
                             <input
                                 id="phone_number"
                                 name="phone_number"
-                                type="text"
+                                type="tel"
                                 value="{{ old('phone_number') }}"
+                                inputmode="numeric"
+                                maxlength="10"
+                                pattern="[0-9]{10}"
                                 class="w-full h-11 rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 @error('phone_number') border-red-400 @enderror"
-                                placeholder="+84 9xx xxx xxx"
+                                placeholder="0xxxxxxxxx"
                             >
                             @error('phone_number') <p class="mt-1 text-xs text-red-300">{{ $message }}</p> @enderror
                         </div>
