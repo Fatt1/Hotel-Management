@@ -25,7 +25,7 @@ class GetAllLayoutRoomsAction
 
 
     
-        $rooms = Room::with([
+        $rooms = Room::query()->with([
             'roomType:id,name,code',
             'floor:id,name',
             'bookingDetails' => function ($query) use ($dateStart, $dateEnd) {
@@ -37,9 +37,14 @@ class GetAllLayoutRoomsAction
                     ->with('booking.customer:id,first_name,last_name')
                     ->orderBy('checkin_date');
             }
-        ])->orderBy('name')->get();
+        ])
+            ->whereHas('roomType', function ($query) {
+                $query->where('is_active', 1);
+            })
+            ->orderBy('name')
+            ->get();
 
-        $allRooms = $rooms->map(function ($room) use ($now) {
+        $allRooms = $rooms->map(function (Room $room) use ($now) {
             $viewModel = $this->determineRoomStatus($room, $now);
             $viewModel->floorName = $room->floor->name ?? 'N/A';
             $viewModel->floorId = $room->floor->id ?? 0;
