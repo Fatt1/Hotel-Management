@@ -1,3 +1,5 @@
+import { cleanRoomApi } from '../../api';
+
 let currentMenuRoom = null;
 
 function showRoomMenu(event, element) {
@@ -62,7 +64,8 @@ function showRoomMenu(event, element) {
   } else if (roomStatus === 'dirty') {
     // Bẩn: Làm sạch
     document.getElementById('menu-clean').style.display = 'flex';
-    document.getElementById('menu-clean').href = `/admin/rooms/${roomId}/clean`;
+    document.getElementById('menu-clean').dataset.roomId = roomId;
+    document.getElementById('menu-clean').href = '#';
   }
   
   // Reset position to top-left before showing to avoid old position affecting calculation
@@ -163,6 +166,31 @@ document.addEventListener('DOMContentLoaded', function() {
   if (menu) {
     menu.addEventListener('click', function(event) {
       event.stopPropagation();
+    });
+  }
+
+  const cleanBtn = document.getElementById('menu-clean');
+  if (cleanBtn) {
+    cleanBtn.addEventListener('click', async function(event) {
+      event.preventDefault();
+      const roomId = Number(cleanBtn.dataset.roomId);
+      if (!Number.isInteger(roomId) || roomId <= 0) {
+        return;
+      }
+
+      const confirmed = window.confirm('Đánh dấu phòng này đã dọn xong?');
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        await cleanRoomApi(roomId);
+        hideRoomMenu();
+        window.location.reload();
+      } catch (error) {
+        const msg = error.response?.data?.message ?? 'Không thể cập nhật trạng thái phòng.';
+        alert(msg);
+      }
     });
   }
   
