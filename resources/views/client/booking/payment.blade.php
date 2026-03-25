@@ -102,7 +102,7 @@
           </div>
 
           {{-- ── Panel: Credit Card ── --}}
-          <div id="panel-cc" class="payment-panel hidden mt-2">
+          <div id="panel-cc" class="payment-panel mt-2" style="display: none;">
             <!-- Form mock for credit card -->
             <div class="space-y-5">
               <!-- Card Number -->
@@ -356,12 +356,16 @@ function switchMethod(method) {
   // Set active tab and panel
   if (method === 'momo') {
     document.getElementById('tab-momo').className = 'method-tab active border-2 border-pink-500 bg-pink-50/50 p-4 rounded-xl text-center cursor-pointer transition-all';
-    document.getElementById('panel-momo').classList.remove('hidden');
-    document.getElementById('panel-cc').classList.add('hidden');
+    
+    // Using display style directly ensures high priority
+    document.getElementById('panel-momo').style.display = 'block';
+    document.getElementById('panel-cc').style.display = 'none';
   } else {
     document.getElementById('tab-cc').className = 'method-tab active border-2 border-blue-500 bg-blue-50/50 p-4 rounded-xl text-center cursor-pointer transition-all';
-    document.getElementById('panel-cc').classList.remove('hidden');
-    document.getElementById('panel-momo').classList.add('hidden');
+    
+    // Using display style directly ensures high priority
+    document.getElementById('panel-cc').style.display = 'block';
+    document.getElementById('panel-momo').style.display = 'none';
   }
 }
 

@@ -24,7 +24,7 @@ class BookingCheckoutController extends Controller
      * Hiển thị trang nhập thông tin khách + tóm tắt đặt phòng.
      * Nhận dữ liệu phòng đã chọn từ trang /rooms (POST).
      */
-    public function checkout(Request $request)
+    public function checkout(Request $request, \App\Actions\Bookings\CalculateCheckoutCartAction $cartAction)
     {
         // --- Ngày & số khách ---
         $checkIn    = $request->input('check_in',  now()->format('Y-m-d'));
@@ -45,30 +45,13 @@ class BookingCheckoutController extends Controller
         }
         $checkIn  = $checkInDate->format('Y-m-d');
         $checkOut = $checkOutDate->format('Y-m-d');
-        $nights   = max(1, (int) $checkInDate->diffInDays($checkOutDate));
+        $nights   = max(1, (int) $checkInDate->copy()->startOfDay()->diffInDays($checkOutDate->copy()->startOfDay()));
 
         // --- Các phòng đã chọn (qty_{id} => số lượng) ---
         // Rooms page POSTs: qty_1=2, qty_5=1, ... kèm check_in, check_out, adults, children, rooms_count
-        $selectedRooms = [];
-        $subtotal = 0;
-
-        foreach ($request->all() as $key => $value) {
-            if (str_starts_with($key, 'qty_') && (int) $value > 0) {
-                $rtId = (int) substr($key, 4);
-                $rt   = RoomType::with(['images'])->find($rtId);
-                if ($rt) {
-                    $qty   = (int) $value;
-                    $price = (float) $rt->daily_price;
-                    $selectedRooms[] = [
-                        'room_type'  => $rt,
-                        'qty'        => $qty,
-                        'price'      => $price,
-                        'line_total' => $price * $qty * $nights,
-                    ];
-                    $subtotal += $price * $qty * $nights;
-                }
-            }
-        }
+        $cart = $cartAction->execute($request->all(), $nights);
+        $selectedRooms = $cart['selectedRooms'];
+        $subtotal = $cart['subtotal'];
 
         // Nếu không có phòng nào được chọn → redirect về trang rooms
         if (empty($selectedRooms)) {
@@ -95,7 +78,7 @@ class BookingCheckoutController extends Controller
      * Hiển thị trang chọn phương thức thanh toán (Step 3/3).
      * Nhận dữ liệu từ form thông tin khách (checkout page).
      */
-    public function payment(Request $request)
+    public function payment(Request $request, \App\Actions\Bookings\CalculateCheckoutCartAction $cartAction)
     {
         // If redirected back from confirm(), use flashed old input to rebuild the payment page.
         $payload = $request->all();
@@ -126,7 +109,7 @@ class BookingCheckoutController extends Controller
         }
         $checkIn  = $checkInDate->format('Y-m-d');
         $checkOut = $checkOutDate->format('Y-m-d');
-        $nights   = max(1, (int) $checkInDate->diffInDays($checkOutDate));
+        $nights   = max(1, (int) $checkInDate->copy()->startOfDay()->diffInDays($checkOutDate->copy()->startOfDay()));
 
         // Guest info passed through from step 2
         $guestInfo = [
@@ -138,26 +121,9 @@ class BookingCheckoutController extends Controller
         ];
 
         // Selected rooms
-        $selectedRooms = [];
-        $subtotal = 0;
-
-        foreach ($payload as $key => $value) {
-            if (str_starts_with($key, 'qty_') && (int) $value > 0) {
-                $rtId = (int) substr($key, 4);
-                $rt   = RoomType::with(['images'])->find($rtId);
-                if ($rt) {
-                    $qty   = (int) $value;
-                    $price = (float) $rt->daily_price;
-                    $selectedRooms[] = [
-                        'room_type'  => $rt,
-                        'qty'        => $qty,
-                        'price'      => $price,
-                        'line_total' => $price * $qty * $nights,
-                    ];
-                    $subtotal += $price * $qty * $nights;
-                }
-            }
-        }
+        $cart = $cartAction->execute($payload, $nights);
+        $selectedRooms = $cart['selectedRooms'];
+        $subtotal = $cart['subtotal'];
 
         if (empty($selectedRooms)) {
             return redirect()->route('client.rooms.index');
@@ -198,7 +164,7 @@ class BookingCheckoutController extends Controller
     /**
      * Return URL sau khi quẹt mã QR MoMo chuyển hướng user về
      */
-    public function momoReturn(Request $request)
+    public function momoReturn(Request $request, \App\Actions\Bookings\GetBookingConfirmationDataAction $confirmationDataAction)
     {
         $resultCode = (string) $request->query('resultCode', '');
         $orderId    = (string) $request->query('orderId', '');
@@ -209,61 +175,33 @@ class BookingCheckoutController extends Controller
         ]);
 
         $booking = Booking::with(['customer', 'bookingDetails.room.roomType.images', 'payments'])->find($bookingId);
+        
+        if (!$booking) {
+             return redirect()->route('client.rooms.index')->with('error', 'Không tìm thấy đơn hàng.');
+        }
 
-        $isPaid = (bool) ($booking?->payments?->contains(function ($payment) {
+        $isPaid = (bool) ($booking->payments?->contains(function ($payment) {
             return $payment->payment_method === 'momo';
         }) ?? false);
 
-        $rooms = [];
-        $subtotal = 0;
-        $checkInDate = now();
-        $checkOutDate = now()->addDay();
-
-        if ($booking && $booking->bookingDetails->isNotEmpty()) {
-            foreach ($booking->bookingDetails as $detail) {
-                $lineTotal = (float) ($detail->room_amount ?? 0);
-                if ($lineTotal <= 0) {
-                    $lineTotal = (float) (($detail->daily_price ?? 0) * max(1, Carbon::parse($detail->checkin_date)->diffInDays(Carbon::parse($detail->checkout_date))));
-                }
-
-                $subtotal += $lineTotal;
-                $rooms[] = [
-                    'name' => $detail->room?->roomType?->name ?? ('Phong #' . $detail->room_id),
-                    'qty' => 1,
-                    'line_total' => $lineTotal,
-                    'width' => $detail->room?->roomType?->width ?? 0,
-                    'image_url' => $detail->room?->roomType?->images?->first()?->image_url ?? '',
-                ];
-            }
-
-            $checkInDate = Carbon::parse($booking->bookingDetails->min('checkin_date'));
-            $checkOutDate = Carbon::parse($booking->bookingDetails->max('checkout_date'));
-        }
-
-        $bookingRef = 'UL-' . str_pad((string) $bookingId, 6, '0', STR_PAD_LEFT);
-        $bookingData = [
-            'check_in' => $checkInDate->format('Y-m-d H:i:s'),
-            'check_out' => $checkOutDate->format('Y-m-d H:i:s'),
-            'adults' => 2,
-            'children' => 0,
-            'nights' => max(1, $checkInDate->diffInDays($checkOutDate)),
-            'rooms' => $rooms,
-            'subtotal' => $subtotal,
-            'guest_name' => trim(($booking?->customer?->first_name ?? '') . ' ' . ($booking?->customer?->last_name ?? '')),
-            'guest_email' => $booking?->customer?->email ?? '',
-            'confirmed_at' => now()->format('d/m/Y H:i'),
-        ];
+        $bookingDataArray = $confirmationDataAction->execute($booking);
 
         $success = $resultCode === '0';
         $message = $success
             ? ($isPaid
-                ? ('Thanh toan MoMo thanh cong! Ma don hang cua ban la: ' . $bookingId)
-                : ('Giao dich thanh cong tren MoMo, dang cho xac nhan thanh toan tu he thong (IPN).'))
-            : ('Giao dich MoMo that bai hoac da bi huy (Ma Loi: ' . $resultCode . ').');
+                ? ('Thanh toán MoMo thành công! Mã đơn hàng của bạn là: ' . $bookingId)
+                : ('Giao dịch thành công trên MoMo, đang chờ xác nhận thanh toán từ hệ thống (IPN).'))
+            : ('Giao dịch MoMo thất bại hoặc đã bị huỷ (Mã Lỗi: ' . $resultCode . ').');
 
-        return view('client.booking.confirmation', compact(
-            'bookingRef', 'bookingData', 'checkInDate', 'checkOutDate', 'success', 'isPaid', 'message'
-        ));
+        return view('client.booking.confirmation', [
+            'bookingRef'   => $bookingDataArray['booking_ref'],
+            'bookingData'  => $bookingDataArray,
+            'checkInDate'  => $bookingDataArray['checkInDate'],
+            'checkOutDate' => $bookingDataArray['checkOutDate'],
+            'success'      => $success,
+            'isPaid'       => $isPaid,
+            'message'      => $message,
+        ]);
     }
 
     /**
@@ -343,7 +281,7 @@ class BookingCheckoutController extends Controller
     /**
      * Hiển thị trang xác nhận đặt phòng thành công.
      */
-    public function confirmation(Request $request)
+    public function confirmation(Request $request, \App\Actions\Bookings\GetBookingConfirmationDataAction $confirmationDataAction)
     {
         $bookingRef  = session('booking_ref');
         $bookingData = session('booking_data');
@@ -353,53 +291,17 @@ class BookingCheckoutController extends Controller
             if ($request->has('booking_id')) {
                 $booking = Booking::with(['customer', 'bookingDetails.room.roomType.images', 'payments'])->find($request->input('booking_id'));
                 if ($booking) {
-                    $rooms = [];
-                    $subtotal = 0;
-                    $checkInDate = now();
-                    $checkOutDate = now()->addDay();
+                    $bookingDataArray = $confirmationDataAction->execute($booking);
 
-                    if ($booking->bookingDetails->isNotEmpty()) {
-                        foreach ($booking->bookingDetails as $detail) {
-                            $lineTotal = (float) ($detail->room_amount ?? 0);
-                            if ($lineTotal <= 0) {
-                                $lineTotal = (float) (($detail->daily_price ?? 0) * max(1, Carbon::parse($detail->checkin_date)->diffInDays(Carbon::parse($detail->checkout_date))));
-                            }
-
-                            $subtotal += $lineTotal;
-                            $rooms[] = [
-                                'name' => $detail->room?->roomType?->name ?? ('Phong #' . $detail->room_id),
-                                'qty' => 1,
-                                'line_total' => $lineTotal,
-                                'width' => $detail->room?->roomType?->width ?? 0,
-                                'image_url' => $detail->room?->roomType?->images?->first()?->image_url ?? '',
-                            ];
-                        }
-
-                        $checkInDate = Carbon::parse($booking->bookingDetails->min('checkin_date'));
-                        $checkOutDate = Carbon::parse($booking->bookingDetails->max('checkout_date'));
-                    }
-
-                    $bookingRef = 'UL-' . str_pad((string) $booking->id, 6, '0', STR_PAD_LEFT);
-                    $bookingData = [
-                        'check_in' => $checkInDate->format('Y-m-d H:i:s'),
-                        'check_out' => $checkOutDate->format('Y-m-d H:i:s'),
-                        'adults' => 2,
-                        'children' => 0,
-                        'nights' => max(1, $checkInDate->diffInDays($checkOutDate)),
-                        'rooms' => $rooms,
-                        'subtotal' => $subtotal,
-                        'guest_name' => trim(($booking->customer?->first_name ?? '') . ' ' . ($booking->customer?->last_name ?? '')),
-                        'guest_email' => $booking->customer?->email ?? '',
-                        'confirmed_at' => $booking->created_at ? $booking->created_at->format('d/m/Y H:i') : now()->format('d/m/Y H:i'),
-                    ];
-
-                    $success = true;
-                    $isPaid = true;
-                    $message = 'Đặt phòng và thanh toán thành công!';
-
-                    return view('client.booking.confirmation', compact(
-                        'bookingRef', 'bookingData', 'checkInDate', 'checkOutDate', 'success', 'isPaid', 'message'
-                    ));
+                    return view('client.booking.confirmation', [
+                        'bookingRef'   => $bookingDataArray['booking_ref'],
+                        'bookingData'  => $bookingDataArray,
+                        'checkInDate'  => $bookingDataArray['checkInDate'],
+                        'checkOutDate' => $bookingDataArray['checkOutDate'],
+                        'success'      => true,
+                        'isPaid'       => true,
+                        'message'      => 'Đặt phòng và thanh toán thành công!',
+                    ]);
                 }
             }
             return redirect()->route('client.rooms.index');
