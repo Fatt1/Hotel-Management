@@ -27,13 +27,6 @@ npm install
 composer run dev
 ```
 
-Neu khong dung `composer run dev`, co the chay tach:
-
-```bash
-php artisan serve --host=localhost --port=8000
-npm run dev
-```
-
 ## 5. Bat ngrok cho cong 8000
 
 Mo terminal moi:

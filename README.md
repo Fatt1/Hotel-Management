@@ -39,11 +39,8 @@ php artisan db:seed
 ### Bước 3: Khởi chạy ứng dụng
 
 ```bash
-# Khởi chạy Laravel development server
-php artisan serve --host=localhost --port=8000
-
-# Trong terminal khác, chạy Vite để build assets
-npm run dev
+# Chạy toàn bộ server + queue + vite
+composer run dev
 ```
 
 Ứng dụng sẽ chạy tại: `http://localhost:8000`

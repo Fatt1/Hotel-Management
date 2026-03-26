@@ -2,6 +2,19 @@ import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 
+const appUrl = process.env.APP_URL ?? 'http://localhost:8000';
+const appHostname = (() => {
+    try {
+        return new URL(appUrl).hostname;
+    } catch {
+        return 'localhost';
+    }
+})();
+
+const hmrHost = process.env.VITE_HMR_HOST ?? appHostname;
+const hmrProtocol = process.env.VITE_HMR_PROTOCOL ?? 'ws';
+const hmrPort = Number(process.env.VITE_HMR_PORT ?? 5173);
+
 export default defineConfig({
     plugins: [
         laravel({
@@ -38,14 +51,12 @@ export default defineConfig({
         host: '0.0.0.0',
         port: 5173,
         strictPort: true,
-        cors: {
-            origin: 'http://localhost:8000',
-        },
+        cors: true,
         hmr: {
-            host: 'localhost',
-            protocol: 'ws',
-            port: 5173,
-            clientPort: 5173,
+            host: hmrHost,
+            protocol: hmrProtocol,
+            port: hmrPort,
+            clientPort: hmrPort,
         },
         watch: {
             ignored: ['**/storage/framework/views/**'],
