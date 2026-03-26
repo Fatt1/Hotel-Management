@@ -34,9 +34,10 @@ RUN mkdir -p \
 
 # Install PHP and Node dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader \
-    && npm install
+    && npm install \
+    && npm run build
 
-EXPOSE 8000 5173
+EXPOSE 8000
 
-# Start web server + Vite dev server + queue worker in one container
-CMD ["sh", "-lc", "php artisan migrate --seed --force || true; php artisan serve --host=0.0.0.0 --port=8000 & npm run dev -- --host 0.0.0.0 --port 5173 & php artisan queue:work database --queue=emails,default --tries=3 --timeout=120"]
+# Start web server + queue worker. Frontend assets are served from public/build.
+CMD ["sh", "-lc", "rm -f public/hot; php artisan migrate --seed --force || true; php artisan queue:work database --queue=emails,default --tries=3 --timeout=120 & php artisan serve --host=0.0.0.0 --port=8000"]
