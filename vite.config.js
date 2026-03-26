@@ -24,6 +24,7 @@ export default defineConfig({
                 'resources/js/client/checkout.js',
                 'resources/js/admin/login.js',
                 'resources/js/admin/role-permission.js',
+                'resources/js/admin/bookings/index.js',
                 'resources/js/admin/bookings/create-booking.js',
                 'resources/js/admin/bookings/update-booking.js',
                 'resources/js/admin/bookings/checkout.js',
