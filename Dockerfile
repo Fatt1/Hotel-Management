@@ -32,6 +32,8 @@ RUN mkdir -p \
     storage/framework/views \
     bootstrap/cache
 
+
+
 # Install PHP and Node dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader \
     && npm install \
