@@ -92,8 +92,10 @@ class CreateBookingOnlineAction
             );
 
             $booking = $this->createBookingAction->execute($bookingData);
-           
-
+            
+            $booking->load(['bookingDetails.room.roomType', 'customer']);
+            // Gửi email xác nhận booking thành công
+            Mail::to($booking->customer->email)->send(new BookingSuccessMail($booking));
             return $booking;
         });
     }

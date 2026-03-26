@@ -183,7 +183,7 @@ class CreateBookingAction
                     'staff_id'       => auth('staff')->id(),
                 ]);
             }
-
+            
             return $booking;
         });
     }

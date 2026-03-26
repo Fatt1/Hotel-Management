@@ -146,7 +146,7 @@ class BookingCheckoutController extends Controller
     {
         try {
             $booking = $action->execute($request);
-
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Đặt phòng thành công.',

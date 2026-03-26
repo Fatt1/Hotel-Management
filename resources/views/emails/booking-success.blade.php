@@ -18,7 +18,7 @@
         </div>
 
         <div style="padding: 20px 24px;">
-            <p style="margin-top: 0;">Xin chao {{ trim(($booking->customer?->first_name ?? '') . ' ' . ($booking->customer?->last_name ?? '')) ?: 'Quy khach' }},</p>
+            <p style="margin-top: 0;">Xin chao {{ trim(($booking->customer?->last_name ?? '') . ' ' . ($booking->customer?->first_name ?? '')) ?: 'Quy khach' }},</p>
             <p>Cam on ban da dat phong tai Urban Luxe Hotel. Don dat phong cua ban da duoc ghi nhan.</p>
 
             <div style="margin: 16px 0; padding: 14px; background: #f1f5f9; border-radius: 8px;">
