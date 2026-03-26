@@ -1,0 +1,546 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="icli5GT743ZblxvXMJ0hWJWb9gVBaBzWZZnRiKqm">
+  <title>Urban Luxe Hotel - Sanctuary in the City</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script type="module" src="http://0.0.0.0:5173/@vite/client" data-navigate-track="reload"></script><link rel="stylesheet" href="http://0.0.0.0:5173/resources/css/app.css" data-navigate-track="reload" /><script type="module" src="http://0.0.0.0:5173/resources/js/app.js" data-navigate-track="reload"></script>  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body class="bg-[#0a0a0a] font-['Inter'] text-[#e8e0d0] overflow-x-hidden w-full">
+
+  
+  <nav class="fixed inset-x-0 top-0 z-50 border-b border-[#d4af37]/15 bg-[#0a0a0a]/95 backdrop-blur-sm">
+    <div class="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 sm:px-8 relative z-50">
+      
+      <a href="/" class="flex items-center gap-2 no-underline flex-shrink-0">
+        <span class="font-['Playfair_Display'] text-lg sm:text-xl font-bold uppercase tracking-[0.15em] text-[#e8e0d0]">Urban Luxe</span>
+      </a>
+
+      
+            <div class="hidden md:flex items-center gap-6 lg:gap-10">
+        <a href="http://localhost:8000/rooms"
+           class="border-b pb-0.5 text-[0.7rem] font-semibold uppercase tracking-[0.15em] no-underline transition-colors border-transparent text-[#9a9080] hover:text-[#d4af37]">Phòng</a>
+
+        <a href="http://localhost:8000/amenities"
+           class="border-b pb-0.5 text-[0.7rem] font-semibold uppercase tracking-[0.15em] no-underline transition-colors border-transparent text-[#9a9080] hover:text-[#d4af37]">Tiện Ích</a>
+
+        <a href="http://localhost:8000/dinings"
+           class="border-b pb-0.5 text-[0.7rem] font-semibold uppercase tracking-[0.15em] no-underline transition-colors border-transparent text-[#9a9080] hover:text-[#d4af37]">Ẩm Thực</a>
+
+        <a href="http://localhost:8000/gallery"
+           class="border-b pb-0.5 text-[0.7rem] font-semibold uppercase tracking-[0.15em] no-underline transition-colors border-transparent text-[#9a9080] hover:text-[#d4af37]">Thư Viện</a>
+      </div>
+
+      
+      <div class="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+        
+                   <a href="http://localhost:8000/login" class="hidden sm:block text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-[#9a9080] no-underline transition-colors hover:text-[#e8e0d0]">Đăng Nhập</a>
+               
+        <a href="http://localhost:8000/rooms" class="bg-[#d4af37] px-3 sm:px-5 py-2 text-[0.65rem] sm:text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-[#0a0a0a] no-underline transition-colors hover:bg-[#c9a227]">Đặt Phòng</a>
+
+        
+        <button id="mobileMenuBtn" onclick="document.getElementById('mobileMenu').classList.toggle('hidden'); document.getElementById('mobileMenu').classList.toggle('flex');" class="md:hidden flex items-center justify-center text-[#d4af37] text-xl ml-1 focus:outline-none">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+
+    
+    <div id="mobileMenu" class="absolute top-16 left-0 right-0 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-[#d4af37]/20 flex-col px-6 py-4 hidden md:hidden shadow-2xl z-40">
+      <a href="http://localhost:8000/rooms" class="py-3 text-[#e8e0d0] text-sm font-semibold uppercase tracking-widest no-underline border-b border-white/5">Phòng</a>
+      <a href="http://localhost:8000/amenities" class="py-3 text-[#e8e0d0] text-sm font-semibold uppercase tracking-widest no-underline border-b border-white/5">Tiện Ích</a>
+      <a href="http://localhost:8000/dinings" class="py-3 text-[#e8e0d0] text-sm font-semibold uppercase tracking-widest no-underline border-b border-white/5">Ẩm Thực</a>
+      <a href="http://localhost:8000/gallery" class="py-3 text-[#e8e0d0] text-sm font-semibold uppercase tracking-widest no-underline border-b border-white/5 mb-2">Thư Viện</a>
+      
+                    <a href="http://localhost:8000/login" class="mt-2 inline-block bg-white/10 text-center rounded-lg px-4 py-3 text-[#e8e0d0] text-sm font-semibold uppercase tracking-widest no-underline w-full">Đăng Nhập Khách Hàng</a>
+          </div>
+  </nav>
+
+  
+  <main>
+    
+
+<section class="relative min-h-screen flex flex-col justify-center bg-[#080c10]">
+
+  
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&q=80"
+         alt=""
+         class="w-full h-full object-cover object-center opacity-55">
+    <div class="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(8,12,16,.35)_0%,rgba(8,12,16,.8)_100%)]"></div>
+  </div>
+
+  
+  <div class="relative z-10 max-w-6xl mx-auto px-8 w-full pt-28 pb-16">
+
+    
+    <p class="text-amber-400/80 text-[11px] font-bold tracking-[0.3em] uppercase mb-4">
+      Urban Luxe · Ho Chi Minh City
+    </p>
+
+    
+    <h1 class="font-['Playfair_Display'] text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-5 max-w-xl">
+      Sanctuary<br>in the City.
+    </h1>
+
+    
+    <p class="text-white/55 text-sm leading-relaxed mb-14 max-w-sm">
+      Experience unparalleled luxury at Urban Luxe — where contemporary design meets timeless elegance in the heart of the city.
+    </p>
+
+    
+    <form method="GET" action="http://localhost:8000/rooms" id="heroSearchForm"
+          class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl shadow-2xl max-w-4xl">
+      <div class="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/10">
+
+        
+        <div class="flex-1 px-5 py-4 group">
+          <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-1.5 flex items-center gap-1.5">
+            <i class="far fa-calendar text-white/30 text-[10px]"></i> Nhận Phòng
+          </div>
+          <input type="text" name="check_in" id="heroCheckIn"
+                 placeholder="dd/mm/yyyy"
+                 autocomplete="off" readonly
+                 class="w-full bg-transparent text-white text-sm font-semibold placeholder-white/30 outline-none cursor-pointer">
+        </div>
+
+        
+        <div class="flex-1 px-5 py-4 group">
+          <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-1.5 flex items-center gap-1.5">
+            <i class="far fa-calendar text-white/30 text-[10px]"></i> Trả Phòng
+          </div>
+          <input type="text" name="check_out" id="heroCheckOut"
+                 placeholder="dd/mm/yyyy"
+                 autocomplete="off" readonly
+                 class="w-full bg-transparent text-white text-sm font-semibold placeholder-white/30 outline-none cursor-pointer">
+        </div>
+
+        
+        <div class="flex-1 px-5 py-4 relative" id="guestWrapper">
+          <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 mb-1.5 flex items-center gap-1.5">
+            <i class="fas fa-user text-white/30 text-[10px]"></i> Khách
+          </div>
+          <button type="button" id="guestTriggerHome"
+                  class="w-full text-left text-white text-sm font-semibold outline-none"
+                  onclick="toggleGuestHome()">
+            <span id="guestLabelHome">2 Người lớn</span>
+            <i class="fas fa-chevron-down text-white/40 text-[9px] ml-1"></i>
+          </button>
+          <input type="hidden" name="adults" id="adultsHome" value="2">
+          <input type="hidden" name="children" id="childrenHome" value="0">
+
+          
+        </div>
+
+        
+        <div class="flex-none md:flex-1 px-5 py-4 md:py-3 flex items-center">
+          <button type="submit"
+                  class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold tracking-wider uppercase py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
+            <i class="fas fa-search text-xs"></i>
+            Tìm Phòng
+          </button>
+        </div>
+
+      </div>
+    </form>
+
+  </div>
+
+  
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
+    <span class="text-white/30 text-[10px] tracking-widest uppercase">Khám Phá</span>
+    <i class="fas fa-chevron-down text-white/30 text-xs"></i>
+  </div>
+</section>
+
+
+<div id="guestDropdownHome"
+     class="hidden absolute w-64 border border-white/15 rounded-xl shadow-2xl p-4"
+     style="z-index:9999; background-color:#0d1117;">
+  
+  <div class="flex items-center justify-between mb-3">
+    <div>
+      <p class="text-white text-sm font-semibold">Người lớn</p>
+      <p class="text-white/40 text-xs">Từ 12 tuổi trở lên</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button type="button" onclick="changeGuestHome('adults',-1)"
+              style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:transparent;cursor:pointer;font-size:16px;line-height:1;">−</button>
+      <span id="adultsCountHome" class="text-white font-bold text-sm w-4 text-center">2</span>
+      <button type="button" onclick="changeGuestHome('adults',1)"
+              style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:transparent;cursor:pointer;font-size:16px;line-height:1;">+</button>
+    </div>
+  </div>
+  
+  <div class="flex items-center justify-between mb-4">
+    <div>
+      <p class="text-white text-sm font-semibold">Trẻ em</p>
+      <p class="text-white/40 text-xs">2–11 tuổi</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button type="button" onclick="changeGuestHome('children',-1)"
+              style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:transparent;cursor:pointer;font-size:16px;line-height:1;">−</button>
+      <span id="childrenCountHome" class="text-white font-bold text-sm w-4 text-center">0</span>
+      <button type="button" onclick="changeGuestHome('children',1)"
+              style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:transparent;cursor:pointer;font-size:16px;line-height:1;">+</button>
+    </div>
+  </div>
+  <button type="button" onclick="closeGuestHome()"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 rounded-lg transition-colors">Áp Dụng</button>
+</div>
+
+
+<section class="bg-[#0d1117] py-20">
+  <div class="max-w-6xl mx-auto px-8">
+
+    
+    <div class="flex items-end justify-between mb-10">
+      <div>
+        <p class="text-amber-400 text-[11px] font-bold tracking-[0.25em] uppercase mb-3">Đẳng Cấp Thượng Hạng</p>
+        <h2 class="font-['Playfair_Display'] text-4xl font-bold text-white">World-Class Amenities</h2>
+        <p class="text-white/40 text-sm mt-3 max-w-sm leading-relaxed">
+          Trải nghiệm những tiện ích đẳng cấp thế giới được thiết kế để chiều chuộng mọi giác quan của bạn.
+        </p>
+      </div>
+      <a href="http://localhost:8000/amenities"
+         class="flex items-center gap-2 text-white/50 hover:text-white text-sm font-semibold transition-colors whitespace-nowrap mb-1">
+        Xem tất cả <i class="fas fa-arrow-right text-xs"></i>
+      </a>
+    </div>
+
+    
+    <div class="grid grid-cols-2 gap-4">
+
+      
+              <div class="relative overflow-hidden rounded-2xl group cursor-pointer"
+             style="height:260px;">
+          <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&amp;q=80" alt="Elite Spa &amp; Wellness"
+               class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+          
+          <div class="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,.85)_0%,rgba(0,0,0,.1)_60%)]"></div>
+          
+          <div class="absolute bottom-0 left-0 right-0 p-6">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-6 h-6 rounded-full bg-amber-400/20 flex items-center justify-center">
+                <i class="fas fa-spa text-amber-400 text-[10px]"></i>
+              </div>
+            </div>
+            <h3 class="text-white font-bold text-lg leading-tight mb-1">Elite Spa &amp; Wellness</h3>
+            <p class="text-white/60 text-xs leading-relaxed line-clamp-2">Thư giãn tâm hồn với các liệu trình spa cao cấp, thiết kế riêng để phục hồi năng lượng và cân bằng nội tâm.</p>
+          </div>
+        </div>
+              <div class="relative overflow-hidden rounded-2xl group cursor-pointer"
+             style="height:260px;">
+          <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&amp;q=80" alt="Skyline Infinity Pool"
+               class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+          
+          <div class="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,.85)_0%,rgba(0,0,0,.1)_60%)]"></div>
+          
+          <div class="absolute bottom-0 left-0 right-0 p-6">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-6 h-6 rounded-full bg-amber-400/20 flex items-center justify-center">
+                <i class="fas fa-water text-amber-400 text-[10px]"></i>
+              </div>
+            </div>
+            <h3 class="text-white font-bold text-lg leading-tight mb-1">Skyline Infinity Pool</h3>
+            <p class="text-white/60 text-xs leading-relaxed line-clamp-2">Hồ bơi vô cực trên lầu thượng với tầm nhìn panorama toàn cảnh thành phố khi hoàng hôn buông xuống.</p>
+          </div>
+        </div>
+              <div class="relative overflow-hidden rounded-2xl group cursor-pointer"
+             style="height:260px;">
+          <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&amp;q=80" alt="State-of-the-Art Fitness"
+               class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+          
+          <div class="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,.85)_0%,rgba(0,0,0,.1)_60%)]"></div>
+          
+          <div class="absolute bottom-0 left-0 right-0 p-6">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-6 h-6 rounded-full bg-amber-400/20 flex items-center justify-center">
+                <i class="fas fa-dumbbell text-amber-400 text-[10px]"></i>
+              </div>
+            </div>
+            <h3 class="text-white font-bold text-lg leading-tight mb-1">State-of-the-Art Fitness</h3>
+            <p class="text-white/60 text-xs leading-relaxed line-clamp-2">Phòng gym hiện đại với thiết bị tiên tiến nhất và huấn luyện viên cá nhân theo yêu cầu 24/7.</p>
+          </div>
+        </div>
+              <div class="relative overflow-hidden rounded-2xl group cursor-pointer"
+             style="height:260px;">
+          <img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800&amp;q=80" alt="24/7 Bespoke Concierge"
+               class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+          
+          <div class="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,.85)_0%,rgba(0,0,0,.1)_60%)]"></div>
+          
+          <div class="absolute bottom-0 left-0 right-0 p-6">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-6 h-6 rounded-full bg-amber-400/20 flex items-center justify-center">
+                <i class="fas fa-concierge-bell text-amber-400 text-[10px]"></i>
+              </div>
+            </div>
+            <h3 class="text-white font-bold text-lg leading-tight mb-1">24/7 Bespoke Concierge</h3>
+            <p class="text-white/60 text-xs leading-relaxed line-clamp-2">Dịch vụ concierge cá nhân hóa sẵn sàng thỏa mãn mọi yêu cầu đặc biệt của quý khách bất kể giờ giấc.</p>
+          </div>
+        </div>
+      
+    </div>
+
+  </div>
+</section>
+
+
+<section class="bg-[#0d1117] py-16 border-t border-white/5">
+  <div class="max-w-6xl mx-auto px-8">
+
+    
+    <div class="mb-10">
+      <p class="text-amber-400 text-[11px] font-bold tracking-[0.25em] uppercase mb-3">Lựa Chọn Tinh Tế</p>
+      <h2 class="font-['Playfair_Display'] text-4xl font-bold text-white">Curated Stays</h2>
+      <p class="text-white/40 text-sm mt-2">Những không gian nghỉ dưỡng được tuyển chọn kỹ lưỡng cho bạn.</p>
+    </div>
+
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              
+                  <div class="bg-[#141920] border border-white/8 rounded-2xl overflow-hidden group hover:border-white/20 transition-all duration-300">
+            <div class="relative h-52 overflow-hidden">
+              <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&amp;q=80" alt="Phòng Deluxe" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+            </div>
+            <div class="p-5">
+              <h3 class="font-['Playfair_Display'] text-white font-bold text-lg mb-1">Phòng Deluxe</h3>
+              <p class="text-white/40 text-xs leading-relaxed mb-4">Không gian sang trọng với cửa sổ toàn cảnh thành phố hiện đại.</p>
+              <div class="flex items-end justify-between">
+                <div>
+                  <span class="text-white/30 text-[10px]">Từ</span>
+                  <div class="text-white font-bold text-lg">900K<span class="text-white/30 text-xs font-normal">/đêm</span></div>
+                </div>
+                <a href="http://localhost:8000/rooms" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors">Đặt Ngay</a>
+              </div>
+            </div>
+          </div>
+                  <div class="bg-[#141920] border border-white/8 rounded-2xl overflow-hidden group hover:border-white/20 transition-all duration-300">
+            <div class="relative h-52 overflow-hidden">
+              <img src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=800&amp;q=80" alt="The Premium Suite" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+            </div>
+            <div class="p-5">
+              <h3 class="font-['Playfair_Display'] text-white font-bold text-lg mb-1">The Premium Suite</h3>
+              <p class="text-white/40 text-xs leading-relaxed mb-4">Phòng suite cao cấp với phòng khách riêng biệt và bồn tắm jacuzzi.</p>
+              <div class="flex items-end justify-between">
+                <div>
+                  <span class="text-white/30 text-[10px]">Từ</span>
+                  <div class="text-white font-bold text-lg">1.5M<span class="text-white/30 text-xs font-normal">/đêm</span></div>
+                </div>
+                <a href="http://localhost:8000/rooms" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors">Đặt Ngay</a>
+              </div>
+            </div>
+          </div>
+                  <div class="bg-[#141920] border border-white/8 rounded-2xl overflow-hidden group hover:border-white/20 transition-all duration-300">
+            <div class="relative h-52 overflow-hidden">
+              <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&amp;q=80" alt="The Urban Penthouse" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+            </div>
+            <div class="p-5">
+              <h3 class="font-['Playfair_Display'] text-white font-bold text-lg mb-1">The Urban Penthouse</h3>
+              <p class="text-white/40 text-xs leading-relaxed mb-4">Penthouse đỉnh cao tọa lạc tại tầng thượng với tầm nhìn 360°.</p>
+              <div class="flex items-end justify-between">
+                <div>
+                  <span class="text-white/30 text-[10px]">Từ</span>
+                  <div class="text-white font-bold text-lg">3.2M<span class="text-white/30 text-xs font-normal">/đêm</span></div>
+                </div>
+                <a href="http://localhost:8000/rooms" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors">Đặt Ngay</a>
+              </div>
+            </div>
+          </div>
+                  </div>
+
+    
+    <div class="text-center mt-10">
+      <a href="http://localhost:8000/rooms"
+         class="inline-flex items-center gap-2.5 border border-white/15 hover:border-white/35 text-white/70 hover:text-white text-sm font-semibold px-8 py-3.5 rounded-xl transition-colors">
+        Xem Tất Cả Phòng <i class="fas fa-arrow-right text-xs"></i>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+
+<section class="bg-[#080c10] py-24 relative overflow-hidden">
+
+  
+  <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/5 rounded-full filter blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-400/5 rounded-full filter blur-3xl pointer-events-none"></div>
+
+  <div class="relative z-10 max-w-3xl mx-auto px-8 text-center">
+
+    
+    <div class="w-10 h-10 rounded-full bg-amber-400/15 flex items-center justify-center mx-auto mb-8">
+      <i class="fas fa-quote-left text-amber-400 text-sm"></i>
+    </div>
+
+    <blockquote class="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-white leading-tight mb-8 italic">
+      "An architectural marvel that redefines what a city hotel can be. The attention to detail is simply unmatched."
+    </blockquote>
+
+    
+    <div class="flex items-center justify-center gap-3">
+      <img src="https://i.pravatar.cc/48?img=12" alt="Ben Collins"
+           class="w-10 h-10 rounded-full border-2 border-amber-400/30">
+      <div class="text-left">
+        <p class="text-white font-semibold text-sm">Ben Collins</p>
+        <p class="text-white/40 text-xs">Travel + Leisure, Top 10 Hotels</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+  </main>
+
+  
+  <footer class="border-t border-[#d4af37]/10 bg-[#050505] pb-8 pt-16">
+    <div class="mx-auto max-w-300 px-8">
+      <div class="mb-12 grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.5fr]">
+        
+        <div>
+          <div class="mb-4 flex items-center gap-2">
+            <span class="font-['Playfair_Display'] text-base font-bold uppercase tracking-[0.15em] text-[#e8e0d0]">Urban Luxe</span>
+          </div>
+          <p class="mb-2 text-[0.8rem] leading-7 text-[#6b6050]">1700 Đường Market<br>San Francisco, CA 94102<br>Hoa Kỳ</p>
+        </div>
+        
+        <div>
+          <p class="mb-5 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#9a9080]">Công Ty</p>
+          <div class="flex flex-col gap-3">
+                          <a href="#" class="text-[0.8rem] text-[#6b6050] no-underline transition-colors hover:text-[#d4af37]">Về Chúng Tôi</a>
+                          <a href="#" class="text-[0.8rem] text-[#6b6050] no-underline transition-colors hover:text-[#d4af37]">Sự Nghiệp</a>
+                          <a href="#" class="text-[0.8rem] text-[#6b6050] no-underline transition-colors hover:text-[#d4af37]">Báo Chí</a>
+                          <a href="#" class="text-[0.8rem] text-[#6b6050] no-underline transition-colors hover:text-[#d4af37]">Blog</a>
+                      </div>
+        </div>
+        
+        <div>
+          <p class="mb-5 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#9a9080]">Hỗ Trợ</p>
+          <div class="flex flex-col gap-3">
+                          <a href="#" class="text-[0.8rem] text-[#6b6050] no-underline transition-colors hover:text-[#d4af37]">Trung Tâm Hỗ Trợ</a>
+                          <a href="#" class="text-[0.8rem] text-[#6b6050] no-underline transition-colors hover:text-[#d4af37]">Câu Hỏi Thường Gặp</a>
+                          <a href="#" class="text-[0.8rem] text-[#6b6050] no-underline transition-colors hover:text-[#d4af37]">Điều Khoản Dịch Vụ</a>
+                          <a href="#" class="text-[0.8rem] text-[#6b6050] no-underline transition-colors hover:text-[#d4af37]">Chính Sách Riêng Tư</a>
+                      </div>
+        </div>
+        
+        <div>
+          <p class="mb-3 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#9a9080]">Nhận Thông Tin</p>
+          <p class="mb-4 text-[0.75rem] text-[#6b6050]">Đăng ký nhận ưu đãi độc quyền.</p>
+          <div class="flex">
+            <input type="email" placeholder="Địa chỉ email" class="flex-1 border border-[#d4af37]/20 bg-[#111111] px-4 py-[0.6rem] text-[0.75rem] text-[#e8e0d0] outline-none placeholder:text-[#6b6050]">
+            <button class="cursor-pointer border-none bg-[#d4af37] px-4 text-base text-[#0a0a0a] transition-colors hover:bg-[#c9a227]">→</button>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col items-start justify-between gap-3 border-t border-[#d4af37]/10 pt-6 md:flex-row md:items-center">
+        <p class="text-[0.7rem] text-[#3d3530]">© 2026 Urban Luxe Hotel. Đã đăng ký bản quyền.</p>
+        <div class="flex gap-4">
+          <a href="#" class="text-[0.7rem] text-[#3d3530] no-underline transition-colors hover:text-[#d4af37]">IG</a>
+          <a href="#" class="text-[0.7rem] text-[#3d3530] no-underline transition-colors hover:text-[#d4af37]">FB</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+// ── Date pickers ──
+var todayStr = new Date().toISOString().split('T')[0];
+
+var checkInPicker = flatpickr('#heroCheckIn', {
+  dateFormat: 'd/m/Y',
+  altInput: false,
+  minDate: 'today',
+  locale: { firstDayOfWeek: 1 },
+  onChange: function(selected) {
+    if (selected[0]) {
+      checkOutPicker.set('minDate', selected[0]);
+      if (!checkOutPicker.selectedDates.length) {
+        var next = new Date(selected[0]);
+        next.setDate(next.getDate() + 1);
+        checkOutPicker.setDate(next);
+      }
+    }
+  }
+});
+
+var checkOutPicker = flatpickr('#heroCheckOut', {
+  dateFormat: 'd/m/Y',
+  minDate: 'today',
+  locale: { firstDayOfWeek: 1 },
+});
+
+// ── Guests dropdown ── (fixed position portal, escapes all overflow clipping)
+var gAdults = 2, gChildren = 0;
+var guestOpen = false;
+
+function toggleGuestHome() {
+  if (guestOpen) { closeGuestHome(); return; }
+  var trigger = document.getElementById('guestTriggerHome');
+  var dd = document.getElementById('guestDropdownHome');
+  var rect = trigger.getBoundingClientRect();
+  // position:absolute relative to document — add scroll offset so it stays fixed when scrolling
+  dd.style.left = (rect.left + window.scrollX) + 'px';
+  dd.style.top  = (rect.bottom + window.scrollY + 8) + 'px';
+  dd.classList.remove('hidden');
+  guestOpen = true;
+}
+function closeGuestHome() {
+  document.getElementById('guestDropdownHome').classList.add('hidden');
+  guestOpen = false;
+}
+function changeGuestHome(type, delta) {
+  if (type === 'adults') {
+    gAdults = Math.max(1, gAdults + delta);
+    document.getElementById('adultsCountHome').textContent = gAdults;
+    document.getElementById('adultsHome').value = gAdults;
+  } else {
+    gChildren = Math.max(0, gChildren + delta);
+    document.getElementById('childrenCountHome').textContent = gChildren;
+    document.getElementById('childrenHome').value = gChildren;
+  }
+  var label = gAdults + ' Người lớn' + (gChildren > 0 ? ', ' + gChildren + ' Trẻ em' : '');
+  document.getElementById('guestLabelHome').textContent = label;
+}
+
+// Close dropdown only when clicking outside BOTH the trigger wrapper AND the portal dropdown
+document.addEventListener('click', function(e) {
+  var wrapper = document.getElementById('guestWrapper');
+  var dd = document.getElementById('guestDropdownHome');
+  if (wrapper && !wrapper.contains(e.target) && dd && !dd.contains(e.target)) {
+    closeGuestHome();
+  }
+});
+
+// ── Form submit: convert dd/mm/yyyy → yyyy-mm-dd for query params ──
+document.getElementById('heroSearchForm').addEventListener('submit', function(e) {
+  var inField  = document.getElementById('heroCheckIn');
+  var outField = document.getElementById('heroCheckOut');
+
+  function parseDMY(str) {
+    if (!str) return '';
+    var parts = str.split('/');
+    if (parts.length !== 3) return str;
+    return parts[2] + '-' + parts[1] + '-' + parts[0];
+  }
+
+  inField.value  = parseDMY(inField.value);
+  outField.value = parseDMY(outField.value);
+});
+</script>
+</body>
+</html>
+
