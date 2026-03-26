@@ -40,7 +40,7 @@ php artisan db:seed
 
 ```bash
 # Khởi chạy Laravel development server
-php artisan serve
+php artisan serve --host=localhost --port=8000
 
 # Trong terminal khác, chạy Vite để build assets
 npm run dev

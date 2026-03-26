@@ -30,7 +30,7 @@ composer run dev
 Neu khong dung `composer run dev`, co the chay tach:
 
 ```bash
-php artisan serve --host=127.0.0.1 --port=8000
+php artisan serve --host=localhost --port=8000
 npm run dev
 ```
 
