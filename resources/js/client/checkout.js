@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     errorMessage.classList.remove("hidden");
                     errorMessage.classList.remove("text-red-500");
                     errorMessage.classList.add("text-green-600");
-                    errorMessage.innerHTML = `<i class="fas fa-check-circle text-[10px]"></i> Đã tìm thấy tài khoản. Thông tin đã được điền.`;
+                    errorMessage.innerHTML = `<i class="fas fa-check-circle text-[10px]"></i> Đã tìm thấy tài khoản. Thông tin đã được điền. Nếu muốn thay đổi thông tin, vui lòng đăng nhập bằng email này.`;
                 }
 
                 if (lastNameInput) {
