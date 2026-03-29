@@ -266,8 +266,8 @@ Route::name('client.')->group(function () {
     // Danh sách loại phòng
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
 
-    // Chi tiết một loại phòng
-    Route::get('/rooms/{id}', [RoomController::class, 'show'])->name('rooms.show');
+    // // Chi tiết một loại phòng
+    // Route::get('/rooms/{id}', [RoomController::class, 'show'])->name('rooms.show');
 
     // Tiện ích khách sạn
     Route::get('/amenities', [AmenityController::class, 'index'])->name('amenities.index');
