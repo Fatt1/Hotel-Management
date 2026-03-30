@@ -69,15 +69,6 @@
             </p>
           @endif
         </div>
-        <div class="flex items-center gap-2">
-          <button onclick="window.print()"
-                  class="flex items-center gap-1.5 border border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-800 text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
-            <i class="fas fa-print text-[11px]"></i> In
-          </button>
-          <button class="flex items-center gap-1.5 border border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-800 text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
-            <i class="far fa-envelope text-[11px]"></i> Email
-          </button>
-        </div>
       </div>
 
       {{-- 4-column summary row --}}
@@ -109,7 +100,7 @@
             {{ $isSuccess ? 'Đã đặt' : 'Chờ xử lý' }}
           </div>
           <div class="text-xs {{ $isPaidState ? 'text-blue-600' : 'text-amber-600' }} font-semibold mt-1">
-            {{ $isPaidState ? 'Da Thanh Toan' : 'Chua Thanh Toan' }}
+            {{ $isPaidState ? 'Đã thanh toán' : 'Chưa thanh toán' }}
           </div>
         </div>
       </div>
@@ -118,7 +109,6 @@
       <div class="px-8 py-6 border-b border-gray-100">
         <div class="flex items-center justify-between mb-4">
           <h3 class="font-bold text-gray-900">Chi Tiết Phòng</h3>
-          <a href="#" class="text-blue-600 hover:text-blue-700 text-xs font-semibold transition-colors">Xem Chính Sách</a>
         </div>
 
         {{-- Room row --}}
@@ -193,19 +183,7 @@
           </div>
         </div>
 
-        {{-- Action buttons --}}
-        <div class="flex items-center justify-center gap-4">
-          <button onclick="window.print()"
-                  class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm tracking-wider uppercase py-3.5 px-7 rounded-xl transition-colors">
-            <i class="fas fa-download text-sm"></i>
-            Tải Biên Lai
-          </button>
-          <a href="{{ route('client.rooms.index') }}"
-             class="flex items-center gap-2 border-2 border-gray-200 hover:border-gray-400 text-gray-700 hover:text-gray-900 font-bold text-sm tracking-wider uppercase py-3.5 px-7 rounded-xl transition-colors">
-            <i class="far fa-calendar text-sm"></i>
-            Quản Lý Đặt Phòng
-          </a>
-        </div>
+       
 
         {{-- Security note --}}
         <div class="flex items-center justify-center gap-2 mt-5 text-[11px] text-gray-400">

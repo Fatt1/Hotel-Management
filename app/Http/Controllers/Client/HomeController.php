@@ -10,11 +10,11 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // Lấy 3 room type nổi bật để hiển thị "Curated Stays"
+        // Lấy 6 room type nổi bật để hiển thị "Curated Stays"
         $featuredRooms = RoomType::with(['images'])
             ->where('is_active', true)
             ->orderBy('daily_price', 'desc')
-            ->take(3)
+            ->take(6)
             ->get();
 
         // Lấy 4 tiện ích nổi bật (amenities)
