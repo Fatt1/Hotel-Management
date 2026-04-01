@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Staff;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Safety net: on production always resolve assets from build manifest.
         if (app()->environment('production')) {
+            URL::forceScheme('https');
             Vite::useHotFile(storage_path('framework/vite.hot.disabled'));
         }
 
