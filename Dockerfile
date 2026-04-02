@@ -42,4 +42,4 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader \
 EXPOSE 8000
 
 # Start web server + queue worker. Frontend assets are served from public/build.
-CMD ["sh", "-lc", "rm -f public/hot; php artisan migrate --force || true; php artisan queue:work database --queue=emails,default --tries=3 --timeout=120 & php artisan serve --host=0.0.0.0 --port=8000"]
+CMD ["sh", "-lc", "rm -f public/hot; php artisan storage:link --force || true; php artisan migrate --force || true; php artisan queue:work database --queue=emails,default --tries=3 --timeout=120 & php artisan serve --host=0.0.0.0 --port=8000"]
