@@ -100,10 +100,14 @@
                 <a href="{{ route('admin.room-types.edit', $room['id']) }}" class="p-2 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-all" title="Chỉnh sửa">
                   <span class="material-symbols-outlined">edit</span>
                 </a>
-                <form action="{{ route('admin.room-types.destroy', $room['id']) }}" method="POST" style="display:inline;" onclick='openDeleteModal(event, @js(route("admin.room-types.destroy", $room["id"])), @js($room["name"]))'>
+                <form action="{{ route('admin.room-types.destroy', $room['id']) }}" method="POST" style="display:inline;">
                   @csrf
                   @method('DELETE')
-                  <button type="button" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Xóa">
+                  <button type="button"
+                    class="btn-delete p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                    data-url="{{ route('admin.room-types.destroy', $room['id']) }}"
+                    data-name="{{ $room['name'] }}"
+                    title="Xóa">
                     <span class="material-symbols-outlined">delete</span>
                   </button>
                 </form>
@@ -135,11 +139,5 @@
 </div>
 
 @vite(['resources/js/admin/room-types/index.js'])
-
-<!-- Hidden Delete Form -->
-<form id="deleteForm" method="POST" style="display: none;">
-  @csrf
-  @method('DELETE')
-</form>
 
 @endsection

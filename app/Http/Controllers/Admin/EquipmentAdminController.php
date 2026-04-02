@@ -23,7 +23,10 @@ class EquipmentAdminController extends Controller
             'equipment_category_id' => $request->input('category_id'),
         ];
 
-        $equipments = $action->executePaginated(filters: $filters, perPage: 5);
+        $perPage = (int) $request->input('page_size', 10);
+        $perPage = max(5, min(100, $perPage));
+
+        $equipments = $action->executePaginated(filters: $filters, perPage: $perPage);
         $categories = EquipmentCategory::orderBy('name')->get();
 
         return view('admin.equipments.index', compact('equipments', 'categories'));

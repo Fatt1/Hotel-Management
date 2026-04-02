@@ -11,6 +11,7 @@ use Spatie\LaravelData\Attributes\Validation\Numeric;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Data;
+use Illuminate\Validation\Validator;
 
 class RoomTypeData extends Data
 {
@@ -83,6 +84,22 @@ class RoomTypeData extends Data
         #[Max(1)]
         public int $is_active = 1,
     ) {}
+
+    public static function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            $data = $validator->getData();
+            $single = (int) ($data['single_bed_quantity'] ?? 0);
+            $double = (int) ($data['double_bed_quantity'] ?? 0);
+
+            if ($single + $double < 1) {
+                $validator->errors()->add(
+                    'single_bed_quantity',
+                    'Loại phòng phải có ít nhất 1 giường (giường đơn hoặc giường đôi).'
+                );
+            }
+        });
+    }
 
     public static function messages(...$args): array
     {

@@ -47,7 +47,8 @@ function incrementValue(btn) {
 function decrementValue(btn) {
   const input = btn.parentElement.querySelector('input');
   if (!input) return;
-  if (parseInt(input.value, 10) > 0) {
+  const min = parseInt(input.getAttribute('min') ?? '0', 10);
+  if (parseInt(input.value, 10) > min) {
     input.value = parseInt(input.value, 10) - 1;
   }
 }
@@ -351,8 +352,60 @@ function confirmEquipment() {
   closeEquipmentModal();
 }
 
+function validateBeforeSubmit(event) {
+  const singleBedInput = document.querySelector('input[name="single_bed_quantity"]');
+  const doubleBedInput = document.querySelector('input[name="double_bed_quantity"]');
+  const singleBed = parseInt(singleBedInput?.value ?? '0', 10);
+  const doubleBed = parseInt(doubleBedInput?.value ?? '0', 10);
+
+  if (singleBed + doubleBed < 1) {
+    event.preventDefault();
+    // Highlight the bed section visually
+    const bedSection = singleBedInput?.closest('.grid');
+    if (bedSection) {
+      bedSection.querySelectorAll('.bg-slate-50.rounded-lg').forEach(el => {
+        if (el.querySelector('input[name="single_bed_quantity"], input[name="double_bed_quantity"]')) {
+          el.classList.add('ring-2', 'ring-red-400');
+          setTimeout(() => el.classList.remove('ring-2', 'ring-red-400'), 3000);
+        }
+      });
+    }
+
+    // Inject a temporary error notice at the top of the form
+    let notice = document.getElementById('bed-error-notice');
+    if (!notice) {
+      notice = document.createElement('div');
+      notice.id = 'bed-error-notice';
+      notice.className = 'mb-6 p-4 bg-red-50 border border-red-200 rounded-lg';
+      notice.innerHTML = `
+        <div class="flex items-center gap-2 text-red-700 font-bold mb-2">
+          <span class="material-symbols-outlined">error</span>
+          Vui lòng kiểm tra lại thông tin:
+        </div>
+        <ul class="list-disc list-inside text-red-600 text-sm space-y-1">
+          <li>Loại phòng phải có ít nhất 1 giường (giường đơn hoặc giường đôi).</li>
+        </ul>
+      `;
+      const form = document.getElementById('roomTypeForm');
+      form?.parentElement?.insertBefore(notice, form);
+    }
+    notice.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return false;
+  }
+
+  // Remove notice if valid
+  document.getElementById('bed-error-notice')?.remove();
+  return true;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   cacheElements();
+
+  const form = document.getElementById('roomTypeForm');
+  if (form) {
+    form.addEventListener('submit', validateBeforeSubmit);
+  }
+
   Object.assign(window, {
     generateCode,
     incrementValue,

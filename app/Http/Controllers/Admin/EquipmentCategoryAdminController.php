@@ -21,7 +21,11 @@ class EquipmentCategoryAdminController extends Controller
     public function index(Request $request, GetEquipmentCategoryListAction $action)
     {
         $filters = ['search' => $request->input('search')];
-        $equipmentCategories = $action->executePaginated(filters: $filters, perPage: 5);
+
+        $perPage = (int) $request->input('page_size', 10);
+        $perPage = max(5, min(100, $perPage));
+
+        $equipmentCategories = $action->executePaginated(filters: $filters, perPage: $perPage);
         return view('admin.equipment-category.index', compact('equipmentCategories'));
     }
 
